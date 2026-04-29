@@ -1,0 +1,34 @@
+// repository/TeacherRepository.java
+package com.school.sms.repository;
+
+import com.school.sms.model.Teacher;
+import com.school.sms.model.TeacherStatus;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface TeacherRepository 
+        extends JpaRepository<Teacher, Long> {
+
+    Optional<Teacher> findByEmail(String email);
+
+    Optional<Teacher> findByEmployeeId(String employeeId);
+
+    Optional<Teacher> findByUserId(Long userId);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByEmployeeId(String employeeId);
+
+    List<Teacher> findByStatus(TeacherStatus status);
+
+    @Query("SELECT t FROM Teacher t WHERE " +
+           "LOWER(t.firstName) LIKE LOWER(CONCAT('%',:keyword,'%')) OR " +
+           "LOWER(t.lastName)  LIKE LOWER(CONCAT('%',:keyword,'%')) OR " +
+           "LOWER(t.email)     LIKE LOWER(CONCAT('%',:keyword,'%'))")
+    List<Teacher> searchTeachers(String keyword);
+}

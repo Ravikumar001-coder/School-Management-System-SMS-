@@ -1,0 +1,257 @@
+// src/main/java/com/school/sms/service/StudentService.java
+
+package com.school.sms.service;
+
+import com.school.sms.dto.request.StudentRequest;
+import com.school.sms.dto.response.StudentResponse;
+import com.school.sms.exception.ResourceNotFoundException;
+import com.school.sms.model.*;
+import com.school.sms.repository.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class StudentService {
+
+    private final StudentRepository studentRepository;
+    private final UserRepository userRepository;
+    private final ClassRepository classRoomRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    // Backward-compatible method used by existing controller
+    public List<StudentResponse> getAllStudents() {
+        return studentRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    // ========================
+    // CREATE STUDENT
+    // ========================
+    @Transactional  // If anything fails, rollback all DB changes
+    public StudentResponse createStudent(StudentRequest request) {
+        
+        // Find the classroom
+        ClassRoom classRoom = classRoomRepository.findById(
+                Objects.requireNonNull(request.getClassRoomId(), "Class id is required"))
+                .orElseThrow(() -> 
+                    new ResourceNotFoundException("Class not found!"));
+
+        // Auto-generate student ID
+        String studentId = generateStudentId();
+
+        // Create user account for student (for login)
+        User user = User.builder()
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+            .username(studentId)
+            .password(passwordEncoder.encode(studentId))
+                .role(Role.STUDENT)
+            .firstLogin(true)
+                .build();
+        user = userRepository.save(Objects.requireNonNull(user));
+
+        // Create student profile
+        Student student = Student.builder()
+                .studentId(studentId)
+                .user(user)
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .dateOfBirth(request.getDateOfBirth())
+                .gender(request.getGender())
+                .address(request.getAddress())
+                .parentName(request.getParentName())
+                .parentPhone(request.getParentPhone())
+                .parentEmail(request.getParentEmail())
+                .guardianRelationship(request.getGuardianRelationship())
+                .bloodGroup(request.getBloodGroup())
+                .profilePhoto(request.getProfilePhoto())
+                .classRoom(classRoom)
+                .academicYear(request.getAcademicYear())
+                .status(StudentStatus.ACTIVE)
+                .build();
+
+        student = studentRepository.save(Objects.requireNonNull(student));
+
+        return mapToResponse(student);
+    }
+
+    // ========================
+    // GET ALL STUDENTS (Paginated)
+    // ========================
+    public Page<StudentResponse> getAllStudents(Pageable pageable) {
+        return studentRepository.findAll(Objects.requireNonNull(pageable))
+                .map(this::mapToResponse);
+    }
+
+    // ========================
+    // GET STUDENT BY ID
+    // ========================
+    @Cacheable(value = "students", key = "#id")
+    public StudentResponse getStudentById(Long id) {
+        Student student = studentRepository.findById(Objects.requireNonNull(id))
+                .orElseThrow(() -> 
+                    new ResourceNotFoundException("Student not found with id: " + id));
+        return mapToResponse(student);
+    }
+
+    // ========================
+    // UPDATE STUDENT
+    // ========================
+    @Transactional
+    @CacheEvict(value = "students", key = "#id")
+    public StudentResponse updateStudent(Long id, StudentRequest request) {
+        Student student = studentRepository.findById(Objects.requireNonNull(id))
+                .orElseThrow(() -> 
+                    new ResourceNotFoundException("Student not found!"));
+
+        ClassRoom classRoom = classRoomRepository.findById(
+                        Objects.requireNonNull(request.getClassRoomId(), "Class id is required"))
+                .orElseThrow(() -> 
+                    new ResourceNotFoundException("Class not found!"));
+
+        student.setFirstName(request.getFirstName());
+        student.setLastName(request.getLastName());
+        student.setEmail(request.getEmail());
+        student.setPhone(request.getPhone());
+        student.setDateOfBirth(request.getDateOfBirth());
+        student.setGender(request.getGender());
+        student.setAddress(request.getAddress());
+        student.setParentName(request.getParentName());
+        student.setParentPhone(request.getParentPhone());
+        student.setParentEmail(request.getParentEmail());
+        student.setGuardianRelationship(request.getGuardianRelationship());
+        student.setBloodGroup(request.getBloodGroup());
+        if (request.getProfilePhoto() != null) {
+            student.setProfilePhoto(request.getProfilePhoto());
+        }
+        student.setAcademicYear(request.getAcademicYear());
+        student.setClassRoom(classRoom);
+
+        User user = student.getUser();
+        if (user != null) {
+            user.setFirstName(request.getFirstName());
+            user.setLastName(request.getLastName());
+            user.setEmail(request.getEmail());
+            userRepository.save(user);
+        }
+
+        student = studentRepository.save(student);
+        return mapToResponse(student);
+    }
+
+    // ========================
+    // DELETE STUDENT
+    // ========================
+    @Transactional
+    @CacheEvict(value = "students", allEntries = true)
+    public void deleteStudent(Long id) {
+        Student student = studentRepository.findById(Objects.requireNonNull(id))
+                .orElseThrow(() -> 
+                    new ResourceNotFoundException("Student not found!"));
+        // Don't actually delete, just deactivate
+        student.setStatus(StudentStatus.INACTIVE);
+        studentRepository.save(student);
+    }
+
+    // ========================
+    // SEARCH STUDENTS
+    // ========================
+    public List<StudentResponse> searchStudents(String keyword) {
+        return studentRepository
+                .findByFirstNameContainingOrLastNameContainingOrEmailContaining(
+                    keyword, keyword, keyword)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    // ========================
+    // GET STUDENTS BY CLASS
+    // ========================
+    public List<StudentResponse> getStudentsByClass(Long classId) {
+        return studentRepository.findByClassRoomId(Objects.requireNonNull(classId))
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public boolean isOwnProfile(Long studentId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            return false;
+        }
+
+        String principal = authentication.getName();
+        return studentRepository.findById(Objects.requireNonNull(studentId))
+            .map(student -> {
+                if (student.getUser() != null) {
+                String username = student.getUser().getUsername();
+                String userEmail = student.getUser().getEmail();
+                return (username != null && username.equalsIgnoreCase(principal))
+                    || (userEmail != null && userEmail.equalsIgnoreCase(principal));
+                }
+                return student.getEmail() != null
+                    && student.getEmail().equalsIgnoreCase(principal);
+            })
+                .orElse(false);
+    }
+
+    // ========================
+    // HELPER METHODS
+    // ========================
+    private String generateStudentId() {
+        long count = studentRepository.count() + 1;
+        return String.format("STU-%d-%04d", 
+                java.time.Year.now().getValue(), count);
+    }
+
+    private StudentResponse mapToResponse(Student student) {
+        String className = "";
+        if (student.getClassRoom() != null) {
+            className = student.getClassRoom().getName() + 
+                       " - " + student.getClassRoom().getSection();
+        }
+
+        return StudentResponse.builder()
+                .id(student.getId())
+                .studentId(student.getStudentId())
+                .firstName(student.getFirstName())
+                .lastName(student.getLastName())
+                .email(student.getEmail())
+                .phone(student.getPhone())
+                .dateOfBirth(student.getDateOfBirth())
+                .gender(student.getGender())
+            .address(student.getAddress())
+                .parentName(student.getParentName())
+                .parentPhone(student.getParentPhone())
+                .parentEmail(student.getParentEmail())
+                .guardianRelationship(student.getGuardianRelationship())
+                .bloodGroup(student.getBloodGroup())
+                .academicYear(student.getAcademicYear())
+                .classRoomId(student.getClassRoom() != null
+                        ? student.getClassRoom().getId() : null)
+                .className(className)
+                .status(student.getStatus() != null ? 
+                        student.getStatus().name() : "ACTIVE")
+                .profilePhoto(student.getProfilePhoto())
+                .build();
+    }
+}

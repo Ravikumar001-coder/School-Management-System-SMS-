@@ -1,0 +1,85 @@
+// src/main/java/com/school/sms/model/Student.java
+
+package com.school.sms.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "students")
+public class Student {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    // Each student has a user account (for login)
+    @OneToOne
+    @JoinColumn(name = "user_id", unique = true)
+    private User user;
+
+    // Student specific info
+    private String studentId;    // Like "STU-2024-001"
+
+    // Legacy column kept for backward compatibility with existing DB schema.
+    @Column(name = "name")
+    private String name;
+    
+    private String firstName;
+    private String lastName;
+    
+    @Column(unique = true)
+    private String email;
+    
+    private String phone;
+    private LocalDate dateOfBirth;
+    private String gender;
+    private String address;
+    private String parentName;
+    private String parentPhone;
+    private String parentEmail;
+    private String guardianRelationship;
+    private String bloodGroup;
+    private String profilePhoto; // File path/URL
+
+    // Which class this student belongs to
+    @ManyToOne
+    @JoinColumn(name = "classroom_id")
+    private ClassRoom classRoom;
+
+    private String academicYear; // "2024-25"
+    private String admissionDate;
+    
+    @Enumerated(EnumType.STRING)
+    private StudentStatus status; // ACTIVE, INACTIVE, GRADUATED
+
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist() {
+        name = buildFullName(firstName, lastName);
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        name = buildFullName(firstName, lastName);
+        updatedAt = LocalDateTime.now();
+    }
+
+    private String buildFullName(String firstName, String lastName) {
+        String first = firstName == null ? "" : firstName.trim();
+        String last = lastName == null ? "" : lastName.trim();
+        String fullName = (first + " " + last).trim();
+        return fullName.isEmpty() ? "UNKNOWN" : fullName;
+    }
+}

@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "app.jwt.secret",
+      "type": "java.lang.String",
+      "description": "JWT signing secret in Base64 format."
+    },
+    {
+      "name": "app.jwt.expiration",
+      "type": "java.lang.Long",
+      "description": "JWT expiration in milliseconds."
+    },
+    {
+      "name": "app.frontend.url",
+      "type": "java.lang.String",
+      "description": "Frontend base URL used for CORS configuration."
+    }
+  ]
+}
