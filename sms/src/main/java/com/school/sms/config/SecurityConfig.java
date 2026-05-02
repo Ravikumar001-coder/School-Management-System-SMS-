@@ -27,6 +27,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final com.school.sms.security.IpThrottlingFilter ipThrottlingFilter;
     private final JwtAuthEntryPoint jwtAuthEntryPoint;
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
@@ -49,8 +50,8 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
                 ));
                 corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 corsConfig.setAllowedHeaders(List.of("*"));
-                corsConfig.setExposedHeaders(List.of("Authorization"));
-            corsConfig.setAllowCredentials(true);
+                corsConfig.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
+            corsConfig.setAllowCredentials(true);  // Required for cookies to be sent cross-origin
                 corsConfig.setMaxAge(3600L);
             return corsConfig;
         }))
@@ -62,12 +63,17 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/v1/auth/refresh").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/files/**").authenticated()
 
-            // 🔥 IMPORTANT (for preflight requests)
+            // Preflight
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
             .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+            .requestMatchers("/api/v1/backups/**").hasRole("ADMIN")
+
+            // Session management — authenticated users may manage their own sessions
+            .requestMatchers("/api/v1/sessions/**").authenticated()
 
             .requestMatchers(HttpMethod.GET, "/api/v1/students/**")
                 .hasAnyRole("ADMIN", "TEACHER", "STUDENT")
@@ -89,7 +95,8 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         )
 
         .authenticationProvider(authenticationProvider())
-        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(ipThrottlingFilter, JwtAuthFilter.class);
 
     return http.build();
 }

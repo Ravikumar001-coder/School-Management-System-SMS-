@@ -7,6 +7,8 @@ import com.school.sms.model.StudentStatus;
 import com.school.sms.model.Teacher;
 import com.school.sms.model.TeacherStatus;
 import com.school.sms.model.User;
+import com.school.sms.model.AcademicYear;
+import com.school.sms.repository.AcademicYearRepository;
 import com.school.sms.repository.ClassRoomRepository;
 import com.school.sms.repository.StudentRepository;
 import com.school.sms.repository.TeacherRepository;
@@ -42,6 +44,7 @@ public class DemoBootstrapConfig {
             StudentRepository studentRepository,
             TeacherRepository teacherRepository,
             ClassRoomRepository classRoomRepository,
+            AcademicYearRepository academicYearRepository,
             PasswordEncoder passwordEncoder
     ) {
         return args -> {
@@ -55,17 +58,33 @@ public class DemoBootstrapConfig {
                 return;
             }
 
-            String academicYear = buildAcademicYear(LocalDate.now());
+            String academicYearLabel = buildAcademicYear(LocalDate.now());
+            int startYear = LocalDate.now().getMonthValue() >= 4 ? LocalDate.now().getYear() : LocalDate.now().getYear() - 1;
+
+            AcademicYear currentYearEntity = academicYearRepository.findFirstByActiveTrueOrderByIdDesc()
+                    .orElseGet(() -> {
+                        AcademicYear year = AcademicYear.builder()
+                                .label(academicYearLabel)
+                                .startYear(startYear)
+                                .endYear(startYear + 1)
+                                .startDate(LocalDate.of(startYear, 4, 1))
+                                .endDate(LocalDate.of(startYear + 1, 3, 31))
+                                .active(true)
+                                .schoolCode("SMS")
+                                .build();
+                        return academicYearRepository.save(year);
+                    });
+
             ClassRoom classRoom = classRoomRepository
                     .findByNameAndSectionAndAcademicYear(
                             DEFAULT_CLASS_NAME,
                             DEFAULT_CLASS_SECTION,
-                            academicYear
+                            academicYearLabel
                     )
                     .orElseGet(() -> classRoomRepository.save(Objects.requireNonNull(ClassRoom.builder()
                             .name(DEFAULT_CLASS_NAME)
                             .section(DEFAULT_CLASS_SECTION)
-                            .academicYear(academicYear)
+                            .academicYear(academicYearLabel)
                             .maxCapacity(40)
                             .classFee(25000.0)
                             .admissionFee(5000.0)
@@ -123,7 +142,7 @@ public class DemoBootstrapConfig {
                             .lastName("Student")
                             .email(DEFAULT_STUDENT_EMAIL)
                             .classRoom(classRoom)
-                            .academicYear(academicYear)
+                            .academicYear(currentYearEntity)
                             .status(StudentStatus.ACTIVE)
                             .build())));
 

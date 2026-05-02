@@ -53,10 +53,12 @@ public class DashboardService {
 
         // Fee info
         Double pendingFees = feePaymentRepository.getTotalPendingFees();
-        int    m = LocalDateTime.now().getMonthValue();
-        int    y = LocalDateTime.now().getYear();
+        int    m = today.getMonthValue();
+        int    y = today.getYear();
+        LocalDate startDate = LocalDate.of(y, m, 1);
+        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
         Double monthlyCollection = feePaymentRepository
-                .getMonthlyCollection(m, y);
+                .getMonthlyCollection(startDate, endDate);
 
         // Students per class
         Map<String, Long> studentsByClass = classRoomRepository

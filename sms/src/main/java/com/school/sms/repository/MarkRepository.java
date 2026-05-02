@@ -1,6 +1,7 @@
 // repository/MarkRepository.java
 package com.school.sms.repository;
 
+import com.school.sms.model.AcademicYear;
 import com.school.sms.model.Mark;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -25,11 +26,10 @@ public interface MarkRepository
 
     // Report card - all marks for a student in a year
     @Query("SELECT m FROM Mark m " +
-           "JOIN m.exam e " +
            "WHERE m.student.id = :studentId " +
-           "AND e.academicYear = :academicYear")
+           "AND m.academicYear = :academicYear")
     List<Mark> findStudentMarksByYear(
-        Long studentId, String academicYear);
+        Long studentId, AcademicYear academicYear);
 
     // Class topper
     @Query("SELECT m FROM Mark m " +

@@ -12,8 +12,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "students")
-public class Student {
+@Table(name = "students", indexes = {
+    @Index(name = "idx_students_classroom_id", columnList = "classroom_id"),
+    @Index(name = "idx_students_user_id", columnList = "user_id"),
+    @Index(name = "idx_students_branch_year", columnList = "branch_id, academic_year_id")
+})
+public class Student extends SoftDeletableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,11 +57,19 @@ public class Student {
     @JoinColumn(name = "classroom_id")
     private ClassRoom classRoom;
 
-    private String academicYear; // "2024-25"
     private String admissionDate;
     
     @Enumerated(EnumType.STRING)
     private StudentStatus status; // ACTIVE, INACTIVE, GRADUATED
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "academic_year_id")
+    private AcademicYear academicYear;
+
+    /** Branch FK — defaults to branch 1 (MAIN). Enables multi-tenancy in Phase 4. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id")
+    private Branch branch;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;

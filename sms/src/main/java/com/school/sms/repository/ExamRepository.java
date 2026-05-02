@@ -1,8 +1,10 @@
 // repository/ExamRepository.java
 package com.school.sms.repository;
 
+import com.school.sms.model.AcademicYear;
 import com.school.sms.model.Exam;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,10 +15,12 @@ public interface ExamRepository
 
     List<Exam> findByClassRoomId(Long classRoomId);
 
+    @Query("SELECT e FROM Exam e WHERE e.classRoom.id = :classRoomId AND e.academicYear = :academicYear")
     List<Exam> findByClassRoomIdAndAcademicYear(
-        Long classRoomId, String academicYear);
+        Long classRoomId, AcademicYear academicYear);
 
-    List<Exam> findByAcademicYear(String academicYear);
+    @Query("SELECT e FROM Exam e WHERE e.academicYear = :academicYear")
+    List<Exam> findByAcademicYear(AcademicYear academicYear);
 
     List<Exam> findByStatus(String status);
 }

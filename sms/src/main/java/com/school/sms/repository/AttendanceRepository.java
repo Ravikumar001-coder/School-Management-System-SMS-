@@ -42,10 +42,10 @@ public interface AttendanceRepository
     // Monthly attendance report
     @Query("SELECT a FROM Attendance a " +
            "WHERE a.classRoom.id = :classId " +
-           "AND MONTH(a.date) = :month " +
-           "AND YEAR(a.date)  = :year")
+           "AND a.date >= :startDate " +
+           "AND a.date <= :endDate")
     List<Attendance> findByClassAndMonth(
-        Long classId, int month, int year);
+        Long classId, java.time.LocalDate startDate, java.time.LocalDate endDate);
 
     // Count present days in range
     @Query("SELECT COUNT(a) FROM Attendance a " +

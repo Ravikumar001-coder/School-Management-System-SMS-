@@ -13,7 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthResponse {
-    private String token;
+    private String token;       // Short-lived access token (15 min) — goes in Authorization header
+    // refreshToken intentionally omitted: transmitted only via HttpOnly cookie, never in body
     private String username;
     private String email;
     private String firstName;
@@ -22,4 +23,4 @@ public class AuthResponse {
     private Long studentId;
     private boolean firstLogin;
     private String message;
-}
+}

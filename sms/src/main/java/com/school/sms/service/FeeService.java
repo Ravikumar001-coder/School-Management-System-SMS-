@@ -24,6 +24,8 @@ public class FeeService {
     private final FeePaymentRepository   feePaymentRepository;
     private final FeeStructureRepository feeStructureRepository;
     private final StudentRepository      studentRepository;
+    private final AcademicYearRepository academicYearRepository;
+    private final ReceiptNumberService   receiptNumberService;
 
     // Collect fee payment
     @Transactional
@@ -42,7 +44,10 @@ public class FeeService {
                     .orElse(null);
         }
 
-        String receiptNo = generateReceiptNumber();
+        AcademicYear currentYear = academicYearRepository.findFirstByActiveTrueOrderByIdDesc()
+                .orElseThrow(() -> new ResourceNotFoundException("Active Academic Year", "status", "active"));
+
+        String receiptNo = receiptNumberService.nextReceiptNumber(currentYear);
 
         FeePayment payment = FeePayment.builder()
                 .student(student)
@@ -57,6 +62,8 @@ public class FeeService {
                 .month(request.getMonth())
                 .status(PaymentStatus.PAID)
                 .remarks(request.getRemarks())
+                .academicYear(currentYear)
+                .branch(student.getBranch())
                 .build();
 
         return mapToResponse(feePaymentRepository.save(payment));
@@ -133,8 +140,10 @@ public class FeeService {
 
     // This month's collection summary
     public Map<String, Object> getMonthlyReport(int month, int year) {
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
         Double collection = feePaymentRepository
-                .getMonthlyCollection(month, year);
+                .getMonthlyCollection(startDate, endDate);
         Double pending    = feePaymentRepository.getTotalPendingFees();
 
         return Map.of(
@@ -146,9 +155,6 @@ public class FeeService {
     }
 
     // ── Helpers ──────────────────────────────────────
-    private String generateReceiptNumber() {
-        return "REC-" + System.currentTimeMillis();
-    }
 
     private FeePaymentResponse mapToResponse(FeePayment f) {
         return FeePaymentResponse.builder()

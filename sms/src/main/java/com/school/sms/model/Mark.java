@@ -14,9 +14,15 @@ import java.time.LocalDateTime;
 @Table(name = "marks",
     uniqueConstraints = {
         @UniqueConstraint(columnNames = {"student_id", "exam_id"})
+    },
+    indexes = {
+        @Index(name = "idx_marks_student_id", columnList = "student_id"),
+        @Index(name = "idx_marks_exam_id", columnList = "exam_id"),
+        @Index(name = "idx_marks_student_exam", columnList = "student_id, exam_id"),
+        @Index(name = "idx_marks_created_at", columnList = "created_at")
     }
 )
-public class Mark {
+public class Mark extends SoftDeletableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,13 +43,20 @@ public class Mark {
     private boolean absent = false;
     private String remarks;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "academic_year_id")
+    private AcademicYear academicYear;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id")
+    private Branch branch;
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
-        // Auto calculate grade
         if (marksObtained != null && totalMarks != null) {
             double percentage = (marksObtained / totalMarks) * 100;
             this.grade = calculateGrade(percentage);

@@ -34,9 +34,9 @@ public interface FeePaymentRepository
     // Monthly collection
     @Query("SELECT SUM(f.amount) FROM FeePayment f " +
            "WHERE f.status = 'PAID' " +
-           "AND MONTH(f.paymentDate) = :month " +
-           "AND YEAR(f.paymentDate)  = :year")
-    Double getMonthlyCollection(int month, int year);
+           "AND f.paymentDate >= :startDate " +
+           "AND f.paymentDate <= :endDate")
+    Double getMonthlyCollection(java.time.LocalDate startDate, java.time.LocalDate endDate);
 
     boolean existsByReceiptNumber(String receiptNumber);
 }

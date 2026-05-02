@@ -26,6 +26,7 @@ public class ExamService {
     private final ClassRoomRepository classRoomRepository;
     private final SubjectRepository   subjectRepository;
     private final StudentRepository   studentRepository;
+    private final AcademicYearRepository academicYearRepository;
 
     @Transactional
     public ExamResponse createExam(ExamRequest request) {
@@ -41,6 +42,9 @@ public class ExamService {
                     new ResourceNotFoundException(
                         "Subject", request.getSubjectId()));
 
+        AcademicYear currentYear = academicYearRepository.findFirstByActiveTrueOrderByIdDesc()
+                .orElseThrow(() -> new RuntimeException("No active academic year found"));
+
         Exam exam = Exam.builder()
                 .name(request.getName())
                 .examType(request.getExamType())
@@ -54,7 +58,7 @@ public class ExamService {
                 .passingMarks(request.getPassingMarks() != null 
                               ? request.getPassingMarks() : 33)
                 .venue(request.getVenue())
-                .academicYear(request.getAcademicYear())
+                .academicYear(currentYear)
                 .status("SCHEDULED")
                 .build();
 
@@ -124,6 +128,7 @@ public class ExamService {
                         .grade(grade)
                         .absent(mr.isAbsent())
                         .remarks(mr.getRemarks())
+                        .academicYear(exam.getAcademicYear())
                         .build();
                 markRepository.save(mark);
                 saved++;
@@ -152,7 +157,10 @@ public class ExamService {
 
     // Get student's report card (all marks)
     public List<MarkResponse> getStudentReportCard(
-            Long studentId, String academicYear) {
+            Long studentId, String academicYearLabel) {
+        AcademicYear academicYear = academicYearRepository.findByLabel(academicYearLabel)
+                .orElseThrow(() -> new ResourceNotFoundException("AcademicYear", "label", academicYearLabel));
+
         return markRepository
                 .findStudentMarksByYear(studentId, academicYear)
                 .stream()
@@ -202,7 +210,7 @@ public class ExamService {
                 .passingMarks(e.getPassingMarks())
                 .venue(e.getVenue())
                 .status(e.getStatus())
-                .academicYear(e.getAcademicYear())
+                .academicYear(e.getAcademicYear() != null ? e.getAcademicYear().getLabel() : null)
                 .build();
     }
 

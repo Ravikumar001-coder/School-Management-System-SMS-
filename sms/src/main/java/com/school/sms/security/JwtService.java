@@ -13,49 +13,87 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
-@Service  // Marks this as a Spring Service
+@Service
 public class JwtService {
 
-    @Value("${app.jwt.secret}")  // Reads from application.properties
+    @Value("${app.jwt.secret}")
     private String secretKey;
 
+    /**
+     * Access token expiry — MUST be short-lived (15 minutes = 900_000 ms).
+     * Value is read from application.properties: app.jwt.expiration
+     */
     @Value("${app.jwt.expiration}")
     private long jwtExpiration;
 
+    @Value("${app.jwt.issuer:sms-api}")
+    private String issuer;
+
+    @Value("${app.jwt.audience:sms-frontend}")
+    private String audience;
+
     // =============================================
-    // STEP 1: Generate Token when user logs in
+    // Token Generation
     // =============================================
+
     public String generateToken(UserDetails userDetails) {
-        Map<String, Object> extraClaims = new HashMap<>();
-        // Add extra info to token
-        extraClaims.put("role", userDetails.getAuthorities()
-                .iterator().next().getAuthority());
-        
+        return buildToken(new HashMap<>(), userDetails, jwtExpiration);
+    }
+
+    private String buildToken(
+            Map<String, Object> extraClaims,
+            UserDetails userDetails,
+            long expiration
+    ) {
+        if (userDetails.getAuthorities() != null && !userDetails.getAuthorities().isEmpty()) {
+            extraClaims.put("role", userDetails.getAuthorities()
+                    .iterator().next().getAuthority());
+        }
+
         return Jwts.builder()
                 .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())  // Email
+                .setSubject(userDetails.getUsername())
+                .setId(UUID.randomUUID().toString())       // jti — unique token ID (prevents replay)
+                .setIssuer(issuer)                          // iss — who minted this token
+                .setAudience(audience)                      // aud — who should accept it
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     // =============================================
-    // STEP 2: Validate Token on each request
+    // Token Validation
     // =============================================
+
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) 
-               && !isTokenExpired(token);
+        try {
+            final String username = extractUsername(token);
+            final String tokenIssuer = extractClaim(token, Claims::getIssuer);
+            final String tokenAudience = extractClaim(token, Claims::getAudience);
+
+            return username.equals(userDetails.getUsername())
+                    && !isTokenExpired(token)
+                    && issuer.equals(tokenIssuer)
+                    && audience.equals(tokenAudience);
+        } catch (JwtException e) {
+            return false;
+        }
     }
 
     // =============================================
-    // STEP 3: Extract info from Token
+    // Claim Extraction
     // =============================================
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public String extractJti(String token) {
+        return extractClaim(token, Claims::getId);
     }
 
     private boolean isTokenExpired(String token) {

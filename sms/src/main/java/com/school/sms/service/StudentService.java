@@ -29,6 +29,7 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final UserRepository userRepository;
     private final ClassRepository classRoomRepository;
+    private final AcademicYearRepository academicYearRepository;
     private final PasswordEncoder passwordEncoder;
 
     // Backward-compatible method used by existing controller
@@ -84,7 +85,8 @@ public class StudentService {
                 .bloodGroup(request.getBloodGroup())
                 .profilePhoto(request.getProfilePhoto())
                 .classRoom(classRoom)
-                .academicYear(request.getAcademicYear())
+                .academicYear(academicYearRepository.findByLabel(request.getAcademicYear())
+                        .orElseGet(() -> academicYearRepository.findFirstByActiveTrueOrderByIdDesc().orElse(null)))
                 .status(StudentStatus.ACTIVE)
                 .build();
 
@@ -142,7 +144,8 @@ public class StudentService {
         if (request.getProfilePhoto() != null) {
             student.setProfilePhoto(request.getProfilePhoto());
         }
-        student.setAcademicYear(request.getAcademicYear());
+        student.setAcademicYear(academicYearRepository.findByLabel(request.getAcademicYear())
+                .orElseGet(() -> academicYearRepository.findFirstByActiveTrueOrderByIdDesc().orElse(null)));
         student.setClassRoom(classRoom);
 
         User user = student.getUser();
@@ -245,7 +248,7 @@ public class StudentService {
                 .parentEmail(student.getParentEmail())
                 .guardianRelationship(student.getGuardianRelationship())
                 .bloodGroup(student.getBloodGroup())
-                .academicYear(student.getAcademicYear())
+                .academicYear(student.getAcademicYear() != null ? student.getAcademicYear().getLabel() : null)
                 .classRoomId(student.getClassRoom() != null
                         ? student.getClassRoom().getId() : null)
                 .className(className)

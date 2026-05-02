@@ -14,11 +14,15 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "attendance",
     uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"student_id", "date", "subject_id"})
-        // One attendance record per student per day per subject
+        @UniqueConstraint(columnNames = {"student_id", "attendance_date", "subject_id", "academic_year_id"})
+    },
+    indexes = {
+        @Index(name = "idx_attendance_student_id", columnList = "student_id"),
+        @Index(name = "idx_attendance_class_date", columnList = "class_id, attendance_date"),
+        @Index(name = "idx_attendance_created_at", columnList = "created_at")
     }
 )
-public class Attendance {
+public class Attendance extends SoftDeletableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,6 +51,14 @@ public class Attendance {
     private AttendanceStatus status; // PRESENT, ABSENT, LATE, EXCUSED
 
     private String remarks;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "academic_year_id", nullable = false)
+    private AcademicYear academicYear;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id")
+    private Branch branch;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;

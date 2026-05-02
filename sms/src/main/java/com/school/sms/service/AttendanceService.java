@@ -22,6 +22,7 @@ public class AttendanceService {
     private final StudentRepository    studentRepository;
     private final ClassRoomRepository  classRoomRepository;
     private final SubjectRepository    subjectRepository;
+    private final AcademicYearRepository academicYearRepository;
 
     // Mark attendance for whole class at once
     @Transactional
@@ -64,6 +65,9 @@ public class AttendanceService {
                     .orElse(null);
             if (student == null) { skipped++; continue; }
 
+            AcademicYear currentYear = academicYearRepository.findFirstByActiveTrueOrderByIdDesc()
+                    .orElseThrow(() -> new ResourceNotFoundException("Active Academic Year", "status", "active"));
+
             Attendance attendance = Attendance.builder()
                     .student(student)
                     .classRoom(classRoom)
@@ -71,6 +75,7 @@ public class AttendanceService {
                     .date(request.getDate())
                     .status(item.getStatus())
                     .remarks(item.getRemarks())
+                    .academicYear(currentYear)
                     .build();
 
             attendanceRepository.save(attendance);
