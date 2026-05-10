@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "receipt_sequences", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"school_code", "academic_year_id"})
+        @UniqueConstraint(columnNames = {"school_code", "academic_year_id", "sequence_type"})
 })
 @Getter
 @Setter
@@ -32,6 +32,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class ReceiptSequence {
+
+    public enum SequenceType { RECEIPT, STUDENT_ID, TEACHER_ID }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +45,10 @@ public class ReceiptSequence {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academic_year_id")
     private AcademicYear academicYear;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private SequenceType sequenceType;
 
     /**
      * Monotonically increasing counter. Never decremented, never reset mid-year.

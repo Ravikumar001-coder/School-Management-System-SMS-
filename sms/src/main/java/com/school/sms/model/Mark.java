@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
         @Index(name = "idx_marks_created_at", columnList = "created_at")
     }
 )
+@EqualsAndHashCode(callSuper = true)
 public class Mark extends SoftDeletableEntity {
 
     @Id

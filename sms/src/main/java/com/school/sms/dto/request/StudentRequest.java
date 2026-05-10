@@ -43,4 +43,6 @@ public class StudentRequest {
     private Long classRoomId;
     
     private String academicYear;
+    private String admissionClass;
+    private String courses;
 }

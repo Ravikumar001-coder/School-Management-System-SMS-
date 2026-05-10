@@ -22,5 +22,7 @@ public interface ExamRepository
     @Query("SELECT e FROM Exam e WHERE e.academicYear = :academicYear")
     List<Exam> findByAcademicYear(AcademicYear academicYear);
 
+    List<Exam> findByClassRoomIdIn(List<Long> classRoomIds);
+
     List<Exam> findByStatus(String status);
 }

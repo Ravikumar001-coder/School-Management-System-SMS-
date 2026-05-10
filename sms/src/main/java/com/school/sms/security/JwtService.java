@@ -10,11 +10,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.util.List;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
@@ -49,8 +51,16 @@ public class JwtService {
             long expiration
     ) {
         if (userDetails.getAuthorities() != null && !userDetails.getAuthorities().isEmpty()) {
-            extraClaims.put("role", userDetails.getAuthorities()
-                    .iterator().next().getAuthority());
+            List<String> roles = userDetails.getAuthorities().stream()
+                    .map(authority -> authority.getAuthority())
+                    .filter(authority -> authority.startsWith("ROLE_"))
+                    .map(authority -> authority.substring("ROLE_".length()))
+                    .collect(Collectors.toList());
+
+            if (!roles.isEmpty()) {
+                extraClaims.put("primaryRole", roles.get(0));
+                extraClaims.put("roles", roles);
+            }
         }
 
         return Jwts.builder()

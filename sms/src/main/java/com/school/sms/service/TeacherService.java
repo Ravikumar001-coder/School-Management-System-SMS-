@@ -27,31 +27,45 @@ public class TeacherService {
     private final UserRepository      userRepository;
     private final SubjectRepository   subjectRepository;
     private final ClassRoomRepository classRoomRepository;
+    private final RoleRepository      roleRepository;
+    private final UserRoleRepository  userRoleRepository;
     private final PasswordEncoder     passwordEncoder;
+    private final AuditLogService     auditLogService;
+    private final AcademicYearRepository academicYearRepository;
+    private final ReceiptNumberService receiptNumberService;
 
     @Transactional
     public TeacherResponse createTeacher(TeacherRequest request) {
 
-        if (teacherRepository.existsByEmail(request.getEmail())
+        if (teacherRepository.existsByEmailAndDeletedAtIsNull(request.getEmail())
                 || userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException(
                 "Teacher with email already exists: " + request.getEmail());
         }
 
-        // Generate employee ID first so it can be used as default username/password.
-        String employeeId = generateEmployeeId();
+        // Generate employee ID gap-free
+        String employeeId = receiptNumberService.nextTeacherId();
 
         // Create login account
         User user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
-            .username(employeeId)
-            .password(passwordEncoder.encode(employeeId))
-                .role(Role.TEACHER)
-            .firstLogin(true)
+                .username(employeeId)
+                .password(passwordEncoder.encode(employeeId))
+                .firstLogin(true)
                 .build();
         user = userRepository.save(user);
+
+        // Assign TEACHER role
+        Role teacherRole = roleRepository.findByName("TEACHER")
+                .orElseThrow(() -> new RuntimeException("TEACHER role not found"));
+        
+        userRoleRepository.save(UserRole.builder()
+                .user(user)
+                .role(teacherRole)
+                .assignedBy("SYSTEM")
+                .build());
 
         // Fetch subjects
         List<Subject> subjects = null;
@@ -83,17 +97,24 @@ public class TeacherService {
                 .build();
 
         teacher = teacherRepository.save(teacher);
-            updateClassAssignments(teacher, request.getAssignedClassIds());
+        updateClassAssignments(teacher, request.getAssignedClassIds());
+
+        // Audit Log
+        AcademicYear currentYear = academicYearRepository.findFirstByActiveTrueOrderByIdDesc().orElse(null);
+        auditLogService.logCreate("TEACHER", teacher.getId(), 
+            String.format("{\"employeeId\":\"%s\",\"email\":\"%s\"}", teacher.getEmployeeId(), teacher.getEmail()),
+            currentYear != null ? currentYear.getLabel() : "N/A");
+
         return mapToResponse(teacher);
     }
 
     public Page<TeacherResponse> getAllTeachers(Pageable pageable) {
-        return teacherRepository.findAll(pageable)
+        return teacherRepository.findByDeletedAtIsNull(pageable)
                 .map(this::mapToResponse);
     }
 
     public TeacherResponse getTeacherById(Long id) {
-        Teacher teacher = teacherRepository.findById(id)
+        Teacher teacher = teacherRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> 
                     new ResourceNotFoundException("Teacher", id));
         return mapToResponse(teacher);
@@ -101,7 +122,7 @@ public class TeacherService {
 
     @Transactional
     public TeacherResponse updateTeacher(Long id, TeacherRequest request) {
-        Teacher teacher = teacherRepository.findById(id)
+        Teacher teacher = teacherRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> 
                     new ResourceNotFoundException("Teacher", id));
 
@@ -144,16 +165,30 @@ public class TeacherService {
 
         Teacher updated = teacherRepository.save(teacher);
         updateClassAssignments(updated, request.getAssignedClassIds());
+
+        // Audit Log
+        AcademicYear currentYear = academicYearRepository.findFirstByActiveTrueOrderByIdDesc().orElse(null);
+        auditLogService.logUpdate("TEACHER", updated.getId(), "PROFILE", null, null,
+            currentYear != null ? currentYear.getLabel() : "N/A");
+
         return mapToResponse(updated);
     }
 
     @Transactional
     public void deleteTeacher(Long id) {
-        Teacher teacher = teacherRepository.findById(id)
+        Teacher teacher = teacherRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> 
                     new ResourceNotFoundException("Teacher", id));
+        
         teacher.setStatus(TeacherStatus.INACTIVE);
+        teacher.softDelete("ADMIN"); // Soft delete
         teacherRepository.save(teacher);
+
+        // Audit Log
+        AcademicYear currentYear = academicYearRepository.findFirstByActiveTrueOrderByIdDesc().orElse(null);
+        auditLogService.logDelete("TEACHER", id, 
+            String.format("{\"employeeId\":\"%s\"}", teacher.getEmployeeId()),
+            currentYear != null ? currentYear.getLabel() : "N/A");
     }
 
     public List<TeacherResponse> searchTeachers(String keyword) {
@@ -165,19 +200,7 @@ public class TeacherService {
 
     // ── Helpers ──────────────────────────────────────
     private String generateEmployeeId() {
-        int currentYear = Year.now().getValue();
-        long sequence = teacherRepository.count() + 1;
-
-        while (sequence <= 999_999) {
-            String candidate = String.format("TCH-%d-%03d", currentYear, sequence);
-            if (!teacherRepository.existsByEmployeeId(candidate)
-                    && !userRepository.existsByUsername(candidate)) {
-                return candidate;
-            }
-            sequence++;
-        }
-
-        throw new IllegalStateException("Unable to generate unique teacher employee ID");
+        return receiptNumberService.nextTeacherId();
     }
 
     public TeacherResponse mapToResponse(Teacher t) {

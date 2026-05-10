@@ -197,10 +197,12 @@ public class ExamService {
                 .id(e.getId())
                 .name(e.getName())
                 .examType(e.getExamType())
+                .classRoomId(e.getClassRoom() != null ? e.getClassRoom().getId() : null)
                 .className(e.getClassRoom() != null
                     ? e.getClassRoom().getName() 
                       + " - " + e.getClassRoom().getSection()
                     : null)
+                .subjectId(e.getSubject() != null ? e.getSubject().getId() : null)
                 .subjectName(e.getSubject() != null 
                     ? e.getSubject().getName() : null)
                 .examDate(e.getExamDate())

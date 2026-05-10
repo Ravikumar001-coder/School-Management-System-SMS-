@@ -20,7 +20,7 @@ public class ClassRoomController {
     private final ClassRoomService classRoomService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<ClassRoomResponse>> create(
             @Valid @RequestBody ClassRoomRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -45,7 +45,7 @@ public class ClassRoomController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<ClassRoomResponse>> update(
             @PathVariable Long id,
             @Valid @RequestBody ClassRoomRequest request) {
@@ -55,7 +55,7 @@ public class ClassRoomController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<Object>> delete(
             @PathVariable Long id) {
         classRoomService.deleteClassRoom(id);

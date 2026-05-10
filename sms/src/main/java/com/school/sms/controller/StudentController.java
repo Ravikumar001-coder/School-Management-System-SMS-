@@ -28,21 +28,36 @@ public class StudentController {
 
     // GET all students with pagination
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'TEACHER')")
     public ResponseEntity<ApiResponse<Page<StudentResponse>>> getAllStudents(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Long classId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy
     ) {
-        Pageable pageable = PageRequest.of(page, size, 
-                                          Sort.by(sortBy).ascending());
-        Page<StudentResponse> students = studentService.getAllStudents(pageable);
+        System.out.println("[DEBUG] StudentController.getAllStudents - params: keyword=" + keyword + ", classId=" + classId);
+        long totalInDb = studentService.countTotalStudents();
+        System.out.println("[DEBUG] Total students in DB (Hibernate count): " + totalInDb);
+        
+        try {
+             // Direct Native SQL check to verify the connection is seeing the table
+             Long nativeCount = studentService.nativeCountStudents();
+             System.out.println("[DEBUG] Total students in DB (NATIVE SQL count): " + nativeCount);
+        } catch (Exception e) {
+             System.err.println("[DEBUG] Native SQL check failed: " + e.getMessage());
+        }
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        Page<StudentResponse> students = studentService.getStudentsFiltered(keyword, classId, pageable);
+        
+        System.out.println("[DEBUG] Found students in this page: " + students.getNumberOfElements());
         return ResponseEntity.ok(ApiResponse.success("Students fetched", students));
     }
 
     // GET student by ID
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER') or " +
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'TEACHER') or " +
                   "(hasRole('STUDENT') and @studentSecurityService.isOwnProfile(#id))")
     public ResponseEntity<ApiResponse<StudentResponse>> getStudentById(@PathVariable Long id) {
         StudentResponse student = studentService.getStudentById(id);
@@ -51,7 +66,7 @@ public class StudentController {
 
     // POST create student
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<StudentResponse>> createStudent(
             @Valid @RequestBody StudentRequest request) {
         
@@ -62,7 +77,7 @@ public class StudentController {
 
     // PUT update student
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<StudentResponse>> updateStudent(
             @PathVariable Long id,
             @Valid @RequestBody StudentRequest request) {
@@ -73,7 +88,7 @@ public class StudentController {
 
     // DELETE (soft delete) student
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<Object>> deleteStudent(@PathVariable Long id) {
         studentService.deleteStudent(id);
         return ResponseEntity.ok(ApiResponse.success("Student deactivated successfully"));
@@ -81,7 +96,7 @@ public class StudentController {
 
     // GET search students
     @GetMapping("/search")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'TEACHER')")
     public ResponseEntity<ApiResponse<List<StudentResponse>>> searchStudents(
             @RequestParam String keyword) {
         
@@ -91,7 +106,7 @@ public class StudentController {
 
     // GET students by class
     @GetMapping("/class/{classId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'TEACHER')")
     public ResponseEntity<ApiResponse<List<StudentResponse>>> getStudentsByClass(
             @PathVariable Long classId) {
         

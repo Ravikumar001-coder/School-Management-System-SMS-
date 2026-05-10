@@ -4,9 +4,11 @@ package com.school.sms.service;
 import com.school.sms.dto.request.ClassRoomRequest;
 import com.school.sms.dto.response.ClassRoomResponse;
 import com.school.sms.exception.ResourceNotFoundException;
+import com.school.sms.model.AcademicYear;
 import com.school.sms.model.ClassRoom;
 import com.school.sms.model.Subject;
 import com.school.sms.model.Teacher;
+import com.school.sms.repository.AcademicYearRepository;
 import com.school.sms.repository.ClassRoomRepository;
 import com.school.sms.repository.StudentRepository;
 import com.school.sms.repository.SubjectRepository;
@@ -27,15 +29,19 @@ public class ClassRoomService {
     private final TeacherRepository   teacherRepository;
     private final StudentRepository   studentRepository;
     private final SubjectRepository   subjectRepository;
+    private final AcademicYearRepository academicYearRepository;
 
     @Transactional
     @SuppressWarnings("null")
     public ClassRoomResponse createClassRoom(ClassRoomRequest request) {
 
+        AcademicYear academicYear = academicYearRepository.findByLabel(request.getAcademicYear())
+                .orElseThrow(() -> new ResourceNotFoundException("AcademicYear", "label", request.getAcademicYear()));
+
         if (classRoomRepository.existsByNameAndSectionAndAcademicYear(
                 request.getName(),
                 request.getSection(),
-                request.getAcademicYear())) {
+                academicYear)) {
             throw new RuntimeException(
                 "Class already exists: " + request.getName() 
                 + " - " + request.getSection());
@@ -54,7 +60,7 @@ public class ClassRoomService {
         ClassRoom classRoom = ClassRoom.builder()
                 .name(request.getName())
                 .section(request.getSection())
-                .academicYear(request.getAcademicYear())
+                .academicYear(academicYear)
                 .classTeacher(teacher)
                 .subjects(resolveSubjects(request.getSubjectIds()))
                 .maxCapacity(request.getMaxCapacity() != null 
@@ -103,9 +109,12 @@ public class ClassRoomService {
                     "Teacher", teacherId));
         }
 
+        AcademicYear academicYear = academicYearRepository.findByLabel(request.getAcademicYear())
+                .orElseThrow(() -> new ResourceNotFoundException("AcademicYear", "label", request.getAcademicYear()));
+
         classRoom.setName(request.getName());
         classRoom.setSection(request.getSection());
-        classRoom.setAcademicYear(request.getAcademicYear());
+        classRoom.setAcademicYear(academicYear);
         classRoom.setClassTeacher(teacher);
         classRoom.setSubjects(resolveSubjects(request.getSubjectIds()));
         if (request.getMaxCapacity() != null) {
@@ -140,7 +149,7 @@ public class ClassRoomService {
                 .id(c.getId())
                 .name(c.getName())
                 .section(c.getSection())
-                .academicYear(c.getAcademicYear())
+                .academicYear(c.getAcademicYear() != null ? c.getAcademicYear().getLabel() : null)
                 .classTeacherId(c.getClassTeacher() != null
                         ? c.getClassTeacher().getId() : null)
                 .classTeacherName(teacherName)

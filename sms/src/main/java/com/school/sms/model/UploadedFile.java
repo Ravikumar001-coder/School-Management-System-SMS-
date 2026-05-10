@@ -22,7 +22,7 @@ public class UploadedFile {
     private String filename;
 
     @Column(nullable = false)
-    private String originalFilename;
+    private String globalFilename;
 
     @Column(nullable = false)
     private String contentType;

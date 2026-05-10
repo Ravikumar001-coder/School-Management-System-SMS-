@@ -26,13 +26,19 @@ public class FileController {
 
     private final com.school.sms.repository.UploadedFileRepository fileRepository;
     private final com.school.sms.repository.UserRepository userRepository;
+    private final com.school.sms.repository.StudentRepository studentRepository;
+    private final com.school.sms.repository.TeacherRepository teacherRepository;
     private final com.school.sms.service.AuthService authService;
 
     public FileController(com.school.sms.repository.UploadedFileRepository fileRepository,
                           com.school.sms.repository.UserRepository userRepository,
+                          com.school.sms.repository.StudentRepository studentRepository,
+                          com.school.sms.repository.TeacherRepository teacherRepository,
                           com.school.sms.service.AuthService authService) {
         this.fileRepository = fileRepository;
         this.userRepository = userRepository;
+        this.studentRepository = studentRepository;
+        this.teacherRepository = teacherRepository;
         this.authService = authService;
     }
 
@@ -74,7 +80,7 @@ public class FileController {
 
         com.school.sms.model.UploadedFile fileEntity = com.school.sms.model.UploadedFile.builder()
                 .filename(newFilename)
-                .originalFilename(originalFilename)
+                .globalFilename(originalFilename)
                 .contentType(contentType)
                 .size(file.getSize())
                 .owner(owner)
@@ -110,19 +116,18 @@ public class FileController {
         // If file is recorded in DB, check ownership
         if (fileEntity != null) {
             boolean isOwner = fileEntity.getOwner() != null && fileEntity.getOwner().getId().equals(currentUser.getId());
-            boolean isAdmin = currentUser.getRole() == com.school.sms.model.Role.ADMIN;
-            boolean isTeacher = currentUser.getRole() == com.school.sms.model.Role.TEACHER;
+            boolean isAdmin = currentUser.isAdmin();
+            boolean isTeacher = currentUser.isTeacher();
+            boolean isOwnProfilePhoto = checkProfilePhotoAccess(currentUser, "/api/v1/files/" + filename);
 
-            if (!isOwner && !isAdmin && !isTeacher) {
+            if (!isOwner && !isAdmin && !isTeacher && !isOwnProfilePhoto) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
         }
         // If file is NOT in DB (legacy or seeded), allow only ADMIN/TEACHER for now to be safe
         else {
-            if (currentUser.getRole() != com.school.sms.model.Role.ADMIN && currentUser.getRole() != com.school.sms.model.Role.TEACHER) {
-                 // Check if it's the student's own photo from the student record
-                 // This is a fallback for seeded data
-                 boolean isOwnPhoto = checkLegacyOwnership(currentUser, "/api/v1/files/" + filename);
+            if (!currentUser.isAdmin() && !currentUser.isTeacher()) {
+                 boolean isOwnPhoto = checkProfilePhotoAccess(currentUser, "/api/v1/files/" + filename);
                  if (!isOwnPhoto) {
                      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
                  }
@@ -141,15 +146,20 @@ public class FileController {
                 .body(resource);
     }
 
-    private boolean checkLegacyOwnership(com.school.sms.model.User user, String fileUrl) {
-        if (user.getRole() == com.school.sms.model.Role.STUDENT) {
-            return userRepository.findById(user.getId())
-                    .map(u -> {
-                        // This logic depends on StudentRepository which we don't have here easily
-                        // We can just assume legacy files are public or restricted to Staff
-                        return false; 
-                    }).orElse(false);
+    private boolean checkProfilePhotoAccess(com.school.sms.model.User user, String fileUrl) {
+        if (user == null || fileUrl == null) {
+            return false;
         }
-        return false;
+
+        boolean studentOwnsPhoto = studentRepository.findByUser_Id(user.getId())
+                .map(student -> fileUrl.equals(student.getProfilePhoto()))
+                .orElse(false);
+        if (studentOwnsPhoto) {
+            return true;
+        }
+
+        return teacherRepository.findByUserId(user.getId())
+                .map(teacher -> fileUrl.equals(teacher.getProfilePhoto()))
+                .orElse(false);
     }
 }

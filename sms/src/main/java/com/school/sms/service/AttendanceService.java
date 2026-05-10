@@ -18,52 +18,43 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AttendanceService {
 
-    private final AttendanceRepository attendanceRepository;
-    private final StudentRepository    studentRepository;
-    private final ClassRoomRepository  classRoomRepository;
-    private final SubjectRepository    subjectRepository;
+    private final AttendanceRepository   attendanceRepository;
+    private final StudentRepository      studentRepository;
+    private final ClassRoomRepository    classRoomRepository;
+    private final SubjectRepository      subjectRepository;
     private final AcademicYearRepository academicYearRepository;
+    private final AuditLogService        auditLogService;
 
     // Mark attendance for whole class at once
     @Transactional
-    public Map<String, Object> markBulkAttendance(
-            BulkAttendanceRequest request) {
+    public Map<String, Object> markBulkAttendance(BulkAttendanceRequest request) {
 
         ClassRoom classRoom = classRoomRepository
                 .findById(request.getClassRoomId())
-                .orElseThrow(() -> 
-                    new ResourceNotFoundException(
-                        "ClassRoom", request.getClassRoomId()));
+                .orElseThrow(() ->
+                    new ResourceNotFoundException("ClassRoom", request.getClassRoomId()));
 
         Subject subject = null;
         if (request.getSubjectId() != null) {
-            subject = subjectRepository
-                    .findById(request.getSubjectId())
-                    .orElse(null);
+            subject = subjectRepository.findById(request.getSubjectId()).orElse(null);
         }
 
-        int saved  = 0;
-        int skipped = 0;
+        int savedCount  = 0;
+        int skippedCount = 0;
 
         for (var item : request.getAttendanceList()) {
 
             // Skip if already marked
             boolean alreadyMarked = (subject != null)
-                ? attendanceRepository
-                    .existsByStudentIdAndDateAndSubjectId(
-                        item.getStudentId(),
-                        request.getDate(),
-                        subject.getId())
-                : attendanceRepository
-                    .existsByStudentIdAndDate(
+                ? attendanceRepository.existsByStudentIdAndDateAndSubjectId(
+                        item.getStudentId(), request.getDate(), subject.getId())
+                : attendanceRepository.existsByStudentIdAndDate(
                         item.getStudentId(), request.getDate());
 
-            if (alreadyMarked) { skipped++; continue; }
+            if (alreadyMarked) { skippedCount++; continue; }
 
-            Student student = studentRepository
-                    .findById(item.getStudentId())
-                    .orElse(null);
-            if (student == null) { skipped++; continue; }
+            Student student = studentRepository.findById(item.getStudentId()).orElse(null);
+            if (student == null) { skippedCount++; continue; }
 
             AcademicYear currentYear = academicYearRepository.findFirstByActiveTrueOrderByIdDesc()
                     .orElseThrow(() -> new ResourceNotFoundException("Active Academic Year", "status", "active"));
@@ -78,43 +69,38 @@ public class AttendanceService {
                     .academicYear(currentYear)
                     .build();
 
-            attendanceRepository.save(attendance);
-            saved++;
+            Attendance att = attendanceRepository.save(attendance);
+
+            // Audit: log each attendance record
+            auditLogService.logCreate("ATTENDANCE", att.getId(),
+                    String.format("{\"studentId\":%d,\"date\":\"%s\",\"status\":\"%s\"}",
+                            student.getId(), request.getDate(), item.getStatus()),
+                    currentYear.getLabel());
+
+            savedCount++;
         }
 
         return Map.of(
             "message", "Attendance processed",
-            "saved",   saved,
-            "skipped", skipped,
+            "saved",   savedCount,
+            "skipped", skippedCount,
             "date",    request.getDate()
         );
     }
 
     // Student's attendance report
-    public Map<String, Object> getStudentReport(
-            Long studentId, LocalDate from, LocalDate to) {
+    public Map<String, Object> getStudentReport(Long studentId, LocalDate from, LocalDate to) {
 
         studentRepository.findById(studentId)
-                .orElseThrow(() -> 
-                    new ResourceNotFoundException("Student", studentId));
+                .orElseThrow(() -> new ResourceNotFoundException("Student", studentId));
 
-        List<Attendance> records = attendanceRepository
-                .findByStudentIdAndDateBetween(studentId, from, to);
+        List<Attendance> records = attendanceRepository.findByStudentIdAndDateBetween(studentId, from, to);
 
         long total   = records.size();
-        long present = records.stream()
-                .filter(a -> a.getStatus() == AttendanceStatus.PRESENT)
-                .count();
-        long absent  = records.stream()
-                .filter(a -> a.getStatus() == AttendanceStatus.ABSENT)
-                .count();
-        long late    = records.stream()
-                .filter(a -> a.getStatus() == AttendanceStatus.LATE)
-                .count();
-
-        double pct = total > 0 
-                ? Math.round((present * 100.0 / total) * 100.0) / 100.0
-                : 0.0;
+        long present = records.stream().filter(a -> a.getStatus() == AttendanceStatus.PRESENT).count();
+        long absent  = records.stream().filter(a -> a.getStatus() == AttendanceStatus.ABSENT).count();
+        long late    = records.stream().filter(a -> a.getStatus() == AttendanceStatus.LATE).count();
+        double pct   = total > 0 ? Math.round((present * 100.0 / total) * 100.0) / 100.0 : 0.0;
 
         return Map.of(
             "studentId",  studentId,
@@ -125,35 +111,25 @@ public class AttendanceService {
             "absent",     absent,
             "late",       late,
             "percentage", pct,
-            "records",    records.stream()
-                                 .map(this::mapToResponse)
-                                 .collect(Collectors.toList())
+            "records",    records.stream().map(this::mapToResponse).collect(Collectors.toList())
         );
     }
 
     // Class attendance for a specific date
-    public Map<String, Object> getClassAttendance(
-            Long classId, LocalDate date) {
+    public Map<String, Object> getClassAttendance(Long classId, LocalDate date) {
 
-        List<Attendance> records = attendanceRepository
-                .findByClassRoomIdAndDate(classId, date);
+        List<Attendance> records = attendanceRepository.findByClassRoomIdAndDate(classId, date);
 
-        long present = records.stream()
-                .filter(a -> a.getStatus() == AttendanceStatus.PRESENT)
-                .count();
-        long absent  = records.stream()
-                .filter(a -> a.getStatus() == AttendanceStatus.ABSENT)
-                .count();
+        long present = records.stream().filter(a -> a.getStatus() == AttendanceStatus.PRESENT).count();
+        long absent  = records.stream().filter(a -> a.getStatus() == AttendanceStatus.ABSENT).count();
 
         return Map.of(
-            "classId",  classId,
-            "date",     date,
-            "total",    records.size(),
-            "present",  present,
-            "absent",   absent,
-            "records",  records.stream()
-                               .map(this::mapToResponse)
-                               .collect(Collectors.toList())
+            "classId", classId,
+            "date",    date,
+            "total",   records.size(),
+            "present", present,
+            "absent",  absent,
+            "records", records.stream().map(this::mapToResponse).collect(Collectors.toList())
         );
     }
 
@@ -161,13 +137,12 @@ public class AttendanceService {
     private AttendanceResponse mapToResponse(Attendance a) {
         return AttendanceResponse.builder()
                 .id(a.getId())
-                .studentName(a.getStudent().getFirstName() 
-                             + " " + a.getStudent().getLastName())
+                .studentDbId(a.getStudent().getId())
+                .studentName(a.getStudent().getFirstName() + " " + a.getStudent().getLastName())
                 .studentId(a.getStudent().getStudentId())
                 .date(a.getDate())
                 .status(a.getStatus().name())
-                .subjectName(a.getSubject() != null 
-                             ? a.getSubject().getName() : null)
+                .subjectName(a.getSubject() != null ? a.getSubject().getName() : null)
                 .remarks(a.getRemarks())
                 .build();
     }

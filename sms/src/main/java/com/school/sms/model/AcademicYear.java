@@ -62,7 +62,11 @@ public class AcademicYear {
      * All new records default to the active year.
      */
     @Builder.Default
-    private boolean active = false;
+    private Boolean active = false;
+
+    @Column(name = "is_current")
+    @Builder.Default
+    private Boolean isCurrent = false;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;

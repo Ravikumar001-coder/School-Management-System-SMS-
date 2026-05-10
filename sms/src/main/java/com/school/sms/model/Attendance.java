@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
         @Index(name = "idx_attendance_created_at", columnList = "created_at")
     }
 )
+@EqualsAndHashCode(callSuper = true)
 public class Attendance extends SoftDeletableEntity {
 
     @Id
@@ -42,7 +43,7 @@ public class Attendance extends SoftDeletableEntity {
 
     @ManyToOne
     @JoinColumn(name = "marked_by")
-    private Teacher markedBy;
+    private User markedBy;
 
     @Column(name = "attendance_date", nullable = false)
     private LocalDate date;

@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
     @Index(name = "idx_exams_subject_id", columnList = "subject_id"),
     @Index(name = "idx_exams_academic_year", columnList = "academic_year_id")
 })
+@EqualsAndHashCode(callSuper = true)
 public class Exam extends SoftDeletableEntity {
 
     @Id
@@ -52,9 +53,16 @@ public class Exam extends SoftDeletableEntity {
 
     @Column(updatable = false)
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
-}
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+}

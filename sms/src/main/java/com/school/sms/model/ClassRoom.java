@@ -4,6 +4,7 @@ package com.school.sms.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -12,7 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "classrooms")
-public class ClassRoom {
+@EqualsAndHashCode(callSuper = true)
+public class ClassRoom extends SoftDeletableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,7 +22,9 @@ public class ClassRoom {
 
     private String name;       // "Class 10"
     private String section;    // "A", "B", "C"
-    private String academicYear; // "2024-25"
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "academic_year_id")
+    private AcademicYear academicYear;
     
     // Class teacher
     @ManyToOne
@@ -43,4 +47,23 @@ public class ClassRoom {
     private Integer maxCapacity;
     private Double classFee;
     private Double admissionFee;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id")
+    private Branch branch;
+
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

@@ -34,6 +34,9 @@ public class BackupRestoreService {
     @Value("${app.backup.dir:./backups}")
     private String backupDir;
 
+    @Value("${app.mysql.bin-dir:}")
+    private String mysqlBinDir;
+
     private static final String DB_NAME = "school_db";
 
     public void init() {
@@ -78,8 +81,9 @@ public class BackupRestoreService {
         backup = backupRepository.save(backup);
 
         try {
+            String mysqldumpPath = resolveMysqlTool("mysqldump.exe");
             ProcessBuilder processBuilder = new ProcessBuilder(
-                    "mysqldump",
+                    mysqldumpPath,
                     "-u" + dbUser,
                     dbPassword.isEmpty() ? "" : "-p" + dbPassword,
                     "--add-drop-table",
@@ -132,8 +136,9 @@ public class BackupRestoreService {
         }
 
         try {
+            String mysqlPath = resolveMysqlTool("mysql.exe");
             ProcessBuilder processBuilder = new ProcessBuilder(
-                    "mysql",
+                    mysqlPath,
                     "-u" + dbUser,
                     dbPassword.isEmpty() ? "" : "-p" + dbPassword,
                     DB_NAME
@@ -174,5 +179,29 @@ public class BackupRestoreService {
         SystemBackup backup = backupRepository.findById(backupId)
                 .orElseThrow(() -> new RuntimeException("Backup not found"));
         return new File(backupDir + File.separator + backup.getFileName());
+    }
+
+    private String resolveMysqlTool(String executableName) {
+        if (mysqlBinDir != null && !mysqlBinDir.isBlank()) {
+            File configured = new File(mysqlBinDir, executableName);
+            if (configured.exists()) {
+                return configured.getAbsolutePath();
+            }
+        }
+
+        String[] candidatePaths = {
+                "C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\" + executableName,
+                "C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin\\" + executableName,
+                executableName
+        };
+
+        for (String candidate : candidatePaths) {
+            File file = new File(candidate);
+            if (file.exists() || executableName.equals(candidate)) {
+                return candidate;
+            }
+        }
+
+        throw new RuntimeException("Required MySQL tool not found: " + executableName);
     }
 }

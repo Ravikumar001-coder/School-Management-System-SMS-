@@ -19,7 +19,7 @@ public class DashboardController {
     private final DashboardService dashboardService;
 
     @GetMapping("/admin")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<DashboardResponse>> adminDashboard() {
         return ResponseEntity.ok(ApiResponse.success(
             "Dashboard data",
@@ -33,5 +33,13 @@ public class DashboardController {
         return ResponseEntity.ok(ApiResponse.success(
             "Student dashboard data",
             dashboardService.getStudentDashboard(studentId)));
+    }
+    @GetMapping("/teacher/{teacherId}")
+    @PreAuthorize("hasRole('TEACHER') and @teacherSecurityService.isOwnId(#teacherId)")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> teacherDashboard(
+            @PathVariable Long teacherId) {
+        return ResponseEntity.ok(ApiResponse.success(
+            "Teacher dashboard data",
+            dashboardService.getTeacherDashboard(teacherId)));
     }
 }

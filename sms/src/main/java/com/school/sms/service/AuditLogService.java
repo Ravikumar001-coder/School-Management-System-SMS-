@@ -100,6 +100,10 @@ public class AuditLogService {
         return auditLogRepository.findByDateRange(from, to, pageable);
     }
 
+    public Page<AuditLog> getAllLogs(Pageable pageable) {
+        return auditLogRepository.findAll(pageable);
+    }
+
     // =============================================
     // Internal helpers
     // =============================================

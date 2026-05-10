@@ -61,6 +61,16 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error("Invalid email or password!"));
     }
 
+    // 403 - Permission Denied (Custom Aspect)
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleUnauthorized(
+            UnauthorizedException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
     // 403 - Access Denied
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiResponse<Object>> handleAccessDenied(

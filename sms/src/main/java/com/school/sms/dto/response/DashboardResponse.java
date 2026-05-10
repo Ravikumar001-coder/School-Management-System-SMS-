@@ -3,10 +3,14 @@ package com.school.sms.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import java.util.Map;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DashboardResponse {
     private Long totalStudents;
     private Long totalTeachers;
@@ -18,4 +22,11 @@ public class DashboardResponse {
     private Double thisMonthCollection;
     private Map<String, Long> studentsByClass;
     private Map<String, Long> attendanceByStatus;
+    
+    // New fields for updated Admin Dashboard
+    private Long totalDepartments;
+    private java.util.List<Map<String, Object>> trends;
+    private Map<String, Long> enrollmentByDepartment;
+    private java.util.List<Map<String, Object>> recentActivity;
+    private java.util.List<Map<String, Object>> upcomingDeadlines;
 }

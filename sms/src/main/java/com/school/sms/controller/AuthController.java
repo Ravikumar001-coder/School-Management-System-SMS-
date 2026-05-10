@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,171 +26,110 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthController {
 
-    static final String REFRESH_COOKIE_NAME = "refresh_token";
-
+    public static final String REFRESH_COOKIE_NAME = "refreshToken";
     private final AuthService authService;
 
-    @Value("${app.security.cookie.secure:true}")
-    private boolean secureCookie;
-
-    @Value("${app.jwt.refresh-expiration:604800000}")
-    private long refreshTokenDurationMs;
-
-    // =============================================
-    // POST /api/v1/auth/login
-    // =============================================
+    // ── POST /auth/login ──────────────────────────────────────────────────────
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(
             @Valid @RequestBody LoginRequest request,
             HttpServletResponse response) {
 
         AuthService.LoginResult result = authService.login(request);
-
-        // Write the refresh token into a Secure + HttpOnly + SameSite=Strict cookie
-        // Path is restricted to /api/v1/auth/refresh — it won't be sent on other requests
-        setRefreshCookie(response, result.rawRefreshToken(), (int) (refreshTokenDurationMs / 1000));
-
+        setRefreshCookie(response, result.refreshToken());
         return ResponseEntity.ok(result.response());
     }
 
-    // =============================================
-    // POST /api/v1/auth/refresh
-    // CSRF strategy: SameSite=Strict cookie + custom header double-submit check
-    // =============================================
+    // ── POST /auth/refresh ────────────────────────────────────────────────────
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh(
-            HttpServletRequest request,
-            HttpServletResponse response) {
-
-        String rawRefreshToken = extractRefreshCookie(request);
-        if (rawRefreshToken == null) {
-            return ResponseEntity.status(401)
-                    .body(AuthResponse.builder().message("No refresh token cookie found.").build());
+    public ResponseEntity<?> refresh(HttpServletRequest request, HttpServletResponse response) {
+        String rawToken = extractRefreshCookie(request);
+        if (rawToken == null) {
+            return ResponseEntity.status(401).body(Map.of("message", "No refresh token provided."));
         }
-
         try {
-            AuthService.RefreshResult result = authService.refreshToken(rawRefreshToken);
-
-            // Rotate: overwrite the cookie with the new token
-            setRefreshCookie(response, result.newRawRefreshToken(), (int) (refreshTokenDurationMs / 1000));
-
+            AuthService.RefreshResult result = authService.refreshToken(rawToken);
+            setRefreshCookie(response, result.newRawRefreshToken());
             return ResponseEntity.ok(result.response());
         } catch (Exception e) {
-            // On any failure (expired, replayed, invalid), clear the cookie
             clearRefreshCookie(response);
-            return ResponseEntity.status(401)
-                    .body(AuthResponse.builder().message(e.getMessage()).build());
+            return ResponseEntity.status(401).body(Map.of("message", e.getMessage()));
         }
     }
 
-    // =============================================
-    // POST /api/v1/auth/logout
-    // =============================================
+    // ── POST /auth/logout ─────────────────────────────────────────────────────
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(
-            HttpServletRequest request,
-            HttpServletResponse response) {
-
-        String rawRefreshToken = extractRefreshCookie(request);
-        authService.logout(rawRefreshToken);
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        String rawToken = extractRefreshCookie(request);
+        authService.logout(rawToken);
         clearRefreshCookie(response);
-
         return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
     }
 
-    // =============================================
-    // GET /api/v1/auth/me
-    // =============================================
+    // ── GET /auth/me ──────────────────────────────────────────────────────────
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<AuthResponse> me(Authentication authentication) {
         return ResponseEntity.ok(authService.getCurrentUserProfile(authentication.getName()));
     }
 
-    // =============================================
-    // POST /api/v1/auth/change-password
-    // =============================================
+    // ── POST /auth/change-password ────────────────────────────────────────────
     @PostMapping("/change-password")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> changePassword(
             Authentication authentication,
-            @Valid @RequestBody ChangePasswordRequest request,
-            HttpServletResponse response) {
-
+            @Valid @RequestBody ChangePasswordRequest request) {
         authService.changePassword(authentication.getName(), request);
-
-        // Invalidate the refresh cookie: password changed, all sessions revoked
-        clearRefreshCookie(response);
-
-        return ResponseEntity.ok(Map.of("message", "Password changed successfully. Please login again."));
+        return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
     }
 
-    // =============================================
-    // POST /api/v1/auth/reset-password/{userId}
-    // =============================================
+    // ── POST /auth/reset-password/{userId} ───────────────────────────────────
     @PostMapping("/reset-password/{userId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> resetPassword(
-            Authentication authentication,
-            @PathVariable Long userId) {
-
+    public ResponseEntity<?> resetPassword(Authentication authentication,
+                                           @PathVariable Long userId) {
         if (authentication == null || !authService.isAdmin(authentication.getName())) {
             throw new AccessDeniedException("Forbidden");
         }
-
         String resetValue = authService.resetPasswordToDefault(userId);
         return ResponseEntity.ok(Map.of(
-                "message", "Password reset to: " + resetValue,
-                "userId", userId,
-                "defaultPassword", resetValue
+            "message", "Password reset successfully",
+            "userId", userId,
+            "defaultPassword", resetValue
         ));
     }
 
-    // =============================================
-    // POST /api/v1/auth/reset-password/by-student-id/{studentId}
-    // =============================================
+    // ── POST /auth/reset-password/by-student-id/{studentId} ──────────────────
     @PostMapping("/reset-password/by-student-id/{studentId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> resetPasswordByStudentId(
-            Authentication authentication,
-            @PathVariable String studentId) {
-
+    public ResponseEntity<?> resetPasswordByStudentId(Authentication authentication,
+                                                      @PathVariable String studentId) {
         if (authentication == null || !authService.isAdmin(authentication.getName())) {
             throw new AccessDeniedException("Forbidden");
         }
-
         String resetValue = authService.resetStudentPasswordToDefault(studentId);
         return ResponseEntity.ok(Map.of(
-                "message", "Password reset to: " + resetValue,
-                "studentId", studentId,
-                "defaultPassword", resetValue
+            "message", "Password reset successfully",
+            "studentId", studentId,
+            "defaultPassword", resetValue
         ));
     }
 
-    // =============================================
-    // Cookie helpers
-    // =============================================
-
-    private void setRefreshCookie(HttpServletResponse response, String rawToken, int maxAgeSeconds) {
-        // Build a manually formatted Set-Cookie header to enforce SameSite=Strict,
-        // which the Servlet Cookie API does not natively support in all containers.
-        String cookieValue = String.format(
-                "%s=%s; Max-Age=%d; Path=/api/v1/auth/refresh; HttpOnly; %sSameSite=Strict",
-                REFRESH_COOKIE_NAME,
-                rawToken,
-                maxAgeSeconds,
-                secureCookie ? "Secure; " : ""
+    // ── Cookie helpers ────────────────────────────────────────────────────────
+    private void setRefreshCookie(HttpServletResponse response, String rawToken) {
+        String cookieHeader = String.format(
+            "%s=%s; Path=/; HttpOnly; SameSite=Strict; Max-Age=%d",
+            REFRESH_COOKIE_NAME, rawToken, 7 * 24 * 60 * 60
         );
-        response.addHeader("Set-Cookie", cookieValue);
+        response.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
     }
 
     private void clearRefreshCookie(HttpServletResponse response) {
-        String cookieValue = String.format(
-                "%s=; Max-Age=0; Path=/api/v1/auth/refresh; HttpOnly; %sSameSite=Strict",
-                REFRESH_COOKIE_NAME,
-                secureCookie ? "Secure; " : ""
+        String cookieHeader = String.format(
+            "%s=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0",
+            REFRESH_COOKIE_NAME
         );
-        response.addHeader("Set-Cookie", cookieValue);
+        response.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
     }
 
     private String extractRefreshCookie(HttpServletRequest request) {

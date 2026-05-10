@@ -2,7 +2,6 @@ package com.school.sms.service;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Bucket4j;
 import io.github.bucket4j.Refill;
 import org.springframework.stereotype.Service;
 
@@ -28,13 +27,13 @@ public class RateLimitingService {
     }
 
     private Bucket newLoginBucket(String ip) {
-        return Bucket4j.builder()
+        return Bucket.builder()
                 .addLimit(Bandwidth.classic(5, Refill.intervally(5, Duration.ofMinutes(15))))
                 .build();
     }
 
     private Bucket newApiBucket(String ip) {
-        return Bucket4j.builder()
+        return Bucket.builder()
                 .addLimit(Bandwidth.classic(100, Refill.intervally(100, Duration.ofMinutes(1))))
                 .build();
     }

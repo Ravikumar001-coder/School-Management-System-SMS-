@@ -20,7 +20,7 @@ public class SubjectController {
     private final SubjectService subjectService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<SubjectResponse>> create(
             @Valid @RequestBody SubjectRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -43,7 +43,7 @@ public class SubjectController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<SubjectResponse>> update(
             @PathVariable Long id,
             @Valid @RequestBody SubjectRequest request) {
@@ -53,7 +53,7 @@ public class SubjectController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<Object>> delete(
             @PathVariable Long id) {
         subjectService.deleteSubject(id);

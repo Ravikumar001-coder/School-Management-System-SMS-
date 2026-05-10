@@ -25,7 +25,10 @@ public class StudentResponse {
     private String address;
     private String academicYear;
     private Long classRoomId;
-    private String className;      // "Class 10 - A"
+    private String className;      // "Class 10"
+    private String sectionName;    // "A"
     private String status;
     private String profilePhoto;
+    private String admissionClass;
+    private String courses;
 }

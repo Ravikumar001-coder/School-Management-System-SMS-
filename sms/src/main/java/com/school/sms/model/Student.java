@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
     @Index(name = "idx_students_user_id", columnList = "user_id"),
     @Index(name = "idx_students_branch_year", columnList = "branch_id, academic_year_id")
 })
+@EqualsAndHashCode(callSuper = true)
 public class Student extends SoftDeletableEntity {
 
     @Id
@@ -57,7 +58,16 @@ public class Student extends SoftDeletableEntity {
     @JoinColumn(name = "classroom_id")
     private ClassRoom classRoom;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
+    private Department department;
+
+
     private String admissionDate;
+    private String admissionClass;
+    
+    @Column(columnDefinition = "TEXT")
+    private String courses; // JSON or comma-separated
     
     @Enumerated(EnumType.STRING)
     private StudentStatus status; // ACTIVE, INACTIVE, GRADUATED

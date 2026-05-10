@@ -26,6 +26,7 @@ public class FeeService {
     private final StudentRepository      studentRepository;
     private final AcademicYearRepository academicYearRepository;
     private final ReceiptNumberService   receiptNumberService;
+    private final AuditLogService        auditLogService;
 
     // Collect fee payment
     @Transactional
@@ -66,7 +67,16 @@ public class FeeService {
                 .branch(student.getBranch())
                 .build();
 
-        return mapToResponse(feePaymentRepository.save(payment));
+        FeePayment saved = feePaymentRepository.save(payment);
+
+        // Audit: log fee collection
+        auditLogService.logCreate("FEE_PAYMENT", saved.getId(),
+                String.format("{\"receipt\":\"%s\",\"amount\":%.2f,\"method\":\"%s\",\"studentId\":%d}",
+                        saved.getReceiptNumber(), saved.getAmount(),
+                        saved.getPaymentMethod(), saved.getStudent().getId()),
+                currentYear.getLabel());
+
+        return mapToResponse(saved);
     }
 
     // All payments for a student

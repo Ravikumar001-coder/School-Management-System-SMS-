@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
     @Index(name = "idx_fee_payments_student_year", columnList = "student_id, academic_year_id"),
     @Index(name = "idx_fee_payments_created_at", columnList = "created_at")
 })
+@EqualsAndHashCode(callSuper = true)
 public class FeePayment extends SoftDeletableEntity {
 
     @Id

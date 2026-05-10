@@ -22,7 +22,7 @@ public class TeacherController {
     private final TeacherService teacherService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<TeacherResponse>> create(
             @Valid @RequestBody TeacherRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -54,7 +54,7 @@ public class TeacherController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<TeacherResponse>> update(
             @PathVariable Long id,
             @RequestBody TeacherRequest request) {
@@ -64,7 +64,7 @@ public class TeacherController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<Object>> delete(
             @PathVariable Long id) {
         teacherService.deleteTeacher(id);

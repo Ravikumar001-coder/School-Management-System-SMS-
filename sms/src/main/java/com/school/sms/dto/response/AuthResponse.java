@@ -2,25 +2,26 @@
 
 package com.school.sms.dto.response;
 
-import com.school.sms.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthResponse {
-    private String token;       // Short-lived access token (15 min) — goes in Authorization header
-    // refreshToken intentionally omitted: transmitted only via HttpOnly cookie, never in body
+    private String token;       // Short-lived access token (15 min)
     private String username;
     private String email;
     private String firstName;
     private String lastName;
-    private Role role;
+    private List<String> roles; // List of roles for the frontend
+    private List<String> permissions; // List of permissions for the frontend
     private Long studentId;
+    private Long teacherId;
     private boolean firstLogin;
     private String message;
-}
+}

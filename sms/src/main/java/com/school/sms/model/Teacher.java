@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "teachers")
+@EqualsAndHashCode(callSuper = true)
 public class Teacher extends SoftDeletableEntity {
 
     @Id

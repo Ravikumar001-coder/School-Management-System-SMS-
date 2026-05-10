@@ -11,7 +11,9 @@ public class ExamResponse {
     private Long id;
     private String name;
     private String examType;
+    private Long classRoomId;
     private String className;
+    private Long subjectId;
     private String subjectName;
     private LocalDate examDate;
     private String startTime;

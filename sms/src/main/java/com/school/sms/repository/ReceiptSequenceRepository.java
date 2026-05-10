@@ -21,6 +21,6 @@ public interface ReceiptSequenceRepository extends JpaRepository<ReceiptSequence
      * The lock is released when the enclosing @Transactional method completes.
      */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT rs FROM ReceiptSequence rs WHERE rs.schoolCode = :schoolCode AND rs.academicYear = :academicYear")
-    Optional<ReceiptSequence> findLockedBySchoolCodeAndAcademicYear(String schoolCode, AcademicYear academicYear);
+    @Query("SELECT rs FROM ReceiptSequence rs WHERE rs.schoolCode = :schoolCode AND rs.academicYear = :academicYear AND rs.sequenceType = :type")
+    Optional<ReceiptSequence> findLocked(String schoolCode, AcademicYear academicYear, ReceiptSequence.SequenceType type);
 }

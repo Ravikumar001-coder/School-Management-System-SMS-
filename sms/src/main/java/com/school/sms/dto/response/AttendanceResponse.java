@@ -9,6 +9,7 @@ import java.time.LocalDate;
 @Builder
 public class AttendanceResponse {
     private Long id;
+    private Long studentDbId;
     private String studentName;
     private String studentId;
     private LocalDate date;

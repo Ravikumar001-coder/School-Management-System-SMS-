@@ -1,6 +1,7 @@
 // repository/ClassRoomRepository.java
 package com.school.sms.repository;
 
+import com.school.sms.model.AcademicYear;
 import com.school.sms.model.ClassRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,12 +15,14 @@ public interface ClassRoomRepository
         extends JpaRepository<ClassRoom, Long> {
 
     Optional<ClassRoom> findByNameAndSectionAndAcademicYear(
-        String name, String section, String academicYear);
+        String name, String section, AcademicYear academicYear);
 
-    List<ClassRoom> findByAcademicYear(String academicYear);
+    List<ClassRoom> findByAcademicYear(AcademicYear academicYear);
+
+    List<ClassRoom> findByAcademicYearIsNull();
 
     boolean existsByNameAndSectionAndAcademicYear(
-        String name, String section, String academicYear);
+        String name, String section, AcademicYear academicYear);
 
     @Query("SELECT c FROM ClassRoom c " +
            "WHERE c.classTeacher.id = :teacherId")

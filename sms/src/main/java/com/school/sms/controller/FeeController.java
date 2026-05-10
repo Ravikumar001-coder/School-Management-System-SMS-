@@ -22,7 +22,7 @@ public class FeeController {
 
     // Collect payment
     @PostMapping("/pay")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<FeePaymentResponse>> pay(
             @Valid @RequestBody FeePaymentRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -33,7 +33,7 @@ public class FeeController {
 
     // Student payment history
     @GetMapping("/student/{studentId}")
-    @PreAuthorize("hasRole('ADMIN') or " +
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN') or " +
                   "(hasRole('STUDENT') and @studentSecurityService.isOwnId(#studentId))")
     public ResponseEntity<ApiResponse<List<FeePaymentResponse>>> studentFees(
             @PathVariable Long studentId) {
@@ -43,7 +43,7 @@ public class FeeController {
     }
 
     @GetMapping("/{paymentId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<FeePaymentResponse>> byId(
             @PathVariable Long paymentId) {
         return ResponseEntity.ok(ApiResponse.success(
@@ -53,7 +53,7 @@ public class FeeController {
 
     // Student fee summary
     @GetMapping("/student/{studentId}/summary")
-    @PreAuthorize("hasRole('ADMIN') or " +
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN') or " +
                   "(hasRole('STUDENT') and @studentSecurityService.isOwnId(#studentId))")
     public ResponseEntity<ApiResponse<Map<String, Object>>> summary(
             @PathVariable Long studentId) {
@@ -64,7 +64,7 @@ public class FeeController {
 
     // Pending fees list
     @GetMapping("/pending")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<List<FeePaymentResponse>>> pending() {
         return ResponseEntity.ok(ApiResponse.success(
             "Pending fees",
@@ -72,7 +72,7 @@ public class FeeController {
     }
 
     @GetMapping("/all")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<List<FeePaymentResponse>>> all() {
         return ResponseEntity.ok(ApiResponse.success(
             "All fee payments",
@@ -81,7 +81,7 @@ public class FeeController {
 
     // Monthly report
     @GetMapping("/report/monthly")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<Map<String, Object>>> monthly(
             @RequestParam int month,
             @RequestParam int year) {

@@ -3,25 +3,25 @@
 package com.school.sms.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-@Data                    // Lombok: generates getters, setters, toString
-@Builder                 // Lombok: Builder pattern
-@NoArgsConstructor       // Lombok: empty constructor
-@AllArgsConstructor      // Lombok: all args constructor
-@Entity                  // JPA: this is a database table
-@Table(name = "users")   // JPA: table name
-public class User implements UserDetails {  // Spring Security interface
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "users")
+@EqualsAndHashCode(exclude = "userRoles")
+@ToString(exclude = "userRoles")
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,11 +40,13 @@ public class User implements UserDetails {  // Spring Security interface
     private String username;
 
     @Column(nullable = false)
-    private String password;  // This will be HASHED, never plain text
+    private String password;
+    
+    private String role; // Denormalized role string (e.g., "ADMIN", "TEACHER")
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;  // ADMIN, TEACHER, STUDENT
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<UserRole> userRoles = new HashSet<>();
 
     @Builder.Default
     @Column(nullable = false)
@@ -59,25 +61,32 @@ public class User implements UserDetails {  // Spring Security interface
 
     private LocalDateTime updatedAt;
 
-    @PrePersist  // Called before saving to DB
+    @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
 
-    @PreUpdate   // Called before updating in DB
+    @PreUpdate
     public void preUpdate() {
         updatedAt = LocalDateTime.now();
     }
 
-    // ========================
-    // Spring Security Methods
-    // ========================
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Returns what role this user has
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+        for (UserRole ur : userRoles) {
+            Role r = ur.getRole();
+            if (r != null) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + r.getName().toUpperCase()));
+                if (r.getPermissions() != null) {
+                    r.getPermissions().forEach(p -> 
+                        authorities.add(new SimpleGrantedAuthority(p.getPermissionKey().toUpperCase()))
+                    );
+                }
+            }
+        }
+        return authorities;
     }
 
     @Override
@@ -96,4 +105,14 @@ public class User implements UserDetails {  // Spring Security interface
 
     @Override
     public boolean isEnabled() { return enabled; }
+
+    public boolean hasRole(String roleName) {
+        if (userRoles == null) return false;
+        return userRoles.stream()
+                .anyMatch(ur -> ur.getRole() != null && ur.getRole().getName().equalsIgnoreCase(roleName));
+    }
+
+    public boolean isAdmin() { return hasRole("ADMIN") || hasRole("SUPERADMIN"); }
+    public boolean isTeacher() { return hasRole("TEACHER"); }
+    public boolean isStudent() { return hasRole("STUDENT"); }
 }

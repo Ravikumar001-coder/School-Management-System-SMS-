@@ -4,6 +4,7 @@ package com.school.sms.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -11,7 +12,8 @@ import lombok.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "subjects")
-public class Subject {
+@EqualsAndHashCode(callSuper = true)
+public class Subject extends SoftDeletableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,4 +40,23 @@ public class Subject {
     private Integer totalMarks;
     
     private String subjectType; // THEORY, PRACTICAL
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id")
+    private Branch branch;
+
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

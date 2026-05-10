@@ -5,13 +5,10 @@ package com.school.sms.service;
 import com.school.sms.dto.request.ChangePasswordRequest;
 import com.school.sms.dto.request.LoginRequest;
 import com.school.sms.dto.response.AuthResponse;
-import com.school.sms.model.Role;
-import com.school.sms.model.Student;
-import com.school.sms.model.Teacher;
-import com.school.sms.model.User;
-import com.school.sms.repository.StudentRepository;
-import com.school.sms.repository.TeacherRepository;
-import com.school.sms.repository.UserRepository;
+import com.school.sms.exception.LoginException;
+import lombok.extern.slf4j.Slf4j;
+import com.school.sms.model.*;
+import com.school.sms.repository.*;
 import com.school.sms.security.JwtService;
 import com.school.sms.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
@@ -19,34 +16,37 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.core.GrantedAuthority;
 
+import java.util.Set;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
+    private final RoleRepository roleRepository;
+    private final UserRoleRepository userRoleRepository;
     private final StudentRepository studentRepository;
     private final TeacherRepository teacherRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final UserSessionService userSessionService;
     private final RateLimitingService rateLimitingService;
-    private final jakarta.servlet.http.HttpServletRequest httpServletRequest;
-
-    // ========================
-    // LOGIN
-    // Returns: AuthResponse (access token in body) + raw refresh token for cookie (via LoginResult)
-    // ========================
+    private final UserRoleSyncService userRoleSyncService;
+    private final HttpServletRequest httpServletRequest;
 
     @Transactional
     public LoginResult login(LoginRequest request) {
-        String ip = httpServletRequest.getRemoteAddr();
-        if (!rateLimitingService.resolveLoginBucket(ip).tryConsume(1)) {
+        if (!rateLimitingService.resolveLoginBucket(httpServletRequest.getRemoteAddr()).tryConsume(1)) {
             throw new RuntimeException("Too many login attempts. Please try again after 15 minutes.");
         }
 
@@ -65,428 +65,183 @@ public class AuthService {
         }
 
         if (!user.isEnabled()) {
-            throw new BadCredentialsException("Invalid email or password!");
+            throw new BadCredentialsException("Account is disabled!");
         }
 
         // Issue short-lived access token (15 min)
         String accessToken = jwtService.generateToken(user);
 
-        // Issue refresh token — raw token returned ONCE, only hash stored in DB
+        // Issue refresh token
         String rawRefreshToken = refreshTokenService.issueNewToken(user);
 
-        // Create session record (uses hash internally)
+        // Create session record
         userSessionService.createSession(user, rawRefreshToken, httpServletRequest);
 
-        AuthResponse authResponse = AuthResponse.builder()
-                .token(accessToken)
-                // No refreshToken field here — it goes into the HttpOnly cookie only
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .role(user.getRole())
-                .studentId(resolveStudentId(user))
-                .firstLogin(user.isFirstLogin())
-                .message("Login successful!")
-                .build();
-
-        return new LoginResult(authResponse, rawRefreshToken);
+        return new LoginResult(mapToAuthResponse(user, accessToken, "Login successful!"), rawRefreshToken);
     }
-
-    // ========================
-    // TOKEN REFRESH (reads cookie, rotates, returns new cookie + new access token)
-    // ========================
 
     @Transactional
     public RefreshResult refreshToken(String rawRefreshToken) {
+        // Rotate the refresh token
         RefreshTokenService.RotationResult rotation = refreshTokenService.rotateRefreshToken(rawRefreshToken);
+        User user = rotation.user();
+        String newRawRefreshToken = rotation.newRawToken();
 
-        // Update the session record with the new token hash
-        String oldHash = RefreshTokenService.sha256(rawRefreshToken);
-        userSessionService.updateSessionAfterRotation(oldHash, rotation.newTokenHash());
+        // Rotate session
+        userSessionService.updateSessionAfterRotation(
+                RefreshTokenService.sha256(rawRefreshToken),
+                rotation.newTokenHash()
+        );
 
-        String newAccessToken = jwtService.generateToken(rotation.user());
+        // Issue new access token
+        String accessToken = jwtService.generateToken(user);
 
-        AuthResponse authResponse = AuthResponse.builder()
-                .token(newAccessToken)
-                .username(rotation.user().getUsername())
-                .email(rotation.user().getEmail())
-                .firstName(rotation.user().getFirstName())
-                .lastName(rotation.user().getLastName())
-                .role(rotation.user().getRole())
-                .studentId(resolveStudentId(rotation.user()))
-                .message("Token refreshed successfully!")
-                .build();
-
-        return new RefreshResult(authResponse, rotation.newRawToken());
+        return new RefreshResult(mapToAuthResponse(user, accessToken, "Token refreshed"), newRawRefreshToken);
     }
-
-    // ========================
-    // LOGOUT (revoke refresh token + session)
-    // ========================
 
     @Transactional
     public void logout(String rawRefreshToken) {
-        if (rawRefreshToken != null && !rawRefreshToken.isBlank()) {
+        if (rawRefreshToken != null) {
             refreshTokenService.revokeToken(rawRefreshToken);
             userSessionService.revokeSession(rawRefreshToken);
         }
     }
 
-    // ========================
-    // PROFILE
-    // ========================
-
     public AuthResponse getCurrentUserProfile(String identifier) {
-        User user = userRepository.findByUsernameOrEmail(identifier, identifier)
-                .orElseThrow(() -> new RuntimeException("User not found!"));
-
-        return AuthResponse.builder()
-                .token(null)
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .role(user.getRole())
-                .studentId(resolveStudentId(user))
-                .firstLogin(user.isFirstLogin())
-                .message("User profile loaded")
-                .build();
+        User user = userRepository.findByUsername(identifier)
+                .or(() -> userRepository.findByEmail(identifier))
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
+        
+        String token = jwtService.generateToken(user);
+        return mapToAuthResponse(user, token, "Profile fetched");
     }
 
-    // ========================
-    // PASSWORD MANAGEMENT
-    // ========================
-
+    @Transactional
     public void changePassword(String identifier, ChangePasswordRequest request) {
-        User user = userRepository.findByUsernameOrEmail(identifier, identifier)
-                .orElseThrow(() -> new RuntimeException("User not found!"));
+        User user = userRepository.findByUsername(identifier)
+                .or(() -> userRepository.findByEmail(identifier))
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
 
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-            throw new UnauthorizedException("Current password is incorrect");
+            throw new BadCredentialsException("Incorrect current password");
         }
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         user.setFirstLogin(false);
         userRepository.save(user);
 
-        // Revoke all existing sessions after password change (security hygiene)
+        // Revoke all tokens for this user because password changed
         refreshTokenService.revokeAllForUser(user);
-        userSessionService.revokeAllSessions(identifier);
+        userSessionService.revokeAllSessions(user.getUsername());
+    }
+
+    public boolean isAdmin(String identifier) {
+        return userRepository.findByUsername(identifier)
+                .or(() -> userRepository.findByEmail(identifier))
+                .map(User::isAdmin)
+                .orElse(false);
     }
 
     @Transactional
     public String resetPasswordToDefault(Long userId) {
-        Long requestedId = Objects.requireNonNull(userId, "User id is required");
-        User user = resolveUserForReset(requestedId)
-                .or(() -> provisionUserForProfileId(requestedId))
-                .orElseThrow(() -> new RuntimeException("User not found!"));
-
-        String username = resolveDefaultPasswordValue(requestedId, user);
-
-        user.setPassword(passwordEncoder.encode(username));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        String defaultPass = user.getUsername() != null ? user.getUsername() : "School@123";
+        user.setPassword(passwordEncoder.encode(defaultPass));
         user.setFirstLogin(true);
         userRepository.save(user);
-
-        // Revoke all sessions on password reset
+        
         refreshTokenService.revokeAllForUser(user);
         userSessionService.revokeAllSessions(user.getUsername());
-        return username;
+        return defaultPass;
     }
 
     @Transactional
     public String resetStudentPasswordToDefault(String studentId) {
-        String requestedStudentId = Objects.requireNonNull(studentId, "Student id is required").trim();
-        if (requestedStudentId.isEmpty()) {
-            throw new RuntimeException("Student id is required");
-        }
-
-        Student student = studentRepository.findByStudentId(requestedStudentId)
-                .orElseThrow(() -> new RuntimeException("Student not found!"));
-
-        return resetPasswordToDefault(student.getId());
+        Student student = studentRepository.findByStudentId(studentId)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+        return resetPasswordToDefault(student.getUser().getId());
     }
 
-    public boolean isAdmin(String identifier) {
-        if (identifier == null || identifier.isBlank()) {
-            return false;
-        }
-
-        return userRepository.findByUsernameOrEmail(identifier, identifier)
-                .map(User::getRole)
-                .map(role -> role == Role.ADMIN)
-                .orElse(false);
+    private String normalizeIdentifier(String identifier) {
+        if (identifier == null) return "";
+        return identifier.trim().toLowerCase(Locale.ROOT);
     }
-
-    // ========================
-    // Result records (carry both response body and raw refresh token to the controller)
-    // ========================
-
-    /** Carries the login response body AND the raw refresh token to be set as a cookie by the controller. */
-    public record LoginResult(AuthResponse response, String rawRefreshToken) {}
-
-    /** Carries the refresh response body AND the new raw refresh token for cookie rotation. */
-    public record RefreshResult(AuthResponse response, String newRawRefreshToken) {}
-
-    // ========================
-    // Private helpers (unchanged from original)
-    // ========================
 
     private Optional<User> resolveOrProvisionUserForLogin(String identifier) {
-        Optional<User> existingUser = userRepository.findByUsernameOrEmail(identifier, identifier);
-        if (existingUser.isPresent()) {
-            return existingUser;
+        Optional<User> user = userRepository.findByUsername(identifier)
+                .or(() -> userRepository.findByEmail(identifier));
+
+        if (user.isPresent()) {
+            userRoleSyncService.syncRolesForUser(user.get());
         }
-
-        Optional<Student> student = studentRepository.findByStudentId(identifier)
-                .or(() -> studentRepository.findByEmail(identifier));
-        if (student.isPresent()) {
-            return Optional.of(provisionStudentLoginUser(student.get()));
-        }
-
-        Optional<Teacher> teacher = teacherRepository.findByEmployeeId(identifier)
-                .or(() -> teacherRepository.findByEmail(identifier));
-        if (teacher.isPresent()) {
-            return Optional.of(provisionTeacherLoginUser(teacher.get()));
-        }
-
-        return Optional.empty();
-    }
-
-    private User provisionStudentLoginUser(Student student) {
-        if (student.getUser() != null) {
-            return Objects.requireNonNull(student.getUser());
-        }
-
-        String username = nonBlankOrElse(student.getStudentId(), student.getEmail());
-        Optional<User> existing = userRepository.findByUsernameOrEmail(username, student.getEmail());
-        User user;
-        if (existing.isPresent()) {
-            user = Objects.requireNonNull(existing.get());
-        } else {
-            user = Objects.requireNonNull(userRepository.save(User.builder()
-                    .firstName(nonBlankOrElse(student.getFirstName(), "Student"))
-                    .lastName(nonBlankOrElse(student.getLastName(), "User"))
-                    .email(student.getEmail())
-                    .username(username)
-                    .password(passwordEncoder.encode(username))
-                    .role(Role.STUDENT)
-                    .firstLogin(true)
-                    .enabled(true)
-                    .build()));
-        }
-
-        student.setUser(user);
-        studentRepository.save(student);
-        return user;
-    }
-
-    private User provisionTeacherLoginUser(Teacher teacher) {
-        if (teacher.getUser() != null) {
-            return Objects.requireNonNull(teacher.getUser());
-        }
-
-        String username = nonBlankOrElse(teacher.getEmployeeId(), teacher.getEmail());
-        Optional<User> existing = userRepository.findByUsernameOrEmail(username, teacher.getEmail());
-        User user;
-        if (existing.isPresent()) {
-            user = Objects.requireNonNull(existing.get());
-        } else {
-            user = Objects.requireNonNull(userRepository.save(User.builder()
-                    .firstName(nonBlankOrElse(teacher.getFirstName(), "Teacher"))
-                    .lastName(nonBlankOrElse(teacher.getLastName(), "User"))
-                    .email(teacher.getEmail())
-                    .username(username)
-                    .password(passwordEncoder.encode(username))
-                    .role(Role.TEACHER)
-                    .firstLogin(true)
-                    .enabled(true)
-                    .build()));
-        }
-
-        teacher.setUser(user);
-        teacherRepository.save(teacher);
         return user;
     }
 
     private boolean isPasswordMatch(User user, String rawPassword) {
-        String storedPassword = user.getPassword();
-        if (storedPassword == null || rawPassword == null) return false;
         try {
-            return passwordEncoder.matches(rawPassword, storedPassword);
-        } catch (IllegalArgumentException ex) {
+            return passwordEncoder.matches(rawPassword, user.getPassword());
+        } catch (Exception e) {
             return false;
         }
     }
 
     private boolean tryLegacyPlainTextPasswordMigration(User user, String rawPassword) {
-        String storedPassword = user.getPassword();
-        if (storedPassword == null || rawPassword == null) return false;
-        if (looksLikeEncodedPassword(storedPassword)) return false;
-        if (!storedPassword.equals(rawPassword)) return false;
-        user.setPassword(passwordEncoder.encode(rawPassword));
-        userRepository.save(user);
-        return true;
-    }
-
-    private boolean tryDefaultCredentialRepair(User user, String rawPassword, String loginIdentifier) {
-        String expectedDefault = resolveExpectedDefaultCredential(user, loginIdentifier);
-        if (expectedDefault == null || rawPassword == null || !expectedDefault.equals(rawPassword)) return false;
-
-        boolean schoolIdCredentialAttempt = looksLikeSchoolId(expectedDefault)
-                && loginIdentifier != null
-                && expectedDefault.equalsIgnoreCase(loginIdentifier.trim());
-
-        String storedPassword = user.getPassword();
-        boolean canRepair = user.isFirstLogin()
-                || storedPassword == null
-                || storedPassword.isBlank()
-                || !looksLikeEncodedPassword(storedPassword)
-                || schoolIdCredentialAttempt;
-
-        if (!canRepair) return false;
-
-        user.setPassword(passwordEncoder.encode(rawPassword));
-        userRepository.save(user);
-        return true;
-    }
-
-    private String resolveExpectedDefaultCredential(User user, String loginIdentifier) {
-        String roleBasedDefault = switch (user.getRole()) {
-            case STUDENT -> studentRepository.findByUser_Id(user.getId())
-                    .map(Student::getStudentId)
-                    .filter(value -> value != null && !value.isBlank())
-                    .or(() -> studentRepository.findByEmail(user.getEmail())
-                            .map(Student::getStudentId)
-                            .filter(value -> value != null && !value.isBlank()))
-                    .orElse(null);
-            case TEACHER -> teacherRepository.findByUserId(user.getId())
-                    .map(Teacher::getEmployeeId)
-                    .filter(value -> value != null && !value.isBlank())
-                    .or(() -> teacherRepository.findByEmail(user.getEmail())
-                            .map(Teacher::getEmployeeId)
-                            .filter(value -> value != null && !value.isBlank()))
-                    .orElse(null);
-            default -> null;
-        };
-
-        if (roleBasedDefault != null && !roleBasedDefault.isBlank()) return roleBasedDefault;
-        if (looksLikeSchoolId(loginIdentifier)) return loginIdentifier;
-        String expectedDefault = user.getUsername();
-        if (expectedDefault == null || expectedDefault.isBlank()) expectedDefault = user.getEmail();
-        return expectedDefault;
-    }
-
-    private boolean looksLikeEncodedPassword(String value) {
-        return value.startsWith("$2a$") || value.startsWith("$2b$")
-                || value.startsWith("$2y$") || value.startsWith("{");
-    }
-
-    private String normalizeIdentifier(String identifier) {
-        String normalized = identifier == null ? "" : identifier.trim();
-        if (normalized.contains("@")) {
-            normalized = normalized.toLowerCase();
-        } else if (looksLikeSchoolId(normalized)) {
-            normalized = normalized.toUpperCase(Locale.ROOT);
+        if (rawPassword.equals(user.getPassword())) {
+            user.setPassword(passwordEncoder.encode(rawPassword));
+            userRepository.save(user);
+            return true;
         }
-        return normalized;
+        return false;
     }
 
-    private boolean looksLikeSchoolId(String identifier) {
-        if (identifier == null || identifier.isBlank()) return false;
-        return identifier.trim().matches("(?i)^(STU|STD|TCH|ADM|ADMIN)-[A-Z0-9-]+$");
-    }
-
-    private Optional<User> resolveUserForReset(Long id) {
-        Long lookupId = Objects.requireNonNull(id, "User id is required");
-
-        Optional<Student> student = studentRepository.findById(lookupId);
-        if (student.isPresent()) {
-            Student s = student.get();
-            if (s.getUser() != null) return Optional.of(s.getUser());
-            Optional<User> matchedStudentUser = userRepository.findByUsernameOrEmail(s.getStudentId(), s.getEmail());
-            if (matchedStudentUser.isPresent()) return matchedStudentUser;
+    private boolean tryDefaultCredentialRepair(User user, String rawPassword, String identifier) {
+        if (user.getUsername() != null && user.getUsername().equalsIgnoreCase(rawPassword)) {
+            user.setPassword(passwordEncoder.encode(rawPassword));
+            userRepository.save(user);
+            return true;
         }
-
-        Optional<Teacher> teacher = teacherRepository.findById(lookupId);
-        if (teacher.isPresent()) {
-            Teacher t = teacher.get();
-            if (t.getUser() != null) return Optional.of(t.getUser());
-            Optional<User> matchedTeacherUser = userRepository.findByUsernameOrEmail(t.getEmployeeId(), t.getEmail());
-            if (matchedTeacherUser.isPresent()) return matchedTeacherUser;
-        }
-
-        return userRepository.findById(lookupId);
-    }
-
-    private Optional<User> provisionUserForProfileId(Long id) {
-        Long lookupId = Objects.requireNonNull(id, "User id is required");
-
-        Optional<Student> student = studentRepository.findById(lookupId);
-        if (student.isPresent()) {
-            Student s = student.get();
-            String username = nonBlankOrElse(s.getStudentId(), s.getEmail());
-            if (username == null || username.isBlank()) return Optional.empty();
-            Optional<User> existing = userRepository.findByUsernameOrEmail(username, s.getEmail());
-            if (existing.isPresent()) {
-                if (s.getUser() == null) { s.setUser(existing.get()); studentRepository.save(s); }
-                return existing;
-            }
-            User created = userRepository.save(Objects.requireNonNull(User.builder()
-                    .firstName(nonBlankOrElse(s.getFirstName(), "Student"))
-                    .lastName(nonBlankOrElse(s.getLastName(), "User"))
-                    .email(s.getEmail()).username(username)
-                    .password(passwordEncoder.encode(username))
-                    .role(Role.STUDENT).firstLogin(true).enabled(true).build()));
-            s.setUser(created); studentRepository.save(s);
-            return Optional.of(created);
-        }
-
-        Optional<Teacher> teacher = teacherRepository.findById(lookupId);
-        if (teacher.isPresent()) {
-            Teacher t = teacher.get();
-            String username = nonBlankOrElse(t.getEmployeeId(), t.getEmail());
-            if (username == null || username.isBlank()) return Optional.empty();
-            Optional<User> existing = userRepository.findByUsernameOrEmail(username, t.getEmail());
-            if (existing.isPresent()) {
-                if (t.getUser() == null) { t.setUser(existing.get()); teacherRepository.save(t); }
-                return existing;
-            }
-            User created = userRepository.save(Objects.requireNonNull(User.builder()
-                    .firstName(nonBlankOrElse(t.getFirstName(), "Teacher"))
-                    .lastName(nonBlankOrElse(t.getLastName(), "User"))
-                    .email(t.getEmail()).username(username)
-                    .password(passwordEncoder.encode(username))
-                    .role(Role.TEACHER).firstLogin(true).enabled(true).build()));
-            t.setUser(created); teacherRepository.save(t);
-            return Optional.of(created);
-        }
-
-        return Optional.empty();
-    }
-
-    private String resolveDefaultPasswordValue(Long requestedId, User user) {
-        return studentRepository.findById(requestedId)
-                .map(Student::getStudentId)
-                .filter(value -> value != null && !value.isBlank())
-                .or(() -> teacherRepository.findById(requestedId)
-                        .map(Teacher::getEmployeeId)
-                        .filter(value -> value != null && !value.isBlank()))
-                .orElseGet(() -> {
-                    String username = user.getUsername();
-                    return (username == null || username.isBlank()) ? user.getEmail() : username;
-                });
-    }
-
-    private String nonBlankOrElse(String primary, String fallback) {
-        return (primary != null && !primary.isBlank()) ? primary : fallback;
+        return false;
     }
 
     private Long resolveStudentId(User user) {
-        if (user.getRole() != Role.STUDENT) return null;
         return studentRepository.findByUser_Id(user.getId())
-                .or(() -> studentRepository.findByEmail(user.getEmail()))
-                .map(student -> student.getId())
+                .map(Student::getId)
                 .orElse(null);
     }
+
+    private Long resolveTeacherId(User user) {
+        return teacherRepository.findByUserId(user.getId())
+                .map(Teacher::getId)
+                .orElse(null);
+    }
+
+    private AuthResponse mapToAuthResponse(User user, String token, String message) {
+        List<String> roles = user.getUserRoles().stream()
+                .map(ur -> ur.getRole().getName().toUpperCase())
+                .collect(Collectors.toList());
+
+        List<String> permissions = user.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(a -> !a.startsWith("ROLE_"))
+                .collect(Collectors.toList());
+
+        return AuthResponse.builder()
+                .token(token)
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .roles(roles)
+                .permissions(permissions)
+                .studentId(resolveStudentId(user))
+                .teacherId(resolveTeacherId(user))
+                .firstLogin(user.isFirstLogin())
+                .message(message)
+                .build();
+    }
+
+    public static record LoginResult(AuthResponse response, String refreshToken) {}
+    public static record RefreshResult(AuthResponse response, String newRawRefreshToken) {}
 }

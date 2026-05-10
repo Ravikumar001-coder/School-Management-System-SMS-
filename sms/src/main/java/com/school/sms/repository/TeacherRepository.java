@@ -3,6 +3,8 @@ package com.school.sms.repository;
 
 import com.school.sms.model.Teacher;
 import com.school.sms.model.TeacherStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -14,11 +16,17 @@ import java.util.Optional;
 public interface TeacherRepository 
         extends JpaRepository<Teacher, Long> {
 
+    Page<Teacher> findByDeletedAtIsNull(Pageable pageable);
+
+    Optional<Teacher> findByIdAndDeletedAtIsNull(Long id);
+
     Optional<Teacher> findByEmail(String email);
 
     Optional<Teacher> findByEmployeeId(String employeeId);
 
     Optional<Teacher> findByUserId(Long userId);
+    
+    Optional<Teacher> findByUser_UsernameOrUser_Email(String username, String email);
 
     boolean existsByEmail(String email);
 
@@ -26,9 +34,13 @@ public interface TeacherRepository
 
     List<Teacher> findByStatus(TeacherStatus status);
 
-    @Query("SELECT t FROM Teacher t WHERE " +
+    @Query("SELECT t FROM Teacher t WHERE t.deletedAt IS NULL AND (" +
            "LOWER(t.firstName) LIKE LOWER(CONCAT('%',:keyword,'%')) OR " +
            "LOWER(t.lastName)  LIKE LOWER(CONCAT('%',:keyword,'%')) OR " +
-           "LOWER(t.email)     LIKE LOWER(CONCAT('%',:keyword,'%'))")
+           "LOWER(t.email)     LIKE LOWER(CONCAT('%',:keyword,'%')))")
     List<Teacher> searchTeachers(String keyword);
+
+    boolean existsByEmailAndDeletedAtIsNull(String email);
+    
+    boolean existsByEmployeeIdAndDeletedAtIsNull(String employeeId);
 }

@@ -22,7 +22,10 @@ public class FeeStructure {
     private String feeName;      // "Tuition Fee", "Transport Fee"
     private Double amount;
     private String frequency;    // "MONTHLY", "QUARTERLY", "ANNUAL"
-    private String academicYear;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "academic_year_id")
+    private AcademicYear academicYear;
+
     @Builder.Default
     private boolean active = true;
 }

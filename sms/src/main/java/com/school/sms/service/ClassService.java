@@ -7,13 +7,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
-@RequiredArgsConstructor
+@org.springframework.stereotype.Service
+@lombok.RequiredArgsConstructor
 public class ClassService {
-
-    private final ClassRepository classRepository;
-
-    public List<ClassRoom> getAllClasses() {
-        return classRepository.findAll();
-    }
+    private final com.school.sms.repository.ClassRepository classRepository;
 }

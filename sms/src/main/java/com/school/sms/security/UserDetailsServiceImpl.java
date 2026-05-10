@@ -1,9 +1,10 @@
-// src/main/java/com/school/sms/security/UserDetailsServiceImpl.java
-
 package com.school.sms.security;
 
+import com.school.sms.repository.ParentRepository;
 import com.school.sms.repository.UserRepository;
+import com.school.sms.service.UserRoleSyncService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final ParentRepository parentRepository;
+    private final UserRoleSyncService userRoleSyncService;
 
     @Override
     public UserDetails loadUserByUsername(String identifier)
@@ -21,18 +24,22 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         String normalizedIdentifier = normalizeIdentifier(identifier);
 
-        var user = userRepository.findByUsernameOrEmail(normalizedIdentifier, normalizedIdentifier)
+        // 1. Try standard user table
+        var user = userRepository.findByUsernameOrEmail(normalizedIdentifier, normalizedIdentifier);
+        if (user.isPresent()) return user.get();
+
+        // 2. Try parent table (mobile number login)
+        return parentRepository.findByMobileNumberAndDeletedAtIsNull(normalizedIdentifier)
+                .map(p -> User.builder()
+                        .username(p.getMobileNumber())
+                        .password("") // Token-based authentication
+                        .roles("PARENT")
+                        .build())
                 .orElseThrow(() ->
                         new UsernameNotFoundException(
                                 "User not found with identifier: " + normalizedIdentifier
                         )
                 );
-
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .authorities("ROLE_" + user.getRole())
-                .build();
     }
 
     private String normalizeIdentifier(String identifier) {

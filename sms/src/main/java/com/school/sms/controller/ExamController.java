@@ -22,7 +22,7 @@ public class ExamController {
     private final ExamService examService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<ExamResponse>> create(
             @Valid @RequestBody ExamRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
