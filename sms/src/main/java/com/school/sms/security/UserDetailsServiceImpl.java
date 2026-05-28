@@ -28,10 +28,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         var user = userRepository.findByUsernameOrEmail(normalizedIdentifier, normalizedIdentifier);
         if (user.isPresent()) return user.get();
 
-        // 2. Try parent table (mobile number login)
-        return parentRepository.findByMobileNumberAndDeletedAtIsNull(normalizedIdentifier)
+        // 2. Try parent table (phone number login)
+        return parentRepository.findByPhoneAndDeletedAtIsNull(normalizedIdentifier)
                 .map(p -> User.builder()
-                        .username(p.getMobileNumber())
+                        .username(p.getPhone())
                         .password("") // Token-based authentication
                         .roles("PARENT")
                         .build())

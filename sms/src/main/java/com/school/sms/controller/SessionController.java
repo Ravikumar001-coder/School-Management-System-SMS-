@@ -120,7 +120,7 @@ public class SessionController {
                 s.getDeviceType(),
                 s.getBrowser(),
                 s.getIpAddress(),
-                s.getLocation(),
+                "Unknown",
                 s.getLastActiveAt(),
                 s.getCreatedAt(),
                 isCurrent

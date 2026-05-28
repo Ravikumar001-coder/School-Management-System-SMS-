@@ -1,7 +1,6 @@
-// src/main/java/com/school/sms/model/User.java
-
 package com.school.sms.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,6 +20,7 @@ import java.util.Set;
 @Table(name = "users")
 @EqualsAndHashCode(exclude = "userRoles")
 @ToString(exclude = "userRoles")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password"})
 public class User implements UserDetails {
 
     @Id
@@ -60,6 +60,15 @@ public class User implements UserDetails {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+    
+    @Transient
+    private Long teacherId;
+    
+    @Transient
+    private Long studentId;
+    
+    @Transient
+    private Long parentId;
 
     @PrePersist
     public void prePersist() {

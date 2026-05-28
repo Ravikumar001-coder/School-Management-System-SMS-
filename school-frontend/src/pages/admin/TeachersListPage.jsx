@@ -1,12 +1,15 @@
 // src/pages/admin/TeachersListPage.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Download, ChevronLeft, ChevronRight, UserSquare2, Trash2, CheckSquare } from 'lucide-react';
+import { Plus, Search, Download, ChevronLeft, ChevronRight, UserSquare2, Trash2, CheckSquare, Filter } from 'lucide-react';
 import PageHeader from '../../components/common/PageHeader';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useToast } from '../../context/ToastContext';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import { teacherApi } from '../../api/teacherApi';
+import { subjectApi } from '../../api/subjectApi';
+import { classApi } from '../../api/classApi';
+import axios from '../../api/axios';
 import { fileApi } from '../../api/fileApi';
 
 const StatusBadge = ({ status }) => {
@@ -38,14 +41,28 @@ const TeachersListPage = () => {
 
   // Filters
   const [search, setSearch] = useState('');
+  const [deptFilter, setDeptFilter] = useState('');
+  const [subjectFilter, setSubjectFilter] = useState('');
+  const [classFilter, setClassFilter] = useState('');
   const [page, setPage]     = useState(0);
   const [size, setSize]     = useState(10);
+
+  // Dropdown data
+  const [departments, setDepartments] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [classes, setClasses] = useState([]);
 
   const fetchTeachers = useCallback(async () => {
     setLoading(true);
     setSelected(new Set());
     try {
-      const res = await teacherApi.getAll(page, size);
+      const filters = {};
+      if (deptFilter) filters.deptId = deptFilter;
+      if (subjectFilter) filters.subjectId = subjectFilter;
+      if (classFilter) filters.classId = classFilter;
+      if (search) filters.search = search;
+
+      const res = await teacherApi.getAll(page, size, filters);
       const data = res?.data?.data ?? {};
       setTeachers(data.content ?? []);
       setTotalElements(data.totalElements ?? 0);
@@ -55,24 +72,31 @@ const TeachersListPage = () => {
     } finally { 
       setLoading(false); 
     }
-  }, [page, size, toast]);
+  }, [page, size, toast, deptFilter, subjectFilter, classFilter, search]);
 
-  useEffect(() => { fetchTeachers(); }, [fetchTeachers]);
-
-  const handleSearch = async () => {
-    if (!search.trim()) { fetchTeachers(); return; }
-    setLoading(true);
+  const fetchFilters = useCallback(async () => {
     try {
-      const res = await teacherApi.search(search);
-      const data = res?.data?.data ?? [];
-      setTeachers(Array.isArray(data) ? data : []);
-      setTotalElements(Array.isArray(data) ? data.length : 0);
-      setTotalPages(1);
-    } catch { 
-      toast.error('Search failed.'); 
-    } finally {
-      setLoading(false);
+      const [deptRes, subRes, classRes] = await Promise.all([
+        axios.get('/departments'),
+        subjectApi.getAll(),
+        classApi.getAll()
+      ]);
+      setDepartments(deptRes.data?.data || []);
+      setSubjects(subRes.data?.data || []);
+      setClasses(classRes.data?.data || []);
+    } catch (err) {
+      console.error('Failed to load filters', err);
     }
+  }, []);
+
+  useEffect(() => { 
+    fetchTeachers(); 
+    fetchFilters();
+  }, [fetchTeachers, fetchFilters]);
+
+  const handleSearchClick = () => {
+    setPage(0);
+    fetchTeachers();
   };
 
   const handleDelete = async () => {
@@ -172,20 +196,60 @@ const TeachersListPage = () => {
       {/* Toolbar */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 mb-5 flex flex-wrap gap-3 items-center">
         <div className="relative flex-1 min-w-[200px] group">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSearch()}
-            placeholder="Search by name, email or ID..."
-            className="w-full border border-slate-200 rounded-lg pl-9 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+            onKeyDown={e => e.key === 'Enter' && fetchTeachers()}
+            placeholder="Search name/ID..."
+            className="w-full border border-slate-200 rounded-lg pl-9 pr-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
           />
         </div>
-        <button onClick={handleSearch} className="bg-indigo-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-all">Search</button>
-        <button onClick={() => { setSearch(''); fetchTeachers(); }} className="bg-slate-100 text-slate-600 px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-200 transition-all">Clear</button>
-        <button onClick={handleExport} className="flex items-center gap-2 border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 transition-all">
-          <Download size={14} /> Export CSV
-        </button>
+
+        <div className="flex flex-wrap gap-2 items-center">
+          <div className="flex items-center gap-1.5 text-slate-500 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100">
+            <Filter size={12} />
+            <span className="text-[11px] font-bold uppercase tracking-wider">Filters:</span>
+          </div>
+
+          <select 
+            value={deptFilter} 
+            onChange={e => { setDeptFilter(e.target.value); setPage(0); }}
+            className="border border-slate-200 rounded-lg px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-indigo-500/20 outline-none bg-white cursor-pointer"
+          >
+            <option value="">All Departments</option>
+            {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+          </select>
+
+          <select 
+            value={subjectFilter} 
+            onChange={e => { setSubjectFilter(e.target.value); setPage(0); }}
+            className="border border-slate-200 rounded-lg px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-indigo-500/20 outline-none bg-white cursor-pointer"
+          >
+            <option value="">All Subjects</option>
+            {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+          </select>
+
+          <select 
+            value={classFilter} 
+            onChange={e => { setClassFilter(e.target.value); setPage(0); }}
+            className="border border-slate-200 rounded-lg px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-indigo-500/20 outline-none bg-white cursor-pointer"
+          >
+            <option value="">All Classes</option>
+            {classes.map(c => <option key={c.id} value={c.id}>{c.name}-{c.section}</option>)}
+          </select>
+
+          <button onClick={() => { setSearch(''); setDeptFilter(''); setSubjectFilter(''); setClassFilter(''); setPage(0); }} 
+            className="text-xs font-bold text-indigo-600 hover:text-indigo-800 px-2 transition-colors">
+            Reset
+          </button>
+        </div>
+
+        <div className="ml-auto flex gap-2">
+          <button onClick={handleExport} className="flex items-center gap-2 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition-all">
+            <Download size={14} /> Export
+          </button>
+        </div>
       </div>
 
       {/* Desktop Table */}

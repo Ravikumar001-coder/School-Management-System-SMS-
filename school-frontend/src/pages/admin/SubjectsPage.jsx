@@ -5,6 +5,7 @@ import Modal from '../../components/common/Modal';
 import { subjectApi } from '../../api/subjectApi';
 import { classApi } from '../../api/classApi';
 import { teacherApi } from '../../api/teacherApi';
+import axios from '../../api/axios';
 
 const initialForm = {
   name: '',
@@ -38,6 +39,7 @@ const SubjectsPage = () => {
   const [subjects, setSubjects] = useState([]);
   const [classes, setClasses] = useState([]);
   const [teachers, setTeachers] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -56,15 +58,17 @@ const SubjectsPage = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [subjectRes, classRes, teacherRes] = await Promise.all([
+      const [subjectRes, classRes, teacherRes, deptRes] = await Promise.all([
         subjectApi.getAll(),
         classApi.getAll(),
         teacherApi.getAll(0, 500),
+        axios.get('/departments')
       ]);
 
       setSubjects(subjectRes.data?.data || []);
       setClasses(classRes.data?.data || []);
       setTeachers(teacherRes.data?.data?.content || []);
+      setDepartments(deptRes.data?.data || []);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to load subjects data.');
     } finally {
@@ -79,8 +83,8 @@ const SubjectsPage = () => {
   const rows = useMemo(() => subjects, [subjects]);
 
   const departmentOptions = useMemo(
-    () => ['ALL', ...new Set(rows.map((r) => r.department))],
-    [rows]
+    () => ['ALL', ...departments.map(d => d.name)],
+    [departments]
   );
 
   const filtered = useMemo(() => {
@@ -354,10 +358,10 @@ const SubjectsPage = () => {
               onChange={handleFormChange}
               className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm"
             >
-              <option value="Science">Science</option>
-              <option value="Humanities">Humanities</option>
-              <option value="Commerce">Commerce</option>
-              <option value="Languages">Languages</option>
+              <option value="">Select Department</option>
+              {departments.map(d => (
+                <option key={d.id} value={d.name}>{d.name}</option>
+              ))}
             </select>
           </div>
 

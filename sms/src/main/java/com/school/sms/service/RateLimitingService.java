@@ -34,7 +34,7 @@ public class RateLimitingService {
 
     private Bucket newApiBucket(String ip) {
         return Bucket.builder()
-                .addLimit(Bandwidth.classic(100, Refill.intervally(100, Duration.ofMinutes(1))))
+                .addLimit(Bandwidth.classic(500, Refill.greedy(500, Duration.ofMinutes(1))))
                 .build();
     }
 }

@@ -1,0 +1,30 @@
+[
+  {
+    "name": "HRMS payroll",
+    "route": "/admin/hrms/payroll",
+    "heading": "Payroll Dashboard",
+    "bodyLength": 730,
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff Staff Onboarding Payroll Engine Leave Approval Center PF & ESI Compliance Performance Reviews System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN HRMS PAYROLL Payroll Dashboard Payroll / Dashboard October 2024 Run Payroll Gross Payroll ₹ 0 Total Deductions ₹ 0 Net Payable ₹ 0 0 Total Staff Processed Payroll Runs Export Bank Sheet Month / Year Total Staff Gross (₹) Deductions (₹) Net Pay (₹) Sta"
+  },
+  {
+    "name": "HRMS leave",
+    "route": "/admin/hrms/leave",
+    "heading": "Leave Management Center",
+    "bodyLength": 628,
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff Staff Onboarding Payroll Engine Leave Approval Center PF & ESI Compliance Performance Reviews System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN HRMS LEAVE Leave Management Center HRMS > Leave Management 0 Pending Approvals Department Availability Science 70% Leave Requests Pending (0) Employee Leave Type Date Range Days Reason Status Actions No data System Online: v2.4.0-Enterprise SCHOOL MAN"
+  },
+  {
+    "name": "HRMS compliance",
+    "route": "/admin/hrms/compliance",
+    "heading": "PF & ESI Compliance",
+    "bodyLength": 529,
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff Staff Onboarding Payroll Engine Leave Approval Center PF & ESI Compliance Performance Reviews System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN HRMS COMPLIANCE PF & ESI Compliance 2026 Month 5 Generate Report Month/Year Total PF Total ESI Status Action No data System Online: v2.4.0-Enterprise SCHOOL MANAGEMENT SYSTEM © 2024 | SECURE OPERATIONAL INTERFACE Failed to load compliance reports Fail"
+  },
+  {
+    "name": "Finance tally",
+    "route": "/admin/finance/tally",
+    "heading": "Tally ERP 9 Integration",
+    "bodyLength": 581,
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Overview Fees Dashboard Fee Collection Chart of Accounts Journal Entries Trial Balance Expenses & Invoices Vendor Management Payroll & Salary Financial Statements Tally Integration Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN FINANCE TALLY Tally ERP 9 Integration Branch Main Branch Date Range Modules to Export Journal Vouchers Chart of Accounts (Ledgers) Generate Tally XML System Online:"
+  }
+]

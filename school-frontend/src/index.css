@@ -1,5 +1,4 @@
-/* src/index.css */
-/* This file must have these 3 lines at the top */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -35,7 +34,7 @@
 /* ============================================
    CUSTOM BASE STYLES
    (These apply to the whole app)
-============================================ */
+ ============================================ */
 
 @layer base {
   /* Smooth scrolling everywhere */
@@ -51,10 +50,10 @@
   /* Default body styles */
   body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont,
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont,
                  'Segoe UI', Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
-    background-color: #e8eaed;
+    background-color: #f8faff;
   }
 
   /* Better heading styles */
@@ -439,6 +438,15 @@
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .hide-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
   }
 }
 

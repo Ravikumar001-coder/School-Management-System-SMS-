@@ -61,6 +61,30 @@ public class RolePermissionSeeder implements CommandLineRunner {
                 }
             }
         }
+
+        List<String> customKeys = Arrays.asList(
+            "ATTENDANCE_MARK",
+            "ATTENDANCE_TEMPLATE_MANAGE",
+            "HOMEWORK_CREATE",
+            "HOMEWORK_REVIEW",
+            "CLASS_DIARY_CREATE",
+            "LESSON_PLAN_MANAGE",
+            "EXAM_DOCUMENT_UPLOAD",
+            "SUBSTITUTE_ASSIGN",
+            "TIMETABLE_VIEW"
+        );
+        for (String key : customKeys) {
+            if (permissionRepository.findByPermissionKey(key).isEmpty()) {
+                String[] parts = key.split("_");
+                String module = parts[0];
+                String action = parts[1];
+                permissionRepository.save(Permission.builder()
+                        .moduleName(module)
+                        .actionName(action)
+                        .permissionKey(key)
+                        .build());
+            }
+        }
     }
 
     private void seedRoles() {
@@ -73,6 +97,8 @@ public class RolePermissionSeeder implements CommandLineRunner {
         
         ensureRole("TEACHER", "Academic access", true);
         ensureRole("ACCOUNTANT", "Financial access", true);
+        ensureRole("HR", "Human resources access", true);
+        ensureRole("LIBRARIAN", "Library access", true);
         ensureRole("PARENT", "Parental access", true);
         ensureRole("STUDENT", "Student access", true);
         
@@ -81,10 +107,20 @@ public class RolePermissionSeeder implements CommandLineRunner {
             "ATTENDANCE_VIEW", "ATTENDANCE_CREATE", "ATTENDANCE_EDIT",
             "MARKS_VIEW", "MARKS_CREATE", "MARKS_EDIT",
             "STUDENTS_VIEW", "EXAMS_VIEW", "DASHBOARD_VIEW",
-            "CLASSES_VIEW", "TEACHERS_VIEW"
+            "CLASSES_VIEW", "TEACHERS_VIEW",
+            "ATTENDANCE_MARK", "ATTENDANCE_TEMPLATE_MANAGE",
+            "HOMEWORK_CREATE", "HOMEWORK_REVIEW",
+            "CLASS_DIARY_CREATE", "LESSON_PLAN_MANAGE",
+            "EXAM_DOCUMENT_UPLOAD", "SUBSTITUTE_ASSIGN",
+            "TIMETABLE_VIEW"
         ));
 
         syncExactPermissionsToRole("ACCOUNTANT", Collections.emptyList());
+        syncExactPermissionsToRole("HR", Arrays.asList(
+            "DASHBOARD_VIEW", "TEACHERS_VIEW", "TEACHERS_CREATE", "TEACHERS_EDIT", "TEACHERS_DELETE",
+            "USERS_VIEW", "REPORTS_VIEW"
+        ));
+        syncExactPermissionsToRole("LIBRARIAN", Collections.emptyList());
         syncExactPermissionsToRole("PARENT", Collections.emptyList());
 
         // 4. Sync basic permissions to Student

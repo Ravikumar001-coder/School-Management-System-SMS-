@@ -1,4 +1,3 @@
-// dto/request/TeacherRequest.java
 package com.school.sms.dto.request;
 
 import jakarta.validation.constraints.*;
@@ -19,22 +18,48 @@ public class TeacherRequest {
     @Email(message = "Invalid email")
     private String email;
 
-    private String password;
-
     private String phone;
+    private String gender;
+    private LocalDate dateOfBirth;
+    private String address;
+    private String bloodGroup;
+    private String profilePhoto;
+
+    // Professional
+    private String designation;
     private String qualification;
     private String specialization;
-    private LocalDate dateOfBirth;
-    private LocalDate joiningDate;
-    private String gender;
-    private String address;
-    private String profilePhoto;
     private Double salary;
+    private LocalDate joiningDate;
+    private String employmentType; // FULL_TIME, PART_TIME, CONTRACT, VISITING
+    private String workShift;
+    private Integer experienceYears;
+    private Long departmentId;
+
+    // Payroll & Banking
+    private String bankAccountNo;
+    private String ifscCode;
+    
+    @NotBlank(message = "PAN Card is required for payroll")
+    private String panCard;
+    
+    @NotBlank(message = "Aadhar Card is required for verification")
+    private String aadharCard;
+    
+    private String pfNumber;
+    private String esiNumber;
+    private String paymentMode; // BANK_TRANSFER, CASH, CHEQUE
+
+    // Lifecycle
+    private LocalDate probationEndDate;
+    private LocalDate contractEndDate;
+    private String biometricId;
+    private Long reportingManagerId;
     private String status;
 
-    // Which subjects this teacher can teach
+    // Assignments
     private List<Long> subjectIds;
-
-    // Which classes this teacher is assigned as class teacher
     private List<Long> assignedClassIds;
+
+    private String emergencyContact;
 }

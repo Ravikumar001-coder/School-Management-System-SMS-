@@ -1,0 +1,2 @@
+-- This migration (V8) was replaced by V9 due to a partial failure during initial execution.
+-- Empty file to satisfy Flyway checksums if needed.

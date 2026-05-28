@@ -13,22 +13,20 @@ import java.util.Optional;
 
 @Repository
 public interface UserSessionRepository extends JpaRepository<UserSession, Long> {
-
-    List<UserSession> findByUserAndActiveOrderByLastActiveAtDesc(User user, boolean active);
-
-    Optional<UserSession> findByRefreshTokenHash(String refreshTokenHash);
-
+    
+    Optional<UserSession> findByRefreshTokenHash(String hash);
+    
     Optional<UserSession> findBySessionIdAndUser(String sessionId, User user);
+    
+    List<UserSession> findByUserAndActiveOrderByLastActiveAtDesc(User user, boolean active);
+    
+    List<UserSession> findByActiveTrue();
 
-    /** Revoke all active sessions for a user EXCEPT the one with the given sessionId. */
     @Modifying
-    @Query("UPDATE UserSession s SET s.active = false, s.revokedAt = :now " +
-           "WHERE s.user = :user AND s.active = true AND s.sessionId <> :currentSessionId")
-    int revokeAllExcept(User user, String currentSessionId, Instant now);
+    @Query("UPDATE UserSession s SET s.active = false, s.revokedAt = :revokedAt WHERE s.user = :user AND s.active = true")
+    int revokeAll(User user, Instant revokedAt);
 
-    /** Revoke all sessions for a user (full logout). */
     @Modifying
-    @Query("UPDATE UserSession s SET s.active = false, s.revokedAt = :now " +
-           "WHERE s.user = :user AND s.active = true")
-    int revokeAll(User user, Instant now);
+    @Query("UPDATE UserSession s SET s.active = false, s.revokedAt = :revokedAt WHERE s.user = :user AND s.sessionId <> :currentSessionId AND s.active = true")
+    int revokeAllExcept(User user, String currentSessionId, Instant revokedAt);
 }

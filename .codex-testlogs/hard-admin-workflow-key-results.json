@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Department Add/Delete",
+    "status": "FAIL",
+    "deptName": "QADEPT475144",
+    "created": true,
+    "deleteClick": false,
+    "deleted": false,
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Students List Parent Directory Classes & Sections Subject Registry Departments School Timetable Exams & Results Communication Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN DEPARTMENTS Departments Management Manage academic and administrative departments New Department Department Name Add Department Existing Departments 6 UNITS Humanity xyz SCIENCE LANGUAGE TECH QADEPT475144 System Online: v2.4.0-Enterprise SCHOOL MANAGEMENT SYSTEM © 2024 | SECURE OPERATIONAL INTERFACE Department created"
+  },
+  {
+    "name": "Broadcast Notice",
+    "status": "PASS",
+    "noticeTitle": "QANOTICE481871",
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Communication Bulletin Board Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN NOTICES Bulletin Board Publish notices and announcements to the school community Draft Notice Headline Message Content Audience Everyone Teachers Only Students Only Parents Only Expiry (Optional) Broadcast Notice LIVE BULLETINS ALL May 26, 2026 QANOTICE481871 QANOTICEBODY System Online: v2.4.0-Enterprise SCHOOL MANAGEMENT SYSTEM © 2024 | SECURE OPERATIONAL INTERFACE Notice published"
+  },
+  {
+    "name": "Generate Tally XML",
+    "status": "PASS",
+    "clickedDownload": true,
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Communication Transport Finance & Accounts Overview Fees Dashboard Fee Collection Chart of Accounts Journal Entries Trial Balance Expenses & Invoices Vendor Management Payroll & Salary Financial Statements Tally Integration Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN FINANCE TALLY Tally ERP 9 Integration Select Period & Modules Choose what data to export 2 Generate XML System generates Tally compatible file 3 Download Import directly into Tally Export Ready! Your data has been formatted for Tally ERP 9 XML. Start Over Download XML File System Online: v2.4.0-Enterprise SCHOOL MANAGEMENT SYSTEM © 2024 | SECURE OPERATIONAL INTERFACE"
+  }
+]

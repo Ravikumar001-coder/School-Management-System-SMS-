@@ -10,6 +10,8 @@ import { useToast } from '../../context/ToastContext';
 import api from '../../api/axios';
 import { studentApi } from '../../api/studentApi';
 
+import usePersistedForm from '../../hooks/usePersistedForm';
+
 const EditParentPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -17,13 +19,18 @@ const EditParentPage = () => {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   
-  // Parent Form
-  const [form, setForm] = useState({
-    fullName: '', mobileNumber: '', email: '', alternateMobile: '',
-    gender: '', relationshipDefault: 'FATHER', occupation: '',
-    address: '', city: '', state: '', pincode: '',
-    studentLinks: []
-  });
+  // ── Form State with Persistence ───────────────────────────────────────────
+  const { 
+    formData: form, 
+    handleChange: handlePersistedChange, 
+    setFormData: setForm,
+    clearDraft,
+    isRestored
+  } = usePersistedForm(`edit_parent_form_${id}`, {});
+
+  const setFormField = (field, value) => {
+    setForm(prev => ({ ...prev, [field]: value }));
+  };
 
   // Student Search
   const [search, setSearch] = useState('');
@@ -36,7 +43,7 @@ const EditParentPage = () => {
         const res = await api.get(`/parents/${id}`);
         const data = res.data?.data;
         if (data) {
-          setForm({
+          const dbForm = {
             fullName: data.fullName || '',
             mobileNumber: data.mobileNumber || '',
             email: data.email || '',
@@ -54,10 +61,12 @@ const EditParentPage = () => {
               studentCode: c.studentCode,
               relationshipType: c.relationshipType,
               isPrimaryContact: c.isPrimaryContact,
-              pickupAuthorized: true, // Defaulting if not in DTO
-              feeResponsible: false    // Defaulting if not in DTO
+              pickupAuthorized: true, 
+              feeResponsible: false    
             }))
-          });
+          };
+          // Merge: Draft overrides DB data
+          setForm(prev => ({ ...dbForm, ...prev }));
         }
       } catch {
         toast.error('Failed to load parent data.');
@@ -122,6 +131,7 @@ const EditParentPage = () => {
     try {
       await api.put(`/parents/${id}`, form);
       toast.success('Parent profile updated successfully!');
+      clearDraft();
       setTimeout(() => navigate('/admin/parents'), 1500);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to update parent.');
@@ -149,16 +159,16 @@ const EditParentPage = () => {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField label="Full Name" required>
-                  <input required value={form.fullName} onChange={e => setForm({...form, fullName: e.target.value})} className="input" placeholder="e.g. Rajesh Kumar" />
+                  <input required value={form.fullName} onChange={e => setFormField('fullName', e.target.value)} className="input" placeholder="e.g. Rajesh Kumar" />
                 </FormField>
                 <FormField label="Primary Mobile" required helpText="10-digit number used for login">
-                  <input required pattern="[0-9]{10}" value={form.mobileNumber} onChange={e => setForm({...form, mobileNumber: e.target.value})} className="input" placeholder="9876543210" />
+                  <input required pattern="[0-9]{10}" value={form.mobileNumber} onChange={e => setFormField('mobileNumber', e.target.value)} className="input" placeholder="9876543210" />
                 </FormField>
                 <FormField label="Email Address">
-                  <input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} className="input" placeholder="parent@example.com" />
+                  <input type="email" value={form.email} onChange={e => setFormField('email', e.target.value)} className="input" placeholder="parent@example.com" />
                 </FormField>
                 <FormField label="Default Relationship">
-                  <select value={form.relationshipDefault} onChange={e => setForm({...form, relationshipDefault: e.target.value})} className="select">
+                  <select value={form.relationshipDefault} onChange={e => setFormField('relationshipDefault', e.target.value)} className="select">
                     <option value="FATHER">Father</option>
                     <option value="MOTHER">Mother</option>
                     <option value="GUARDIAN">Guardian</option>
@@ -248,10 +258,17 @@ const EditParentPage = () => {
               </div>
             </section>
 
-            <div className="pt-6 border-t border-slate-50">
+            <div className="pt-6 border-t border-slate-50 flex justify-between items-center">
               <Button type="submit" loading={loading} className="px-12 bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 rounded-2xl h-14 text-base font-bold">
                 Update Profile
               </Button>
+              <button 
+                type="button" 
+                onClick={() => clearDraft(true)}
+                className="text-slate-400 hover:text-rose-500 text-xs font-bold uppercase tracking-widest px-4 transition-colors"
+              >
+                🗑️ Clear Draft
+              </button>
             </div>
           </form>
         </div>

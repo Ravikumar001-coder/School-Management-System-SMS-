@@ -20,6 +20,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 
     boolean existsByUsername(String username);
+    @org.springframework.data.jpa.repository.Query(value = 
+        "SELECT MAX(CAST(SUBSTRING(username, :prefixLength + 1) AS UNSIGNED)) " +
+        "FROM users WHERE username LIKE CONCAT(:prefix, '%')", nativeQuery = true)
+    Long findMaxSequenceByPrefix(String prefix, int prefixLength);
 }
 // Spring Data JPA automatically implements these methods!
 // No need to write SQL queries!

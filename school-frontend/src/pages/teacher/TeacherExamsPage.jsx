@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiCalendar, FiClock, FiBook, FiAward, FiEye, FiEdit3, FiTrash2, FiSearch, FiFilter, FiPlus, FiChevronRight, FiCheckCircle } from 'react-icons/fi';
+import { FiCalendar, FiClock, FiBook, FiAward, FiEye, FiEdit3, FiTrash2, FiSearch, FiFilter, FiPlus, FiChevronRight, FiCheckCircle, FiChevronDown } from 'react-icons/fi';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
@@ -125,40 +125,45 @@ const TeacherExamsPage = () => {
         </div>
 
         {/* Filter Section */}
-        <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm flex flex-col lg:flex-row items-center gap-4">
-           <div className="relative flex-1 w-full">
-              <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+        <div className="bg-white rounded-[2rem] border border-gray-100 p-6 shadow-sm flex flex-col lg:flex-row items-center gap-6">
+           <div className="relative flex-1 w-full group">
+              <FiSearch className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
               <input 
                 type="text" 
                 placeholder="Search exams by name or subject..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-full bg-gray-50 border-none rounded-2xl pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none font-medium"
+                className="w-full bg-slate-50/50 border border-transparent rounded-[1.5rem] pl-14 pr-6 py-4 text-sm focus:bg-white focus:border-indigo-500 transition-all outline-none font-bold"
               />
            </div>
+           
            <div className="flex items-center gap-3 w-full lg:w-auto">
-              <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl border border-gray-100">
-                 <FiFilter className="text-gray-400" />
+              {/* Class Dropdown */}
+              <div className="relative flex-1 lg:w-48 group">
                  <select 
                    value={classFilter} 
                    onChange={e => setClassFilter(e.target.value)}
-                   className="bg-transparent text-xs font-bold text-gray-600 outline-none"
+                   className="w-full h-12 bg-white rounded-2xl border border-slate-100 px-5 pr-10 font-bold text-xs outline-none focus:border-indigo-500 shadow-sm appearance-none cursor-pointer group-hover:border-slate-200 transition-all"
                  >
                    <option value="ALL">All Classes</option>
                    {classOptions.map(c => <option key={c} value={c}>{c}</option>)}
                  </select>
+                 <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover:text-slate-600 transition-colors" />
               </div>
-              <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl border border-gray-100">
+
+              {/* Status Dropdown */}
+              <div className="relative flex-1 lg:w-48 group">
                  <select 
                    value={statusFilter} 
                    onChange={e => setStatusFilter(e.target.value)}
-                   className="bg-transparent text-xs font-bold text-gray-600 outline-none"
+                   className="w-full h-12 bg-white rounded-2xl border border-slate-100 px-5 pr-10 font-bold text-xs outline-none focus:border-indigo-500 shadow-sm appearance-none cursor-pointer group-hover:border-slate-200 transition-all"
                  >
                    <option value="ALL">All Status</option>
                    <option value="SCHEDULED">Scheduled</option>
                    <option value="COMPLETED">Completed</option>
                    <option value="OVERDUE">Overdue</option>
                  </select>
+                 <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover:text-slate-600 transition-colors" />
               </div>
            </div>
         </div>
@@ -204,7 +209,7 @@ const TeacherExamsPage = () => {
 
                   <div className="p-4 bg-gray-50 flex items-center gap-2">
                      <button 
-                       onClick={() => navigate(`/admin/exams/${exam.id}/marks`)}
+                       onClick={() => navigate(`/teacher/exams/${exam.id}/marks`)}
                        className="flex-1 bg-white hover:bg-indigo-600 hover:text-white text-gray-800 border border-gray-200 hover:border-indigo-600 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2"
                      >
                        <FiEdit3 /> {marksCount > 0 ? 'Edit Marks' : 'Enter Marks'}

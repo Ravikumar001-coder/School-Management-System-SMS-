@@ -155,4 +155,17 @@ public class ParentSuperAppController {
         superAppService.submitConsentResponse(parentMobile, studentId, formId, response);
         return ResponseEntity.ok(ApiResponse.success("Consent response submitted successfully", null));
     }
+
+    @GetMapping("/diary/{studentId}")
+    public ResponseEntity<ApiResponse<java.util.List<java.util.Map<String, Object>>>> getDiary(
+            @PathVariable Long studentId,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            @AuthenticationPrincipal UserDetails user) {
+        String parentMobile = user.getUsername();
+        LocalDate from = startDate != null ? LocalDate.parse(startDate) : LocalDate.now().minusDays(14);
+        LocalDate to = endDate != null ? LocalDate.parse(endDate) : LocalDate.now();
+        return ResponseEntity.ok(ApiResponse.success("Class diary fetched",
+                superAppService.getClassDiaryForParent(parentMobile, studentId, from, to)));
+    }
 }

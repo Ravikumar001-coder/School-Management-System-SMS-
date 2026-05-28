@@ -107,8 +107,16 @@ const RolePermissionMatrix = () => {
     setMatrix(newMatrix);
   };
 
-  const modules = [...new Set(permissions.map(p => p.moduleName))];
-  const actions = [...new Set(permissions.map(p => p.actionName))];
+  // Group permissions by their moduleName directly from the API response.
+  // This correctly renders CUSTOM keys like ATTENDANCE_MARK, HOMEWORK_CREATE, etc.
+  // which do not follow the strict MODULE_ACTION naming convention.
+  const modulePermissionMap = permissions.reduce((acc, p) => {
+    if (!acc[p.moduleName]) acc[p.moduleName] = [];
+    acc[p.moduleName].push(p);
+    return acc;
+  }, {});
+  const modules = Object.keys(modulePermissionMap);
+
   const hasSensitivePerms = (role) =>
     (role?.permissions || []).some(p => (p?.permissionKey || '').startsWith('ROLES_'));
 
@@ -170,18 +178,20 @@ const RolePermissionMatrix = () => {
                       📦 {module}
                     </td>
                   </tr>
-                  {actions.map(action => {
-                    const permKey = `${module}_${action}`;
-                    const perm = permissions.find(p => p.permissionKey === permKey);
-                    if (!perm) return null;
+                  {modulePermissionMap[module].map(perm => {
+                    const permKey = perm.permissionKey;
                     const isSensitive = permKey.startsWith('ROLES_');
                     const isLocked = role => role.name === 'SUPERADMIN' || (!isSuperAdmin() && isSensitive);
+                    // Display name: use actionName if available, else derive from permissionKey
+                    const displayName = perm.actionName
+                      ? perm.actionName.toLowerCase()
+                      : permKey.replace(module + '_', '').replace(/_/g, ' ').toLowerCase();
 
                     return (
                       <tr key={permKey} className="hover:bg-gray-50/50 transition-colors">
                         <td className="px-8 py-3.5 text-sm text-gray-600 font-medium border-r border-gray-50">
                           <div className="flex items-center justify-between">
-                            <span className="capitalize">{action.toLowerCase()}</span>
+                            <span className="capitalize">{displayName}</span>
                             <div className="flex gap-2">
                               <button
                                 onClick={() => handleSelectAllInRow(permKey, true)}

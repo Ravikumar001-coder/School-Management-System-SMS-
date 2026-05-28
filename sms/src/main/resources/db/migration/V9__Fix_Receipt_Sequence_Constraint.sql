@@ -1,0 +1,2 @@
+-- This migration (V9) was replaced by V10 due to a compatibility failure during initial execution.
+-- Empty file to satisfy Flyway.

@@ -24,6 +24,8 @@ public interface ClassRoomRepository
     boolean existsByNameAndSectionAndAcademicYear(
         String name, String section, AcademicYear academicYear);
 
+    Optional<ClassRoom> findByIdAndAcademicYearId(Long id, Long academicYearId);
+
     @Query("SELECT c FROM ClassRoom c " +
            "WHERE c.classTeacher.id = :teacherId")
     List<ClassRoom> findByClassTeacherId(Long teacherId);

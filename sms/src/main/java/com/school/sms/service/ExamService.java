@@ -27,6 +27,7 @@ public class ExamService {
     private final SubjectRepository   subjectRepository;
     private final StudentRepository   studentRepository;
     private final AcademicYearRepository academicYearRepository;
+    private final AuditLogService auditLogService;
 
     @Transactional
     public ExamResponse createExam(ExamRequest request) {
@@ -111,11 +112,17 @@ public class ExamService {
             if (existing.isPresent()) {
                 // Update existing
                 Mark mark = existing.get();
+                Double oldMarks = mark.getMarksObtained();
                 mark.setMarksObtained(mr.getMarksObtained());
                 mark.setAbsent(mr.isAbsent());
                 mark.setGrade(grade);
                 mark.setRemarks(mr.getRemarks());
                 markRepository.save(mark);
+                
+                auditLogService.logUpdate("Mark", mark.getId(), "marksObtained", 
+                        oldMarks != null ? oldMarks.toString() : "N/A", 
+                        mr.getMarksObtained() != null ? mr.getMarksObtained().toString() : "ABSENT", 
+                        exam.getAcademicYear().getLabel());
                 updated++;
             } else {
                 // Create new
@@ -129,8 +136,13 @@ public class ExamService {
                         .absent(mr.isAbsent())
                         .remarks(mr.getRemarks())
                         .academicYear(exam.getAcademicYear())
+                        .branch(student.getBranch())
                         .build();
-                markRepository.save(mark);
+                Mark savedMark = markRepository.save(mark);
+                
+                auditLogService.logCreate("Mark", savedMark.getId(), 
+                        "Entered marks for " + student.getFirstName() + " in " + exam.getName(), 
+                        exam.getAcademicYear().getLabel());
                 saved++;
             }
         }

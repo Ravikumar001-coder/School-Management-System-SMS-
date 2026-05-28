@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "attendance",
     uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"student_id", "attendance_date", "subject_id", "academic_year_id"})
+        @UniqueConstraint(columnNames = {"student_id", "attendance_date", "subject_id", "academic_year_id", "period_number"})
     },
     indexes = {
         @Index(name = "idx_attendance_student_id", columnList = "student_id"),
@@ -40,6 +40,9 @@ public class Attendance extends SoftDeletableEntity {
     @ManyToOne
     @JoinColumn(name = "subject_id")
     private Subject subject;
+
+    @Column(name = "period_number")
+    private Integer periodNumber;
 
     @ManyToOne
     @JoinColumn(name = "marked_by")

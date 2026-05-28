@@ -21,7 +21,10 @@ public class UploadedFile {
     @Column(nullable = false, unique = true)
     private String filename;
 
-    @Column(nullable = false)
+    @Column(name = "original_filename", nullable = false)
+    private String originalFilename;
+
+    @Column(name = "global_filename", nullable = false)
     private String globalFilename;
 
     @Column(nullable = false)

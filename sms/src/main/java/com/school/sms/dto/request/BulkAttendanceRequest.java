@@ -20,6 +20,8 @@ public class BulkAttendanceRequest {
 
     private Long subjectId;
 
+    private Integer periodNumber;
+
     @NotNull(message = "Attendance list is required")
     private List<AttendanceRequest> attendanceList;
 }

@@ -1,6 +1,6 @@
 // src/context/AuthContext.jsx
 
-import React, { createContext, useContext, useEffect, useRef, useState, useMemo } from 'react';
+import React, { createContext, useContext, useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import api from '../api/axios';
 import { logoutApi } from '../api/authApi';
 
@@ -78,20 +78,20 @@ export const AuthProvider = ({ children }) => {
   }, [token, user?.role]);
 
   // Login function
-  const login = (userData, authToken) => {
+  const login = useCallback((userData, authToken) => {
     setUser(userData);
     setToken(authToken);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', authToken);
-  };
+  }, []);
 
-  const selectChild = (childId) => {
+  const selectChild = useCallback((childId) => {
     setActiveChildId(childId);
     localStorage.setItem('activeChildId', childId);
-  };
+  }, []);
 
   // Logout function
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await logoutApi();
     } catch {
@@ -106,19 +106,26 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('activeChildId');
       localStorage.removeItem('children');
     }
-  };
+  }, []);
+
+  const normalizedRoles = useMemo(
+    () => (user?.roles ?? (user?.role ? [user.role] : []))
+      .map(role => String(role).replace(/^ROLE_/, '').toUpperCase()),
+    [user?.role, user?.roles]
+  );
 
   // Check if user has a specific permission
-  const can = (permission) => {
-    if (user?.role === 'SUPERADMIN' || user?.role === 'ADMIN') return true;
+  const can = useCallback((permission) => {
+    if (normalizedRoles.includes('SUPERADMIN') || normalizedRoles.includes('ADMIN')) return true;
     if (!user?.permissions) return false;
     return user.permissions.includes(permission.toUpperCase());
-  };
+  }, [normalizedRoles, user?.permissions]);
 
-  const isAdmin = () => user?.role === 'ADMIN' || user?.role === 'SUPERADMIN';
-  const isTeacher = () => user?.role === 'TEACHER';
-  const isStudent = () => user?.role === 'STUDENT';
-  const isParent = () => user?.role === 'PARENT';
+  const isSuperAdmin = useCallback(() => normalizedRoles.includes('SUPERADMIN'), [normalizedRoles]);
+  const isAdmin = useCallback(() => normalizedRoles.includes('ADMIN') || isSuperAdmin(), [normalizedRoles, isSuperAdmin]);
+  const isTeacher = useCallback(() => normalizedRoles.includes('TEACHER'), [normalizedRoles]);
+  const isStudent = useCallback(() => normalizedRoles.includes('STUDENT'), [normalizedRoles]);
+  const isParent = useCallback(() => normalizedRoles.includes('PARENT'), [normalizedRoles]);
 
   const contextValue = useMemo(() => ({
     user,
@@ -126,6 +133,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     isAdmin,
+    isSuperAdmin,
     isTeacher,
     isStudent,
     isParent,
@@ -134,7 +142,7 @@ export const AuthProvider = ({ children }) => {
     setActiveChildId: selectChild,
     children: myChildren,
     isAuthenticated: !!token
-  }), [user, token, login, logout, isAdmin, isTeacher, isStudent, isParent, can, activeChildId, myChildren]);
+  }), [user, token, login, logout, isAdmin, isSuperAdmin, isTeacher, isStudent, isParent, can, activeChildId, myChildren, selectChild]);
 
   return (
     <AuthContext.Provider value={contextValue}>

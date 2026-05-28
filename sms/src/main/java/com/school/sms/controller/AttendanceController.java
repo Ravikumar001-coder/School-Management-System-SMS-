@@ -52,11 +52,12 @@ public class AttendanceController {
     @PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
     public ResponseEntity<ApiResponse<Map<String, Object>>> classAttendance(
             @PathVariable Long classId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                LocalDate date) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) Long subjectId,
+            @RequestParam(required = false) Integer periodNumber) {
 
         return ResponseEntity.ok(ApiResponse.success(
             "Class attendance",
-            attendanceService.getClassAttendance(classId, date)));
+            attendanceService.getClassAttendance(classId, date, subjectId, periodNumber)));
     }
 }

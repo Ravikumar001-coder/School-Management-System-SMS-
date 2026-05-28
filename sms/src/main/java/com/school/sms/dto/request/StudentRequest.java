@@ -1,5 +1,3 @@
-// src/main/java/com/school/sms/dto/request/StudentRequest.java
-
 package com.school.sms.dto.request;
 
 import jakarta.validation.constraints.*;
@@ -29,20 +27,39 @@ public class StudentRequest {
     private String gender;
 
     private String address;
-    
-    @NotBlank(message = "Parent name is required")
-    private String parentName;
-    
-    private String parentPhone;
-    private String parentEmail;
-    private String guardianRelationship;
     private String bloodGroup;
     private String profilePhoto;
     
+    // Academic Assignment
     @NotNull(message = "Class is required")
     private Long classRoomId;
     
-    private String academicYear;
+    private Long departmentId;
+    private String section;
+    private String rollNumber;
+    
+    // Enterprise SIS Fields
+    private String aadharCard;
+    private String nationality;
+    private String religion;
+    private String category;
+    private String emergencyContact;
+    private String medicalConditions;
+    private String previousSchool;
+    private String admissionSource;
+    private LocalDate admissionDate;
     private String admissionClass;
     private String courses;
+    private Boolean isNewAdmission;
+    private LocalDate graduationDate;
+    private Long promotedFromClassroomId;
+    private String previousStudentId;
+    private String transferCertificateNo;
+    
+    // Parent Integration
+    @NotNull(message = "Parent details are required")
+    private ParentRequest parent;
+
+    private String guardianRelationship; // FATHER, MOTHER, GUARDIAN
+    private Boolean isPrimaryGuardian;
 }

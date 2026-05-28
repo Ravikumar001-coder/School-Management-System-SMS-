@@ -1,0 +1,47 @@
+{
+    "departmentCreatedBeforeCleanup":  true,
+    "departmentDeleteResponse":  "Department deleted",
+    "departmentDeleted":  true,
+    "noticeCreatedBeforeCleanup":  true,
+    "noticeDeleteResponse":  "Announcement deleted",
+    "noticeDeleted":  true,
+    "latestBackups":  [
+                          {
+                              "id":  8,
+                              "fileName":  "backup_20260526_204138.sql",
+                              "fileType":  "SQL",
+                              "fileSize":  412729,
+                              "backupStatus":  "SUCCESS",
+                              "restoreStatus":  "NOT_RESTORED",
+                              "createdBy":  "ADMIN-001",
+                              "notes":  "Manual backup via API",
+                              "createdAt":  "2026-05-26T20:41:38.209881"
+                          },
+                          {
+                              "id":  7,
+                              "fileName":  "backup_20260526_083547.sql",
+                              "fileType":  "SQL",
+                              "fileSize":  397644,
+                              "backupStatus":  "SUCCESS",
+                              "restoreStatus":  "NOT_RESTORED",
+                              "createdBy":  "SYSTEM",
+                              "notes":  "Scheduled daily backup",
+                              "createdAt":  "2026-05-26T08:35:48.097491"
+                          },
+                          {
+                              "id":  6,
+                              "fileName":  "backup_20260521_093634.sql",
+                              "fileType":  "SQL",
+                              "fileSize":  267865,
+                              "backupStatus":  "SUCCESS",
+                              "restoreStatus":  "SUCCESS",
+                              "createdBy":  "ADMIN-001",
+                              "notes":  "Manual backup via API",
+                              "createdAt":  "2026-05-21T09:36:34.459875"
+                          }
+                      ],
+    "payrollRunFound":  true,
+    "complianceSubmitted":  true,
+    "tallyExportSuccess":  true,
+    "tallyXmlLength":  340
+}

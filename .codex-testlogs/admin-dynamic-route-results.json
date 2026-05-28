@@ -1,0 +1,83 @@
+[
+  {
+    "name": "Student detail",
+    "route": "/admin/students/36",
+    "actualPath": "/admin/students/36",
+    "heading": "sk rk\nACTIVE",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN STUDENTS RECORD #36 DIRECTORY STUDENT PROFILE sk rk ACTIVE Edit Profile Manage Attendance sk rk ID: STU-2026-0014 • Roll: TBD s@gmail.com 58621478458 Gender: Male AT"
+  },
+  {
+    "name": "Student edit",
+    "route": "/admin/students/36/edit",
+    "actualPath": "/admin/students/36/edit",
+    "heading": "Edit Profile",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN STUDENTS RECORD #36 EDIT Edit Profile Modifying record for sk rk IDENTITY & PROFILE Change Photo FIRST NAME * LAST NAME * STUDENT ID (FIXED) PERSONAL EMAIL * PHONE *"
+  },
+  {
+    "name": "Teacher detail",
+    "route": "/admin/teachers/2",
+    "actualPath": "/admin/teachers/2",
+    "heading": "Alice Johnson\nACTIVE",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN TEACHERS RECORD #2 HRMS DIRECTORY STAFF PROFILE Alice Johnson ACTIVE Edit Profile Biometric Sync AJ Alice Johnson TCH-2024-001 PAYROLL ACTIVE TYPE FULL TIME VERIFICA"
+  },
+  {
+    "name": "Teacher edit",
+    "route": "/admin/teachers/2/edit",
+    "actualPath": "/admin/teachers/2/edit",
+    "heading": "Edit Staff Record",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN TEACHERS RECORD #2 EDIT Edit Staff Record Modifying record for Alice Johnson IDENTITY & PROFILE AJ Change Photo FIRST NAME * LAST NAME * EMPLOYEE ID (FIXED) PERSONAL"
+  },
+  {
+    "name": "Parent detail",
+    "route": "/admin/parents/1",
+    "actualPath": "/admin/parents/1",
+    "heading": "Ravi Ravi",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN PARENTS RECORD #1 Ravi Ravi null • Registered Guardian Back Edit Profile R Ravi Ravi ACCOUNT ACTIVE CONTACT DETAILS MOBILE 9142081366 EMAIL x@gmail.com ADDRESS N/A L"
+  },
+  {
+    "name": "Parent edit",
+    "route": "/admin/parents/1/edit",
+    "actualPath": "/admin/parents/1/edit",
+    "heading": "Edit Parent Profile",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN PARENTS RECORD #1 EDIT Edit Parent Profile Updating Ravi Ravi Back Identity & Contact Full Name Primary Mobile 10-digit number used for login Email Address Default R"
+  },
+  {
+    "name": "Exam marks",
+    "route": "/admin/exams/1/marks",
+    "actualPath": "/admin/exams/1/marks",
+    "heading": "Enter Marks (Unit Test 1 - Mathematics)",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN EXAMS RECORD #1 MARKS Enter Marks (Unit Test 1 - Mathematics) Home > Academic > Exams > Enter Marks SELECT EXAM Unit Test 1 - Mathematics (Grade 1 - A) Unit Test 1 -"
+  },
+  {
+    "name": "Exam rankings",
+    "route": "/admin/exams/1/rankings",
+    "actualPath": "/admin/exams/1/rankings",
+    "heading": "Class Performance Rankings",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN EXAMS RECORD #1 RANKINGS Class Performance Rankings Unit Test 1 - Mathematics — Leadership Board Grade 1 — A Grade 1 — B Grade 2 — A Grade 3 — A Grade 4 — A Grade 5 "
+  },
+  {
+    "name": "Fee invoice",
+    "route": "/admin/fees/invoice/1",
+    "actualPath": "/admin/fees/invoice/1",
+    "heading": "School Fee Invoice",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN FEES INVOICE RECORD #1 School Fee Invoice Home > Academic > Fees > Invoice System Online: v2.4.0-Enterprise SCHOOL MANAGEMENT SYSTEM © 2024 | SECURE OPERATIONAL INTE"
+  }
+]

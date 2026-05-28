@@ -48,6 +48,7 @@ const LoginPage = () => {
           email:     data.email,
           firstName: data.firstName,
           lastName:  data.lastName,
+          role:      (data.roles || [])[0]?.replace(/^ROLE_/, '').toUpperCase(),
           roles:     data.roles,
           permissions: data.permissions,
           studentId: data.studentId ?? null,

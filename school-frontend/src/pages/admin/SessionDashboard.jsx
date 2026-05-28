@@ -1,6 +1,8 @@
 // src/pages/admin/SessionDashboard.jsx
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
+import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import PageHeader from '../../components/common/PageHeader';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -31,16 +33,18 @@ const SessionCard = ({ session, onRevoke, revoking }) => {
         <div className="text-3xl mt-1">{DEVICE_ICONS[session.deviceType] || '💻'}</div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="font-semibold text-gray-800">{session.deviceName || 'Unknown Device'}</h3>
+            <h3 className="font-semibold text-gray-800">
+              {session.username ? <span className="text-blue-600 mr-2">[{session.username}]</span> : ''}
+              {session.deviceName || 'Unknown Device'}
+            </h3>
             <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
               {session.browser || 'Unknown Browser'}
             </span>
           </div>
           <div className="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 text-xs text-gray-500">
             <span>🌐 IP: {session.ip || 'Unknown'}</span>
-            <span>📍 {session.location || 'Location unavailable'}</span>
-            <span>⏰ Last active: {ago(session.lastActive)}</span>
-            <span>📅 Created: {session.createdAt ? new Date(session.createdAt).toLocaleDateString() : '—'}</span>
+            <span>📅 Created: {session.loginTime || session.createdAt ? new Date(session.loginTime || session.createdAt).toLocaleDateString() : '—'}</span>
+            <span className="col-span-2 text-[10px] text-gray-300 font-mono truncate">{session.sessionId}</span>
           </div>
         </div>
       </div>
@@ -61,32 +65,40 @@ const SessionCard = ({ session, onRevoke, revoking }) => {
 };
 
 const SessionDashboard = () => {
+  const navigate = useNavigate();
   const toast = useToast();
+  const { user } = useAuth();
   const [sessions,  setSessions]  = useState([]);
   const [loading,   setLoading]   = useState(true);
   const [revoking,  setRevoking]  = useState(null);
   const [revokeAll, setRevokeAll] = useState(false);
 
+  const isAdmin = user?.roles?.some(r => ['ADMIN', 'SUPERADMIN'].includes(r.replace(/^ROLE_/, '')));
+
   const fetchSessions = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get('/sessions');
-      setSessions(Array.isArray(res.data) ? res.data : []);
+      // Admin sees everything, others see only theirs
+      const endpoint = isAdmin ? '/admin/sessions/active' : '/sessions';
+      const res = await api.get(endpoint);
+      const data = res.data?.data ?? res.data ?? [];
+      setSessions(Array.isArray(data) ? data : []);
     } catch {
       toast.error('Failed to load active sessions.');
     } finally {
       setLoading(false);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isAdmin, toast]);
 
   useEffect(() => { fetchSessions(); }, [fetchSessions]);
 
   const handleRevoke = async (sessionId) => {
     setRevoking(sessionId);
     try {
-      await api.delete(`/sessions/${sessionId}`);
+      const endpoint = isAdmin ? `/admin/sessions/${sessionId}` : `/sessions/${sessionId}`;
+      await api.delete(endpoint);
       toast.success('Session revoked.');
-      setSessions(prev => prev.filter(s => s.sessionId !== sessionId));
+      fetchSessions();
     } catch {
       toast.error('Failed to revoke session.');
     } finally {
@@ -113,24 +125,42 @@ const SessionDashboard = () => {
   return (
     <>
       <PageHeader
-        title="Active Sessions"
-        subtitle={`${sessions.length} active session${sessions.length !== 1 ? 's' : ''} across your devices`}
+        title={isAdmin ? "System Session Audit" : "Active Sessions"}
+        subtitle={isAdmin 
+          ? `Monitoring ${sessions.length} active JWT sessions across the entire system`
+          : `${sessions.length} active session${sessions.length !== 1 ? 's' : ''} across your devices`}
         actions={
-          otherSessions.length > 0 && (
-            <button
-              onClick={handleRevokeAll}
-              disabled={revokeAll}
-              className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition disabled:opacity-50"
+          isAdmin ? (
+            <button 
+              onClick={() => navigate(-1)}
+              className="bg-slate-100 text-slate-600 px-4 py-2 rounded-xl text-sm font-bold"
             >
-              {revokeAll ? 'Revoking...' : `🔒 Logout ${otherSessions.length} other device(s)`}
+              Back
             </button>
+          ) : (
+            otherSessions.length > 0 && (
+              <button
+                onClick={handleRevokeAll}
+                disabled={revokeAll}
+                className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition disabled:opacity-50"
+              >
+                {revokeAll ? 'Revoking...' : `🔒 Logout ${otherSessions.length} other device(s)`}
+              </button>
+            )
           )
         }
       />
 
       {/* Security tip */}
-      <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-3 mb-5 text-sm text-amber-700">
-        ⚠️ If you see a session you don't recognise, revoke it immediately and change your password.
+      <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-3 mb-5 text-sm text-amber-700 flex justify-between items-center">
+        <span>
+          {isAdmin 
+            ? "🛡️ Administrative Mode: You are viewing all active logins. Terminating a session will instantly invalidate the user's JWT."
+            : "⚠️ If you see a session you don't recognise, revoke it immediately and change your password."}
+        </span>
+        {isAdmin && (
+           <button onClick={fetchSessions} className="text-amber-800 font-bold hover:underline">Refresh List</button>
+        )}
       </div>
 
       {loading ? (

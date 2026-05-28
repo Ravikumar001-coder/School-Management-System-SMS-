@@ -9,4 +9,5 @@ export const examApi = {
   getMarks:     (examId)        => api.get(`/exams/${examId}/marks`),
   reportCard:   (id, year)      => api.get(`/exams/report-card/student/${id}?academicYear=${year}`),
   topper:       (examId)        => api.get(`/exams/${examId}/topper`),
+  getClassRankings: (examId, classId) => api.get(`/exams/${examId}/class/${classId}/rankings`),
 };

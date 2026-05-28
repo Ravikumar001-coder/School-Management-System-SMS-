@@ -7,7 +7,15 @@ import java.util.Optional;
 
 @Repository
 public interface ParentRepository extends JpaRepository<Parent, Long> {
-    Optional<Parent> findByMobileNumberAndDeletedAtIsNull(String mobileNumber);
+    Optional<Parent> findByPhoneAndDeletedAtIsNull(String phone);
     Optional<Parent> findByParentUuidAndDeletedAtIsNull(String uuid);
-    boolean existsByMobileNumberAndDeletedAtIsNull(String mobileNumber);
+    boolean existsByPhoneAndDeletedAtIsNull(String phone);
+
+    // Legacy Aliases for Auth/Security stability
+    default Optional<Parent> findByMobileNumberAndDeletedAtIsNull(String mobile) {
+        return findByPhoneAndDeletedAtIsNull(mobile);
+    }
+    default boolean existsByMobileNumberAndDeletedAtIsNull(String mobile) {
+        return existsByPhoneAndDeletedAtIsNull(mobile);
+    }
 }

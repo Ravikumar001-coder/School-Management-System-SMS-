@@ -129,10 +129,17 @@ public class ClassRoomService {
     @Transactional
     public void deleteClassRoom(Long id) {
         Long classRoomId = Objects.requireNonNull(id, "ClassRoom id is required");
-        if (!classRoomRepository.existsById(classRoomId)) {
-            throw new ResourceNotFoundException("ClassRoom", classRoomId);
+        ClassRoom classRoom = classRoomRepository.findById(classRoomId)
+                .orElseThrow(() -> new ResourceNotFoundException("ClassRoom", classRoomId));
+        
+        long studentCount = studentRepository.countByClassRoomId(classRoomId);
+        if (studentCount > 0) {
+            throw new RuntimeException(
+                String.format("Cannot delete class '%s-%s' because it has %d active students assigned to it. Please reassign or deactivate students first.", 
+                classRoom.getName(), classRoom.getSection(), studentCount));
         }
-        classRoomRepository.deleteById(classRoomId);
+        
+        classRoomRepository.delete(classRoom);
     }
 
     // ── Helpers ──────────────────────────────────────

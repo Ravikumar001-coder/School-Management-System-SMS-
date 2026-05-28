@@ -2,48 +2,41 @@ package com.school.sms.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.Instant;
-import java.util.UUID;
 
-@Entity
-@Table(name = "user_sessions")
-@Getter
-@Setter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Entity
+@Table(name = "user_sessions",
+    indexes = {
+        @Index(name = "idx_sessions_user", columnList = "user_id"),
+        @Index(name = "idx_sessions_token_hash", columnList = "refresh_token_hash"),
+        @Index(name = "idx_sessions_session_id", columnList = "session_id")
+    }
+)
 public class UserSession {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * Opaque public identifier exposed in the Session Management API.
-     * Clients use this UUID to revoke a specific session without exposing the internal DB id.
-     */
-    @Column(nullable = false, unique = true, updatable = false)
-    @Builder.Default
-    private String sessionId = UUID.randomUUID().toString();
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    /** SHA-256 hash of the refresh token — mirrors RefreshToken.tokenHash for fast join-free lookups. */
-    @Column(nullable = false)
+    @Column(name = "session_id", unique = true)
+    private String sessionId; // Public opaque identifier
+
+    @Column(name = "refresh_token_hash", unique = true)
     private String refreshTokenHash;
 
-    private String deviceType;      // Desktop / Mobile / Tablet
-    private String deviceName;      // Parsed from User-Agent
-    private String browser;         // Chrome, Safari, Firefox …
-    private String userAgent;       // Full raw User-Agent string
     private String ipAddress;
-    private String location;        // Optional; populated async
-
-    /** Stable fingerprint: hash(userAgent + acceptLanguage + screenResolution). */
-    private String deviceFingerprint;
+    private String userAgent;
+    private String browser;
+    private String deviceType;
+    private String deviceName;
 
     private Instant createdAt;
     private Instant lastActiveAt;
@@ -51,4 +44,17 @@ public class UserSession {
 
     @Builder.Default
     private boolean active = true;
+
+    @PrePersist
+    public void prePersist() {
+        if (sessionId == null) {
+            sessionId = java.util.UUID.randomUUID().toString();
+        }
+        if (createdAt == null) {
+            createdAt = Instant.now();
+        }
+        if (lastActiveAt == null) {
+            lastActiveAt = Instant.now();
+        }
+    }
 }

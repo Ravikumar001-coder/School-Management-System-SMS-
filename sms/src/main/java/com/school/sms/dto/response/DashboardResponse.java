@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.util.Map;
+import java.util.List;
 
 @Data
 @Builder
@@ -25,8 +26,9 @@ public class DashboardResponse {
     
     // New fields for updated Admin Dashboard
     private Long totalDepartments;
-    private java.util.List<Map<String, Object>> trends;
+    private List<Map<String, Object>> trends;
     private Map<String, Long> enrollmentByDepartment;
-    private java.util.List<Map<String, Object>> recentActivity;
-    private java.util.List<Map<String, Object>> upcomingDeadlines;
+    private List<Map<String, Object>> recentActivity;
+    private List<Map<String, Object>> upcomingDeadlines;
+    private Long activeSessionsCount;
 }

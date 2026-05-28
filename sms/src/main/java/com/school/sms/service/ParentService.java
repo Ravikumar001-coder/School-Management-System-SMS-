@@ -26,28 +26,23 @@ public class ParentService {
 
     @Transactional
     public ParentResponse createParent(ParentRequest request) {
-        // 1. Check if mobile already exists
-        if (parentRepository.existsByMobileNumberAndDeletedAtIsNull(request.getMobileNumber())) {
-            throw new RuntimeException("A parent with this mobile number already exists.");
+        // 1. Check if phone already exists
+        if (parentRepository.existsByPhoneAndDeletedAtIsNull(request.getPhone())) {
+            throw new RuntimeException("A parent with this phone number already exists.");
         }
 
         AcademicYear activeYear = academicYearRepository.findFirstByActiveTrueOrderByIdDesc().orElse(null);
 
         // 2. Create Parent profile
         Parent parent = Parent.builder()
-                .fullName(request.getFullName())
-                .mobileNumber(request.getMobileNumber())
-                .alternateMobile(request.getAlternateMobile())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .phone(request.getPhone())
+                .alternatePhone(request.getAlternatePhone())
                 .email(request.getEmail())
-                .gender(request.getGender())
-                .relationshipDefault(request.getRelationshipDefault())
                 .address(request.getAddress())
-                .city(request.getCity())
-                .state(request.getState())
-                .pincode(request.getPincode())
                 .occupation(request.getOccupation())
-                .photoUrl(request.getPhotoUrl())
-                .academicYear(activeYear)
+                .isActive(true)
                 .build();
 
         parent = parentRepository.save(parent);
@@ -60,7 +55,7 @@ public class ParentService {
         }
 
         auditLogService.logCreate("PARENT", parent.getId(), 
-            String.format("{\"name\":\"%s\",\"mobile\":\"%s\"}", parent.getFullName(), parent.getMobileNumber()), 
+            String.format("{\"name\":\"%s\",\"phone\":\"%s\"}", parent.getFirstName() + " " + parent.getLastName(), parent.getPhone()), 
             activeYear != null ? activeYear.getLabel() : null);
 
         return mapToResponse(parent);
@@ -71,7 +66,7 @@ public class ParentService {
         Student student = studentRepository.findById(req.getStudentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Student", req.getStudentId()));
 
-        // Forensic Fix: Prevent duplicate parent-student links in same session
+        // Prevent duplicate parent-student links
         boolean alreadyLinked = parent.getStudentLinks().stream()
                 .anyMatch(l -> l.getStudent().getId().equals(student.getId()));
         if (alreadyLinked) {
@@ -82,15 +77,13 @@ public class ParentService {
         ParentStudentLink link = ParentStudentLink.builder()
                 .parent(parent)
                 .student(student)
-                .relationshipType(req.getRelationshipType())
-                .isPrimaryContact(req.isPrimaryContact())
-                .pickupAuthorized(req.isPickupAuthorized())
-                .feeResponsible(req.isFeeResponsible())
+                .relationship(req.getRelationshipType())
+                .isPrimaryGuardian(req.isPrimaryContact())
                 .createdBy("ADMIN")
                 .build();
 
         linkRepository.save(link);
-        parent.getStudentLinks().add(link); // Keep local state in sync for multi-link sessions
+        parent.getStudentLinks().add(link); 
         
         log.info("Linked parent {} to student {}", parent.getId(), student.getId());
     }
@@ -110,22 +103,23 @@ public class ParentService {
     }
 
     @Transactional(readOnly = true)
-    public List<ParentResponse.StudentLinkResponse> getChildrenByParentMobile(String mobile) {
-        Parent parent = parentRepository.findByMobileNumberAndDeletedAtIsNull(mobile)
+    public List<ParentResponse.StudentLinkResponse> getChildrenByParentPhone(String phone) {
+        Parent parent = parentRepository.findByPhoneAndDeletedAtIsNull(phone)
                 .orElseThrow(() -> new ResourceNotFoundException("Parent", 0L));
         
-        return parent.getStudentLinks().stream().map(l -> 
-            ParentResponse.StudentLinkResponse.builder()
-                .studentId(l.getStudent().getId())
-                .firstName(l.getStudent().getFirstName())
-                .lastName(l.getStudent().getLastName())
-                .studentCode(l.getStudent().getStudentId())
-                .className(l.getStudent().getClassRoom() != null ? l.getStudent().getClassRoom().getName() : "N/A")
-                .photoUrl(l.getStudent().getProfilePhoto())
+        return parent.getStudentLinks().stream().map(l -> {
+            Student s = l.getStudent();
+            return ParentResponse.StudentLinkResponse.builder()
+                .studentId(s.getId())
+                .firstName(s.getFirstName())
+                .lastName(s.getLastName())
+                .studentCode(s.getStudentId())
+                .className(s.getClassRoom() != null ? s.getClassRoom().getName() : "N/A")
+                .photoUrl(s.getProfilePhoto())
                 .relationshipType(l.getRelationshipType())
                 .isPrimaryContact(l.isPrimaryContact())
-                .build()
-        ).collect(Collectors.toList());
+                .build();
+        }).collect(Collectors.toList());
     }
 
     @Transactional
@@ -133,23 +127,16 @@ public class ParentService {
         Parent parent = parentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Parent", id));
 
-        parent.setFullName(request.getFullName());
-        parent.setMobileNumber(request.getMobileNumber());
-        parent.setAlternateMobile(request.getAlternateMobile());
+        parent.setFirstName(request.getFirstName());
+        parent.setLastName(request.getLastName());
+        parent.setPhone(request.getPhone());
+        parent.setAlternatePhone(request.getAlternatePhone());
         parent.setEmail(request.getEmail());
-        parent.setGender(request.getGender());
-        parent.setRelationshipDefault(request.getRelationshipDefault());
         parent.setAddress(request.getAddress());
-        parent.setCity(request.getCity());
-        parent.setState(request.getState());
-        parent.setPincode(request.getPincode());
         parent.setOccupation(request.getOccupation());
-        parent.setPhotoUrl(request.getPhotoUrl());
 
         // Sync student links
         if (request.getStudentLinks() != null) {
-            // Remove existing links not in the request (simple approach: clear and re-add or match)
-            // For stability, we'll clear and re-link
             linkRepository.deleteByParent(parent);
             parent.getStudentLinks().clear();
 
@@ -160,8 +147,7 @@ public class ParentService {
 
         parent = parentRepository.save(parent);
         
-        auditLogService.logUpdate("PARENT", parent.getId(), "PROFILE", null, null, 
-            parent.getAcademicYear() != null ? parent.getAcademicYear().getLabel() : null);
+        auditLogService.logUpdate("PARENT", parent.getId(), "PROFILE", null, null, null);
 
         return mapToResponse(parent);
     }
@@ -172,35 +158,36 @@ public class ParentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Parent", id));
         
         parent.setActive(false);
-        parent.softDelete("ADMIN"); // SoftDeletableEntity method
+        parent.softDelete("ADMIN"); 
         parentRepository.save(parent);
 
         auditLogService.logDelete("PARENT", id, 
-            String.format("{\"mobile\":\"%s\"}", parent.getMobileNumber()), 
-            parent.getAcademicYear() != null ? parent.getAcademicYear().getLabel() : null);
+            String.format("{\"phone\":\"%s\"}", parent.getPhone()), null);
     }
 
     public ParentResponse mapToResponse(Parent p) {
+        List<ParentResponse.StudentLinkResponse> children = p.getStudentLinks().stream().map(l -> {
+            Student s = l.getStudent();
+            return ParentResponse.StudentLinkResponse.builder()
+                .studentId(s.getId())
+                .firstName(s.getFirstName())
+                .lastName(s.getLastName())
+                .studentCode(s.getStudentId())
+                .className(s.getClassRoom() != null ? s.getClassRoom().getName() : "N/A")
+                .photoUrl(s.getProfilePhoto())
+                .relationshipType(l.getRelationshipType())
+                .isPrimaryContact(l.isPrimaryContact())
+                .build();
+        }).collect(Collectors.toList());
+
         return ParentResponse.builder()
                 .id(p.getId())
                 .parentUuid(p.getParentUuid())
-                .fullName(p.getFullName())
-                .mobileNumber(p.getMobileNumber())
+                .fullName(p.getFirstName() + " " + (p.getLastName() != null ? p.getLastName() : ""))
+                .mobileNumber(p.getPhone())
                 .email(p.getEmail())
-                .relationshipDefault(p.getRelationshipDefault())
                 .active(p.isActive())
-                .children(p.getStudentLinks().stream().map(l -> 
-                    ParentResponse.StudentLinkResponse.builder()
-                        .studentId(l.getStudent().getId())
-                        .firstName(l.getStudent().getFirstName())
-                        .lastName(l.getStudent().getLastName())
-                        .studentCode(l.getStudent().getStudentId())
-                        .className(l.getStudent().getClassRoom() != null ? l.getStudent().getClassRoom().getName() : "N/A")
-                        .photoUrl(l.getStudent().getProfilePhoto())
-                        .relationshipType(l.getRelationshipType())
-                        .isPrimaryContact(l.isPrimaryContact())
-                        .build()
-                ).collect(Collectors.toList()))
+                .children(children)
                 .build();
     }
 }

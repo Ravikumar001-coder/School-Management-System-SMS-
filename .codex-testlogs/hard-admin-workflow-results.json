@@ -1,0 +1,39 @@
+{
+  "startedAt": "2026-05-26T15:11:35.437Z",
+  "results": [
+    {
+      "name": "Run Manual Backup",
+      "status": "CHECK",
+      "beforeCount": null,
+      "afterCount": null,
+      "sample": "SCHOOLOS Dashboard Students Faculty Academic Communication Transport Finance & Accounts Hostel HRMS & Staff System Roles & Access Data Backup Audit Trail Active Sessions A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN BACKUPS Database Backup & Recovery Manage system snapshots and data survivability Run Manual Backup LAST SUCCESSFUL BACKUP May 26, 2026, 8:41:38 PM TOTAL BACKUPS 7 Data Recovery Warning Restoring a backup will instantly overwrite current live data. Ensure you have a recent sn"
+    },
+    {
+      "name": "Run Payroll",
+      "status": "PASS",
+      "sample": "SCHOOLOS Dashboard Students Faculty Academic Communication Transport Finance & Accounts Hostel HRMS & Staff Staff Onboarding Payroll Engine Leave Approval Center PF & ESI Compliance Performance Reviews System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN HRMS PAYROLL Payroll Dashboard Payroll / Dashboard October 2024 Run Payroll Gross Payroll ₹ 0 Total Deductions ₹ 0 Net Payable ₹ 0 0 Total Staff Processed Payroll Runs Export Bank Sheet Month / Year Total Staff Gross (₹) Deductions (₹) Net Pay (₹) Status 10 / 2024 0 0 0 0 Draft 1 Quick Actions Lock Payroll Send Payslips (Email) Payroll"
+    },
+    {
+      "name": "Generate Compliance",
+      "status": "PASS",
+      "challanStatus": "PASS",
+      "submitButtons": 1,
+      "sample": "SCHOOLOS Dashboard Students Faculty Academic Communication Transport Finance & Accounts Hostel HRMS & Staff Staff Onboarding Payroll Engine Leave Approval Center PF & ESI Compliance Performance Reviews System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN HRMS COMPLIANCE PF & ESI Compliance 2026 Month 5 Generate Report Month/Year Total PF Total ESI Status Action 5/2026 ₹0.00 ₹0.00 SUBMITTED Submitted 1 System Online: v2.4.0-Enterprise SCHOOL MANAGEMENT SYSTEM © 2024 | SECURE OPERATIONAL INTERFACE"
+    },
+    {
+      "name": "Department Add/Delete",
+      "status": "FAIL",
+      "error": "Error: Browser Use encountered an error interacting with this webpage's clipboard: Browser Use virtual clipboard is not installed\nlocator.fill failed for selector internal:attr=[placeholder=\"e.g. Science, Arts, HR\"s]"
+    },
+    {
+      "name": "Broadcast Notice",
+      "status": "FAIL",
+      "error": "Error: Browser Use encountered an error interacting with this webpage's clipboard: Browser Use virtual clipboard is not installed\nlocator.fill failed for selector internal:attr=[placeholder=\"e.g. Annual Sports Meet 2026\"s]"
+    },
+    {
+      "name": "Generate Tally XML",
+      "status": "FAIL",
+      "error": "Error: Browser Use encountered an error interacting with this webpage's clipboard: Browser Use virtual clipboard is not installed\nlocator.fill failed for selector internal:attr=[placeholder=\"Start date\"s]"
+    }
+  ]
+}

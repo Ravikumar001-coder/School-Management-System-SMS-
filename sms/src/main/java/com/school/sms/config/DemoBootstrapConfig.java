@@ -34,6 +34,12 @@ public class DemoBootstrapConfig {
             TeacherRepository teacherRepository,
             ClassRoomRepository classRoomRepository,
             AcademicYearRepository academicYearRepository,
+            NotificationRepository notificationRepository,
+            TodoRepository todoRepository,
+            SubjectRepository subjectRepository,
+            TimetableRepository timetableRepository,
+            BranchRepository branchRepository,
+            com.school.sms.service.ReceiptNumberService receiptNumberService,
             PasswordEncoder passwordEncoder
     ) {
         return args -> {
@@ -42,8 +48,8 @@ public class DemoBootstrapConfig {
                 return;
             }
 
-            if (teacherRepository.count() > 0 || studentRepository.count() > 0) {
-                log.info("Demo seed skipped (existing teachers/students found)");
+            if (teacherRepository.count() > 0 && timetableRepository.count() > 0) {
+                log.info("Demo seed skipped (existing teachers/timetable found)");
                 return;
             }
 
@@ -57,6 +63,8 @@ public class DemoBootstrapConfig {
                             .isCurrent(true)
                             .build()));
 
+            Branch mainBranch = branchRepository.findByCode("MAIN").orElse(null);
+
             ClassRoom classRoom = classRoomRepository
                     .findByNameAndSectionAndAcademicYear(
                             DEFAULT_CLASS_NAME,
@@ -67,72 +75,175 @@ public class DemoBootstrapConfig {
                             .name(DEFAULT_CLASS_NAME)
                             .section(DEFAULT_CLASS_SECTION)
                             .academicYear(academicYear)
+                            .branch(mainBranch)
                             .maxCapacity(40)
                             .classFee(25000.0)
                             .admissionFee(5000.0)
                             .build())));
 
-            String year = String.valueOf(Year.now().getValue());
-            String teacherEmployeeId = String.format("TCH-%s-001", year);
-            User teacherUser = userRepository
-                    .findByUsernameOrEmail(teacherEmployeeId, DEFAULT_TEACHER_EMAIL)
-                    .orElseGet(() -> userRepository.save(Objects.requireNonNull(User.builder()
-                            .firstName("Demo")
-                            .lastName("Teacher")
-                            .email(DEFAULT_TEACHER_EMAIL)
-                            .username(teacherEmployeeId)
-                            .password(passwordEncoder.encode(teacherEmployeeId))
-                            .role("TEACHER")
-                            .firstLogin(true)
-                            .enabled(true)
-                            .build())));
+            Teacher teacher = teacherRepository.findByEmail(DEFAULT_TEACHER_EMAIL).orElse(null);
+            String teacherEmployeeId;
+            User teacherUser;
 
-            Teacher teacher = teacherRepository.findByEmail(DEFAULT_TEACHER_EMAIL)
-                    .orElseGet(() -> teacherRepository.save(Objects.requireNonNull(Teacher.builder()
-                            .user(teacherUser)
-                            .employeeId(teacherEmployeeId)
-                            .firstName("Demo")
-                            .lastName("Teacher")
-                            .email(DEFAULT_TEACHER_EMAIL)
-                            .status(TeacherStatus.ACTIVE)
-                            .build())));
+            if (teacher == null) {
+                teacherEmployeeId = receiptNumberService.nextTeacherId();
+                teacherUser = userRepository.save(Objects.requireNonNull(User.builder()
+                        .firstName("Demo")
+                        .lastName("Teacher")
+                        .email(DEFAULT_TEACHER_EMAIL)
+                        .username(teacherEmployeeId)
+                        .password(passwordEncoder.encode(teacherEmployeeId))
+                        .role("TEACHER")
+                        .firstLogin(true)
+                        .enabled(true)
+                        .build()));
+
+                teacher = teacherRepository.save(Objects.requireNonNull(Teacher.builder()
+                        .user(teacherUser)
+                        .employeeId(teacherEmployeeId)
+                        .firstName("Demo")
+                        .lastName("Teacher")
+                        .email(DEFAULT_TEACHER_EMAIL)
+                        .status(TeacherStatus.ACTIVE)
+                        .branch(mainBranch)
+                        .build()));
+            } else {
+                teacherUser = teacher.getUser();
+                teacherEmployeeId = teacher.getEmployeeId();
+            }
+
+            final Teacher finalTeacher = teacher;
+
+            // Seed Subjects (check if exist to avoid duplicates)
+            Subject math = subjectRepository.findByCode("MATH10")
+                    .orElseGet(() -> subjectRepository.save(Subject.builder()
+                        .name("Mathematics").code("MATH10").subjectType("THEORY").branch(mainBranch)
+                        .assignedTeacher(finalTeacher).classRoom(classRoom).build()));
+            
+            Subject science = subjectRepository.findByCode("PHY10")
+                    .orElseGet(() -> subjectRepository.save(Subject.builder()
+                        .name("Physics").code("PHY10").subjectType("THEORY").branch(mainBranch)
+                        .assignedTeacher(finalTeacher).classRoom(classRoom).build()));
+            
+            // Ensure existing subjects are linked to teacher if they were already seeded
+            if (math.getAssignedTeacher() == null || !math.getAssignedTeacher().getId().equals(teacher.getId())) {
+                math.setAssignedTeacher(teacher);
+                math.setClassRoom(classRoom);
+                subjectRepository.save(math);
+            }
+            if (science.getAssignedTeacher() == null || !science.getAssignedTeacher().getId().equals(teacher.getId())) {
+                science.setAssignedTeacher(teacher);
+                science.setClassRoom(classRoom);
+                subjectRepository.save(science);
+            }
+
+            // Seed Timetable if empty
+            if (timetableRepository.count() == 0) {
+                log.info("Seeding demo timetable entries...");
+                try {
+                    timetableRepository.save(Timetable.builder()
+                            .teacher(teacher)
+                            .subject(math)
+                            .classRoom(classRoom)
+                            .dayOfWeek("MONDAY")
+                            .periodNumber(1)
+                            .startTime(java.time.LocalTime.of(8, 0))
+                            .endTime(java.time.LocalTime.of(9, 0))
+                            .roomNumber("101")
+                            .branch(mainBranch)
+                            .academicYear(academicYear)
+                            .build());
+                    
+                    timetableRepository.save(Timetable.builder()
+                            .teacher(teacher)
+                            .subject(science)
+                            .classRoom(classRoom)
+                            .dayOfWeek("TUESDAY")
+                            .periodNumber(2)
+                            .startTime(java.time.LocalTime.of(9, 0))
+                            .endTime(java.time.LocalTime.of(10, 0))
+                            .roomNumber("102")
+                            .branch(mainBranch)
+                            .academicYear(academicYear)
+                            .build());
+
+                    log.info("Demo Timetable seeded successfully for teacher: {}", teacherEmployeeId);
+                } catch (Exception e) {
+                    log.error("FAILED to seed timetable: {}", e.getMessage(), e);
+                }
+            }
 
             if (classRoom.getClassTeacher() == null) {
                 classRoom.setClassTeacher(teacher);
                 classRoomRepository.save(classRoom);
             }
 
-            String studentId = String.format("STU-%s-0001", year);
-            User studentUser = userRepository
-                    .findByUsernameOrEmail(studentId, DEFAULT_STUDENT_EMAIL)
-                    .orElseGet(() -> userRepository.save(Objects.requireNonNull(User.builder()
-                            .firstName("Demo")
-                            .lastName("Student")
-                            .email(DEFAULT_STUDENT_EMAIL)
-                            .username(studentId)
-                            .password(passwordEncoder.encode(studentId))
-                            .role("STUDENT")
-                            .firstLogin(true)
-                            .enabled(true)
-                            .build())));
+            Student student = studentRepository.findByEmail(DEFAULT_STUDENT_EMAIL).orElse(null);
+            String studentId;
+            User studentUser;
 
-            studentRepository.findByEmail(DEFAULT_STUDENT_EMAIL)
-                    .orElseGet(() -> studentRepository.save(Objects.requireNonNull(Student.builder()
-                            .user(studentUser)
-                            .studentId(studentId)
-                            .firstName("Demo")
-                            .lastName("Student")
-                            .email(DEFAULT_STUDENT_EMAIL)
-                            .classRoom(classRoom)
-                            .academicYear(academicYear)
-                            .status(StudentStatus.ACTIVE)
-                            .build())));
+            if (student == null) {
+                studentId = receiptNumberService.nextStudentId(academicYear);
+                studentUser = userRepository.save(Objects.requireNonNull(User.builder()
+                        .firstName("Demo")
+                        .lastName("Student")
+                        .email(DEFAULT_STUDENT_EMAIL)
+                        .username(studentId)
+                        .password(passwordEncoder.encode(studentId))
+                        .role("STUDENT")
+                        .firstLogin(true)
+                        .enabled(true)
+                        .build()));
+
+                studentRepository.save(Objects.requireNonNull(Student.builder()
+                        .user(studentUser)
+                        .studentId(studentId)
+                        .firstName("Demo")
+                        .lastName("Student")
+                        .email(DEFAULT_STUDENT_EMAIL)
+                        .classRoom(classRoom)
+                        .academicYear(academicYear)
+                        .status(StudentStatus.ACTIVE)
+                        .build()));
+            } else {
+                studentId = student.getStudentId();
+                studentUser = student.getUser();
+            }
 
             log.info("Demo seed created: teacher={} student={} class={} {}",
                     teacherEmployeeId,
                     studentId,
                     DEFAULT_CLASS_NAME,
                     DEFAULT_CLASS_SECTION);
+
+            // Seed Notifications & Todos for the Demo Teacher
+            if (notificationRepository.count() == 0) {
+                notificationRepository.save(Notification.builder()
+                        .title("Exam schedule published")
+                        .message("Unit Test 1 - Grade 10")
+                        .type("EXAM")
+                        .recipient(teacherUser)
+                        .build());
+                notificationRepository.save(Notification.builder()
+                        .title("Homework pending review")
+                        .message("10-A • Algebra")
+                        .type("HOMEWORK")
+                        .recipient(teacherUser)
+                        .build());
+            }
+
+            if (todoRepository.count() == 0) {
+                todoRepository.save(Todo.builder()
+                        .title("Enter marks for Unit Test 1")
+                        .priority("HIGH")
+                        .user(teacherUser)
+                        .build());
+                todoRepository.save(Todo.builder()
+                        .title("Review 5 leave applications")
+                        .priority("MEDIUM")
+                        .user(teacherUser)
+                        .build());
+            }
         };
     }
 

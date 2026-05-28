@@ -47,7 +47,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
                     "http://localhost:3000",
                     "http://127.0.0.1:3000"
                 ));
-                corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
                 corsConfig.setAllowedHeaders(List.of("*"));
                 corsConfig.setExposedHeaders(List.of("Authorization"));
             corsConfig.setAllowCredentials(true);
@@ -63,11 +63,11 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
             .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/auth/refresh").permitAll()
-            .requestMatchers(HttpMethod.POST, "/api/v1/parents/auth/**").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/v1/parent/auth/**").permitAll()
             // Preflight
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-            .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+            .requestMatchers("/api/v1/admin/**").hasAnyRole("ADMIN", "SUPERADMIN")
             .requestMatchers("/api/v1/parents/**").hasAnyRole("ADMIN", "SUPERADMIN", "PARENT")
 
             .requestMatchers(HttpMethod.GET, "/api/v1/students/**")
@@ -81,6 +81,9 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
 
             .requestMatchers("/api/v1/teachers/**")
                 .hasAnyRole("ADMIN", "TEACHER")
+
+            .requestMatchers("/api/v1/hrms/**")
+                .hasAnyRole("ADMIN", "HR", "SUPERADMIN")
 
             .anyRequest().authenticated()
         )

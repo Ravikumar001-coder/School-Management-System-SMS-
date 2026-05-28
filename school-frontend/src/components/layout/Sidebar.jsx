@@ -13,8 +13,8 @@ const Sidebar = ({ isOpen, onClose, isCollapsed }) => {
 
   const filteredMenu = getFilteredMenu(user?.roles || [], can);
 
-  const toggleSubmenu = (id) => {
-    setOpenMenus(prev => ({ ...prev, [id]: !prev[id] }));
+  const toggleSubmenu = (id, currentlyOpen) => {
+    setOpenMenus(prev => ({ ...prev, [id]: !currentlyOpen }));
   };
 
   const isActive = (path) => location.pathname === path;
@@ -53,13 +53,13 @@ const Sidebar = ({ isOpen, onClose, isCollapsed }) => {
         <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1 custom-scrollbar">
           {filteredMenu.map((item) => {
             const hasChildren = !!item.filteredChildren;
-            const open = openMenus[item.id] || isParentActive(item);
             const active = isParentActive(item);
+            const open = openMenus[item.id] !== undefined ? openMenus[item.id] : active;
 
             return (
               <div key={item.id} className="space-y-1">
                 <button
-                  onClick={() => hasChildren ? toggleSubmenu(item.id) : (item.path && navigate(item.path))}
+                  onClick={() => hasChildren ? toggleSubmenu(item.id, open) : (item.path && navigate(item.path))}
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all group
                              ${active ? 'bg-blue-600/10 text-blue-400' : 'hover:bg-slate-800 hover:text-white'}
                              ${isCollapsed ? 'justify-center' : ''}`}

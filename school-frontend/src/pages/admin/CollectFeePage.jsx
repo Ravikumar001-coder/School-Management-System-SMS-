@@ -8,6 +8,8 @@ import { feeApi } from '../../api/feeApi';
 import { fileApi } from '../../api/fileApi';
 import { classApi } from '../../api/classApi';
 
+import usePersistedForm from '../../hooks/usePersistedForm';
+
 const CollectFeePage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -19,18 +21,41 @@ const CollectFeePage = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [search, setSearch] = useState('');
   const [history, setHistory] = useState([]);
-  const [selectedRows, setSelectedRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const [form, setForm] = useState({
-    paymentType: 'Class Fee',
-    amount: 1,
-    paymentMethod: 'Cash',
-    paymentDate: new Date().toISOString().split('T')[0],
-    transactionId: '',
-    note: '',
+  // ── Combined State for Persistence ────────────────────────────────────────
+  const { 
+    formData: state, 
+    setFormData: setState,
+    clearDraft 
+  } = usePersistedForm('fee_collection_form', {
+    form: {
+      paymentType: 'Class Fee',
+      amount: 1,
+      paymentMethod: 'Cash',
+      paymentDate: new Date().toISOString().split('T')[0],
+      transactionId: '',
+      note: '',
+    },
+    selectedRows: []
   });
+
+  const { form, selectedRows } = state;
+
+  const setForm = (newForm) => {
+    setState(prev => ({
+      ...prev,
+      form: typeof newForm === 'function' ? newForm(prev.form) : { ...prev.form, ...newForm }
+    }));
+  };
+
+  const setSelectedRows = (newRows) => {
+    setState(prev => ({
+      ...prev,
+      selectedRows: typeof newRows === 'function' ? newRows(prev.selectedRows) : newRows
+    }));
+  };
 
   useEffect(() => {
     Promise.all([studentApi.getAll(0, 200), classApi.getAll()])
@@ -221,6 +246,7 @@ const CollectFeePage = () => {
       await Promise.all(payloads.map((payload) => feeApi.collect(payload)));
 
       toast.success('Recent payment recorded.');
+      clearDraft();
       setTimeout(() => {
         navigate('/admin/fees', { state: { successMessage: 'Recent payment recorded.' } });
       }, 700);
@@ -433,20 +459,29 @@ const CollectFeePage = () => {
               />
             </div>
 
-            <div className="flex justify-end gap-2 pt-1">
+            <div className="flex justify-between items-center pt-1">
               <button
-                onClick={handleCollect}
-                disabled={saving}
-                className="bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-800 disabled:opacity-60"
+                type="button"
+                onClick={() => clearDraft(true)}
+                className="text-gray-400 hover:text-red-500 text-xs flex items-center gap-1"
               >
-                {saving ? 'Recording...' : 'Record Payment'}
+                🗑️ Clear Draft
               </button>
-              <button
-                onClick={() => navigate('/admin/fees')}
-                className="bg-gray-100 text-gray-700 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-200"
-              >
-                Cancel
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleCollect}
+                  disabled={saving}
+                  className="bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-800 disabled:opacity-60"
+                >
+                  {saving ? 'Recording...' : 'Record Payment'}
+                </button>
+                <button
+                  onClick={() => navigate('/admin/fees')}
+                  className="bg-gray-100 text-gray-700 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-200"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         </div>

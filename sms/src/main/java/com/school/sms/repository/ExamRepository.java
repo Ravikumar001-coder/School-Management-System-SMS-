@@ -25,4 +25,6 @@ public interface ExamRepository
     List<Exam> findByClassRoomIdIn(List<Long> classRoomIds);
 
     List<Exam> findByStatus(String status);
+
+    List<Exam> findBySubjectIdInAndAcademicYear(List<Long> subjectIds, AcademicYear academicYear);
 }

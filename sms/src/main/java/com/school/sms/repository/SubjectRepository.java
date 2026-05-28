@@ -19,4 +19,7 @@ public interface SubjectRepository
     List<Subject> findBySubjectType(String subjectType);
 
     List<Subject> findByNameContaining(String name);
+
+    List<Subject> findByAssignedTeacherId(Long teacherId);
+    long countByDepartmentId(Long departmentId);
 }

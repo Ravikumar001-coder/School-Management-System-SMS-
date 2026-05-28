@@ -36,13 +36,16 @@ public class TeacherController {
     public ResponseEntity<ApiResponse<Page<TeacherResponse>>> getAll(
             @RequestParam(defaultValue = "0")    int page,
             @RequestParam(defaultValue = "10")   int size,
-            @RequestParam(defaultValue = "firstName") String sortBy) {
+            @RequestParam(defaultValue = "firstName") String sortBy,
+            @RequestParam(required = false) Long deptId,
+            @RequestParam(required = false) Long subjectId,
+            @RequestParam(required = false) Long classId,
+            @RequestParam(required = false) String search) {
 
-        Pageable pageable = PageRequest.of(page, size, 
-                                           Sort.by(sortBy));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
         return ResponseEntity.ok(ApiResponse.success(
             "Teachers fetched", 
-            teacherService.getAllTeachers(pageable)));
+            teacherService.getFilteredTeachers(deptId, subjectId, classId, search, pageable)));
     }
 
     @GetMapping("/{id}")

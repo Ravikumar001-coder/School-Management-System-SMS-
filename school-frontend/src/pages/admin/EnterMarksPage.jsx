@@ -3,15 +3,20 @@ import { useParams, useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/common/PageHeader';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useToast } from '../../context/ToastContext';
+import { useAuth } from '../../context/AuthContext';
 import { examApi } from '../../api/examApi';
 import { classApi } from '../../api/classApi';
 import { studentApi } from '../../api/studentApi';
 import { fileApi } from '../../api/fileApi';
+import api from '../../api/axios';
+import usePersistedForm from '../../hooks/usePersistedForm';
 
 const EnterMarksPage = () => {
   const { id }    = useParams();
   const navigate  = useNavigate();
   const toast = useToast();
+  const { user } = useAuth();
+  
   const [allExams, setAllExams] = useState([]);
   const [selectedExamId, setSelectedExamId] = useState(id ? Number(id) : null);
   const [selectedSubjectName, setSelectedSubjectName] = useState('');
@@ -22,22 +27,49 @@ const EnterMarksPage = () => {
   const [loading, setLoading]   = useState(true);
   const [saving, setSaving]     = useState(false);
 
+  const isTeacher = user?.role === 'TEACHER';
+
+  // ── Persistent Marks State ────────────────────────────────────────────────
+  const { 
+    formData: persistedMarks, 
+    setFormData: setPersistedMarks,
+    clearDraft,
+    isRestored
+  } = usePersistedForm(selectedExamId ? `enter_marks_form_${selectedExamId}` : null, {});
+
   useEffect(() => {
     const preferredIdFromRoute = id ? Number(id) : null;
-    Promise.all([examApi.getAll(), classApi.getAll()])
-      .then(([examRes, classRes]) => {
-        const exams = examRes.data.data || [];
-        const classList = classRes.data.data || [];
+    
+    const loadInitial = async () => {
+      try {
+        setLoading(true);
+        let exams = [];
+        let classList = [];
+
+        if (isTeacher) {
+          const scopeRes = await api.get('/teacher/scope');
+          exams = scopeRes.data.data.exams || [];
+          classList = scopeRes.data.data.assignedClasses || [];
+        } else {
+          const [examRes, classRes] = await Promise.all([examApi.getAll(), classApi.getAll()]);
+          exams = examRes.data.data || [];
+          classList = classRes.data.data || [];
+        }
+
         setAllExams(exams);
         setClasses(classList);
 
         const preferredId = preferredIdFromRoute || (exams[0]?.id ?? null);
         setSelectedExamId(preferredId);
-      })
-      .catch((err) => {
+      } catch (err) {
         toast.showToast(err.response?.data?.message || 'Failed to load exams data.', 'error');
-      });
-  }, [id]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadInitial();
+  }, [id, isTeacher]);
 
   useEffect(() => {
     if (!allExams.length || !selectedExamId) {
@@ -56,7 +88,9 @@ const EnterMarksPage = () => {
       return;
     }
 
-    const targetClass = classes.find((c) => `${c.name} - ${c.section}` === selected.className);
+    // Match class by name since that's what the exam object has
+    const targetClass = classes.find((c) => `${c.name} - ${c.section}` === selected.className || c.name === selected.className);
+    
     if (!targetClass) {
       setStudents([]);
       setMarks({});
@@ -69,11 +103,30 @@ const EnterMarksPage = () => {
       .then((sRes) => {
         const list = sRes.data.data || [];
         setStudents(list);
-        const init = {};
-        list.forEach((s) => {
-          init[s.id] = { marksObtained: '', absent: false };
+        
+        // Fetch existing marks for this exam to pre-populate
+        return examApi.getMarks(selectedExamId).then(mRes => {
+          const existingMarks = mRes.data.data || [];
+          const init = {};
+          
+          list.forEach((s) => {
+            // Priority: Persisted Draft > Existing DB Marks > Empty
+            if (persistedMarks && persistedMarks[s.id]) {
+              init[s.id] = persistedMarks[s.id];
+            } else {
+              const existing = existingMarks.find(m => m.studentCode === s.studentId);
+              if (existing) {
+                init[s.id] = { 
+                  marksObtained: existing.marksObtained ?? '', 
+                  absent: existing.absent || false 
+                };
+              } else {
+                init[s.id] = { marksObtained: '', absent: false };
+              }
+            }
+          });
+          setMarks(init);
         });
-        setMarks(init);
       })
       .catch((err) => {
         toast.showToast(err.response?.data?.message || 'Failed to load students for selected exam.', 'error');
@@ -81,11 +134,14 @@ const EnterMarksPage = () => {
       .finally(() => setLoading(false));
   }, [allExams, selectedExamId, classes]);
 
+  // Sync back to persistence on change
   const handleChange = (studentId, field, value) => {
-    setMarks(prev => ({
-      ...prev,
-      [studentId]: { ...prev[studentId], [field]: value }
-    }));
+    const newMarks = {
+      ...marks,
+      [studentId]: { ...marks[studentId], [field]: value }
+    };
+    setMarks(newMarks);
+    setPersistedMarks(newMarks);
   };
 
   const handleSubmit = async () => {
@@ -100,11 +156,17 @@ const EnterMarksPage = () => {
         studentId:      s.id,
         marksObtained:  marks[s.id]?.absent
                         ? null
-                        : Number(marks[s.id]?.marksObtained),
+                        : marks[s.id]?.marksObtained === '' ? null : Number(marks[s.id]?.marksObtained),
         absent:         marks[s.id]?.absent || false,
       }));
       await examApi.enterMarks({ examId: Number(selectedExamId), marks: marksList });
       toast.showToast('Marks saved successfully!', 'success');
+      clearDraft();
+      
+      // Navigate back
+      setTimeout(() => {
+        navigate(isTeacher ? '/teacher/exams' : '/admin/exams');
+      }, 1500);
     } catch (err) {
       toast.showToast(err.response?.data?.message || 'Failed to save marks.', 'error');
     } finally {
@@ -112,129 +174,140 @@ const EnterMarksPage = () => {
     }
   };
 
-  if (loading) return <><LoadingSpinner /></>;
+  if (loading) return <div className="p-10 flex justify-center"><LoadingSpinner /></div>;
 
   return (
-    <>
-      <PageHeader title={`Enter Marks ${exam?.name ? `(${exam.name})` : ''}`} subtitle="Home > Academic > Exams > Enter Marks" />
+    <div className="px-6 py-8">
+      <PageHeader 
+        title={`Enter Marks ${exam?.name ? `(${exam.name})` : ''}`} 
+        subtitle={isTeacher ? "Home > Teacher > Exams > Enter Marks" : "Home > Academic > Exams > Enter Marks"} 
+      />
 
-      <div className="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
-        <div className="p-4 border-b bg-gray-50 flex flex-col lg:flex-row gap-3 lg:items-end lg:justify-between">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full lg:max-w-2xl">
-            <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">Select Exam</label>
+      <div className="bg-white rounded-[2rem] shadow-sm border border-slate-50 overflow-hidden mt-6">
+        <div className="p-6 border-b bg-slate-50/50 flex flex-col lg:flex-row gap-6 lg:items-end lg:justify-between">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full lg:max-w-2xl">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Select Exam</label>
               <select
                 value={selectedExamId || ''}
                 onChange={(e) => setSelectedExamId(Number(e.target.value))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-500 shadow-sm transition-all"
               >
                 {allExams.map((e) => (
-                  <option key={e.id} value={e.id}>{e.name}</option>
+                  <option key={e.id} value={e.id}>{e.name} ({e.className})</option>
                 ))}
               </select>
             </div>
 
-            <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">Select Subject</label>
-              <select
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Subject</label>
+              <input 
+                type="text"
+                disabled
                 value={selectedSubjectName}
-                onChange={(e) => setSelectedSubjectName(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {Array.from(new Set(allExams.map((e) => e.subjectName).filter(Boolean))).map((subject) => (
-                  <option key={subject} value={subject}>{subject}</option>
-                ))}
-              </select>
+                className="w-full bg-slate-100 border-none rounded-2xl px-4 py-3 text-sm font-bold text-slate-500"
+              />
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <button
               type="button"
-              className="bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-800"
+              onClick={() => clearDraft(true)}
+              className="text-slate-400 hover:text-rose-500 text-[10px] font-black uppercase tracking-widest px-4"
             >
-              Upload Marks via CSV
+              🗑️ Clear Draft
             </button>
             <button
               onClick={handleSubmit}
               disabled={saving}
-              className="bg-blue-800 text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-900 disabled:opacity-60"
+              className="bg-slate-900 text-white px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-800 disabled:opacity-50 shadow-lg shadow-slate-200 active:scale-95 transition-all"
             >
-              {saving ? 'Saving...' : 'Save All'}
+              {saving ? 'Saving...' : 'Publish Marks'}
             </button>
-            <button onClick={() => navigate('/admin/exams')} className="text-sm text-gray-600 hover:text-gray-900 px-2 py-2">
-              Back
+            <button 
+              onClick={() => navigate(isTeacher ? '/teacher/exams' : '/admin/exams')} 
+              className="text-xs font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 px-4"
+            >
+              Cancel
             </button>
           </div>
         </div>
 
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="text-left px-5 py-3 font-semibold text-gray-700">ID</th>
-              <th className="text-left px-5 py-3 font-semibold text-gray-700">Student Name</th>
-              <th className="text-left px-5 py-3 font-semibold text-gray-700">Roll No.</th>
-              <th className="text-left px-5 py-3 font-semibold text-gray-700">Class</th>
-              <th className="text-left px-5 py-3 font-semibold text-gray-700">Marks Obtained</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {students.map((s, i) => (
-              <tr key={s.id} className="hover:bg-gray-50">
-                <td className="px-5 py-3 text-gray-700">{121 + i}</td>
-                <td className="px-5 py-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-green-100 overflow-hidden flex items-center justify-center text-green-700 text-xs font-bold">
-                      {s.profilePhoto ? (
-                        <img src={fileApi.toPublicUrl(s.profilePhoto)} alt={`${s.firstName || ''} ${s.lastName || ''}`.trim()} className="w-8 h-8 object-cover rounded-full" />
-                      ) : (
-                        <>{s.firstName?.[0]}{s.lastName?.[0]}</>
-                      )}
-                    </div>
-                    <span className="font-medium text-gray-800">{s.firstName} {s.lastName}</span>
-                  </div>
-                </td>
-                <td className="px-5 py-3">
-                  {String(s.studentId || '').replace(/\D/g, '').slice(-4) || `00${i + 10}`}
-                </td>
-                <td className="px-5 py-3">
-                  <select
-                    disabled
-                    className="border border-gray-300 rounded-lg px-2 py-1.5 bg-gray-50 text-sm"
-                  >
-                    <option>{exam?.className || '-'}</option>
-                  </select>
-                </td>
-                <td className="px-5 py-3">
-                  <input
-                    type="number"
-                    min="0"
-                    max={exam?.totalMarks}
-                    value={marks[s.id]?.marksObtained || ''}
-                    onChange={e =>
-                      handleChange(s.id, 'marksObtained', e.target.value)}
-                    disabled={marks[s.id]?.absent}
-                    className="w-28 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 
-                               disabled:bg-gray-100"
-                    placeholder="0"
-                  />
-                  <span className="ml-3 text-gray-700 font-medium">[ {exam?.passingMarks || 0} ] / {exam?.totalMarks || 100}</span>
-                  <label className="ml-3 inline-flex items-center gap-1 text-xs text-red-600">
-                    <input
-                      type="checkbox"
-                      checked={marks[s.id]?.absent || false}
-                      onChange={e => handleChange(s.id, 'absent', e.target.checked)}
-                      className="w-3.5 h-3.5 accent-red-500 cursor-pointer"
-                    />
-                    Absent
-                  </label>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-slate-50/80 border-b border-slate-100">
+              <tr>
+                <th className="text-left px-6 py-4 font-black text-slate-400 uppercase tracking-widest text-[10px]">Student Name</th>
+                <th className="text-left px-6 py-4 font-black text-slate-400 uppercase tracking-widest text-[10px]">Student ID</th>
+                <th className="text-left px-6 py-4 font-black text-slate-400 uppercase tracking-widest text-[10px]">Class</th>
+                <th className="text-left px-6 py-4 font-black text-slate-400 uppercase tracking-widest text-[10px]">Marks Obtained</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {students.map((s, i) => (
+                <tr key={s.id} className="hover:bg-slate-50/50 transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-indigo-50 overflow-hidden flex items-center justify-center text-indigo-600 text-[10px] font-black border border-indigo-100 shadow-sm">
+                        {s.profilePhoto ? (
+                          <img src={fileApi.toPublicUrl(s.profilePhoto)} alt={s.firstName} className="w-10 h-10 object-cover" />
+                        ) : (
+                          <>{s.firstName?.[0]}{s.lastName?.[0]}</>
+                        )}
+                      </div>
+                      <span className="font-black text-slate-900">{s.firstName} {s.lastName}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    {s.studentId}
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-black uppercase tracking-tighter">
+                      {exam?.className || '-'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-4">
+                      <div className="relative w-32">
+                        <input
+                          type="number"
+                          min="0"
+                          max={exam?.totalMarks}
+                          value={marks[s.id]?.marksObtained || ''}
+                          onChange={e => handleChange(s.id, 'marksObtained', e.target.value)}
+                          disabled={marks[s.id]?.absent}
+                          className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold outline-none focus:border-indigo-500 shadow-sm disabled:bg-slate-100 disabled:text-slate-300"
+                          placeholder="Score"
+                        />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">Pass: {exam?.passingMarks || 33}</span>
+                        <span className="text-[10px] font-black text-indigo-600 uppercase tracking-tighter leading-none">Max: {exam?.totalMarks || 100}</span>
+                      </div>
+                      <label className="ml-4 flex items-center gap-2 cursor-pointer group">
+                        <div className="relative">
+                          <input
+                            type="checkbox"
+                            checked={marks[s.id]?.absent || false}
+                            onChange={e => handleChange(s.id, 'absent', e.target.checked)}
+                            className="peer sr-only"
+                          />
+                          <div className="w-5 h-5 bg-white border-2 border-slate-200 rounded-lg peer-checked:bg-rose-500 peer-checked:border-rose-500 transition-all flex items-center justify-center">
+                            <div className="w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100 transition-all"></div>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-rose-500 transition-colors">Absent</span>
+                      </label>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

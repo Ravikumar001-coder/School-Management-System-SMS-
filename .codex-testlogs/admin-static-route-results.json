@@ -1,0 +1,443 @@
+[
+  {
+    "name": "Dashboard",
+    "route": "/admin/dashboard",
+    "actualPath": "/admin/dashboard",
+    "heading": "Root Admin Overview",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN DASHBOARD Root Admin Overview ENTERPRISE MANAGEMENT CONSOLE TOTAL STUDENTS 14 +3% ENROLLED LEARNERS TOTAL"
+  },
+  {
+    "name": "Students list",
+    "route": "/admin/students",
+    "actualPath": "/admin/students",
+    "heading": "Students Directory",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Directory Admit Student Daily Attendance Faculty Academic Students List Parent Directory Classes & Sections Subject Registry Departments School Timetable Exams & Results Transport Finance & Accounts Hostel HRMS & Staff System A ADMI"
+  },
+  {
+    "name": "Add student",
+    "route": "/admin/students/new",
+    "actualPath": "/admin/students/new",
+    "heading": "Student Admission",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Directory Admit Student Daily Attendance Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN STUDENTS NEW Student Admission Onboarding for Academic Session 2"
+  },
+  {
+    "name": "Teachers list",
+    "route": "/admin/teachers",
+    "actualPath": "/admin/teachers",
+    "heading": "Faculty Directory",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Teachers Directory Hire Teacher Academic Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN TEACHERS Faculty Directory 22 teaching staff members Hire Teacher FILTERS"
+  },
+  {
+    "name": "Add teacher",
+    "route": "/admin/teachers/new",
+    "actualPath": "/admin/teachers/new",
+    "heading": "Staff Onboarding (HRMS)",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Teachers Directory Hire Teacher Academic Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN TEACHERS NEW Staff Onboarding (HRMS) Create an enterprise-hardened employ"
+  },
+  {
+    "name": "Classes",
+    "route": "/admin/classes",
+    "actualPath": "/admin/classes",
+    "heading": "Classes Management",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Students List Parent Directory Classes & Sections Subject Registry Departments School Timetable Exams & Results Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT"
+  },
+  {
+    "name": "Subjects",
+    "route": "/admin/subjects",
+    "actualPath": "/admin/subjects",
+    "heading": "Subjects Page",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Students List Parent Directory Classes & Sections Subject Registry Departments School Timetable Exams & Results Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT"
+  },
+  {
+    "name": "Attendance",
+    "route": "/admin/attendance",
+    "actualPath": "/admin/attendance",
+    "heading": "Attendance Center",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Directory Admit Student Daily Attendance Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN ATTENDANCE Attendance Center Fast operational mode is active. Re"
+  },
+  {
+    "name": "Exams",
+    "route": "/admin/exams",
+    "actualPath": "/admin/exams",
+    "heading": "Exams List",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Students List Parent Directory Classes & Sections Subject Registry Departments School Timetable Exams & Results Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT"
+  },
+  {
+    "name": "Create exam",
+    "route": "/admin/exams/new",
+    "actualPath": "/admin/exams/new",
+    "heading": "Create Exam",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN EXAMS NEW Create Exam Home > Academic > Create Exam Exam Name Exam Type Theory Practical Oral Term Term 1"
+  },
+  {
+    "name": "Fees",
+    "route": "/admin/fees",
+    "actualPath": "/admin/fees",
+    "heading": "School Monthly Fees Overview",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Overview Fees Dashboard Fee Collection Chart of Accounts Journal Entries Trial Balance Expenses & Invoices Vendor Management Payroll & Salary Financial Statements Tally Integration Hoste"
+  },
+  {
+    "name": "Collect fee",
+    "route": "/admin/fees/collect",
+    "actualPath": "/admin/fees/collect",
+    "heading": "Collect Fee",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Overview Fees Dashboard Fee Collection Chart of Accounts Journal Entries Trial Balance Expenses & Invoices Vendor Management Payroll & Salary Financial Statements Tally Integration Hoste"
+  },
+  {
+    "name": "Backups",
+    "route": "/admin/backups",
+    "actualPath": "/admin/backups",
+    "heading": "Database Backup & Recovery",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff System Active Sessions A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN BACKUPS Database Backup & Recovery Manage system snapshots and data survivability Run Man"
+  },
+  {
+    "name": "Roles",
+    "route": "/admin/roles",
+    "actualPath": "/admin/roles",
+    "heading": "Interface Crash Detect",
+    "status": "PASS",
+    "flags": [],
+    "sample": "Interface Crash Detect A critical frontend exception occurred. The system state has been preserved for safety. Attempt System Restart Return to Dashboard TypeError: isSuperAdmin is not a function"
+  },
+  {
+    "name": "Sessions",
+    "route": "/admin/sessions",
+    "actualPath": "/admin/sessions",
+    "heading": "System Session Audit",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff System Active Sessions A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN SESSIONS System Session Audit Monitoring 159 active JWT sessions across the entire system"
+  },
+  {
+    "name": "Audit logs",
+    "route": "/admin/audit-logs",
+    "actualPath": "/admin/audit-logs",
+    "heading": "Audit Logs",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff System Active Sessions A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN AUDIT LOGS Audit Logs Operational traceability and system forensics Export Logs All Entit"
+  },
+  {
+    "name": "Parents",
+    "route": "/admin/parents",
+    "actualPath": "/admin/parents",
+    "heading": "Parent Directory",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Students List Parent Directory Classes & Sections Subject Registry Departments School Timetable Exams & Results Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT"
+  },
+  {
+    "name": "Add parent",
+    "route": "/admin/parents/new",
+    "actualPath": "/admin/parents/new",
+    "heading": "Register Parent",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN PARENTS NEW Register Parent Create guardian profile and link students Cancel Identity & Contact Full Name"
+  },
+  {
+    "name": "Departments",
+    "route": "/admin/departments",
+    "actualPath": "/admin/departments",
+    "heading": "Departments Management",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Students List Parent Directory Classes & Sections Subject Registry Departments School Timetable Exams & Results Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT"
+  },
+  {
+    "name": "Notices",
+    "route": "/admin/notices",
+    "actualPath": "/admin/notices",
+    "heading": "Bulletin Board",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN NOTICES Bulletin Board Publish notices and announcements to the school community Draft Notice Headline Me"
+  },
+  {
+    "name": "Timetable",
+    "route": "/admin/timetable",
+    "actualPath": "/admin/timetable",
+    "heading": "Master Timetable\nENTERPRISE V2.0",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Students List Parent Directory Classes & Sections Subject Registry Departments School Timetable Exams & Results Transport Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT"
+  },
+  {
+    "name": "Transport dashboard",
+    "route": "/admin/transport/dashboard",
+    "actualPath": "/admin/transport/dashboard",
+    "heading": "Fleet Dashboard",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Fleet Dashboard Live Tracking GPS Playback Route Manager Vehicle Manager Driver Manager Student Assignment Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMI"
+  },
+  {
+    "name": "Transport tracking",
+    "route": "/admin/transport/tracking",
+    "actualPath": "/admin/transport/tracking",
+    "heading": "Live Tracking",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Fleet Dashboard Live Tracking GPS Playback Route Manager Vehicle Manager Driver Manager Student Assignment Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMI"
+  },
+  {
+    "name": "Transport routes",
+    "route": "/admin/transport/routes",
+    "actualPath": "/admin/transport/routes",
+    "heading": "Route Management",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Fleet Dashboard Live Tracking GPS Playback Route Manager Vehicle Manager Driver Manager Student Assignment Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMI"
+  },
+  {
+    "name": "Transport vehicles",
+    "route": "/admin/transport/vehicles",
+    "actualPath": "/admin/transport/vehicles",
+    "heading": "Fleet Management",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Fleet Dashboard Live Tracking GPS Playback Route Manager Vehicle Manager Driver Manager Student Assignment Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMI"
+  },
+  {
+    "name": "Transport drivers",
+    "route": "/admin/transport/drivers",
+    "actualPath": "/admin/transport/drivers",
+    "heading": "Driver Management",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Fleet Dashboard Live Tracking GPS Playback Route Manager Vehicle Manager Driver Manager Student Assignment Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMI"
+  },
+  {
+    "name": "Transport assignments",
+    "route": "/admin/transport/assignments",
+    "actualPath": "/admin/transport/assignments",
+    "heading": "Student Assignment Wizard",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Fleet Dashboard Live Tracking GPS Playback Route Manager Vehicle Manager Driver Manager Student Assignment Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMI"
+  },
+  {
+    "name": "Transport playback",
+    "route": "/admin/transport/playback",
+    "actualPath": "/admin/transport/playback",
+    "heading": "Playback Controls",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Fleet Dashboard Live Tracking GPS Playback Route Manager Vehicle Manager Driver Manager Student Assignment Finance & Accounts Hostel HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMI"
+  },
+  {
+    "name": "Hostel dashboard",
+    "route": "/admin/hostel/dashboard",
+    "actualPath": "/admin/hostel/dashboard",
+    "heading": "Warden Dashboard",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel Warden Dashboard Infrastructure Allocations Attendance Mess Dashboard Mess Plans Mess Bills Mess Payments HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN"
+  },
+  {
+    "name": "Hostel infrastructure",
+    "route": "/admin/hostel/infrastructure",
+    "actualPath": "/admin/hostel/infrastructure",
+    "heading": "Hostel Infrastructure",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel Warden Dashboard Infrastructure Allocations Attendance Mess Dashboard Mess Plans Mess Bills Mess Payments HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN"
+  },
+  {
+    "name": "Hostel allocations",
+    "route": "/admin/hostel/allocations",
+    "actualPath": "/admin/hostel/allocations",
+    "heading": "Hostel Room Allocation",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel Warden Dashboard Infrastructure Allocations Attendance Mess Dashboard Mess Plans Mess Bills Mess Payments HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN"
+  },
+  {
+    "name": "Hostel attendance",
+    "route": "/admin/hostel/attendance",
+    "actualPath": "/admin/hostel/attendance",
+    "heading": "Hostel Attendance",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel Warden Dashboard Infrastructure Allocations Attendance Mess Dashboard Mess Plans Mess Bills Mess Payments HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN"
+  },
+  {
+    "name": "Mess dashboard",
+    "route": "/admin/hostel/mess/dashboard",
+    "actualPath": "/admin/hostel/mess/dashboard",
+    "heading": "Mess Finance Command Center",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel Warden Dashboard Infrastructure Allocations Attendance Mess Dashboard Mess Plans Mess Bills Mess Payments HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN"
+  },
+  {
+    "name": "Mess plans",
+    "route": "/admin/hostel/mess/plans",
+    "actualPath": "/admin/hostel/mess/plans",
+    "heading": "Mess Plans",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel Warden Dashboard Infrastructure Allocations Attendance Mess Dashboard Mess Plans Mess Bills Mess Payments HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN"
+  },
+  {
+    "name": "Mess bills",
+    "route": "/admin/hostel/mess/bills",
+    "actualPath": "/admin/hostel/mess/bills",
+    "heading": "Monthly Mess Billing",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel Warden Dashboard Infrastructure Allocations Attendance Mess Dashboard Mess Plans Mess Bills Mess Payments HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN"
+  },
+  {
+    "name": "Mess payments",
+    "route": "/admin/hostel/mess/payments",
+    "actualPath": "/admin/hostel/mess/payments",
+    "heading": "Mess Collections & Payments",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel Warden Dashboard Infrastructure Allocations Attendance Mess Dashboard Mess Plans Mess Bills Mess Payments HRMS & Staff System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN"
+  },
+  {
+    "name": "HRMS onboarding",
+    "route": "/admin/hrms/onboarding",
+    "actualPath": "/admin/hrms/onboarding",
+    "heading": "Staff Onboarding Center",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff Staff Onboarding Payroll Engine Leave Approval Center PF & ESI Compliance Performance Reviews System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN HRMS ONBOAR"
+  },
+  {
+    "name": "HRMS payroll",
+    "route": "/admin/hrms/payroll",
+    "actualPath": "/admin/hrms/payroll",
+    "heading": "Payroll Dashboard",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff Staff Onboarding Payroll Engine Leave Approval Center PF & ESI Compliance Performance Reviews System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN HRMS PAYROL"
+  },
+  {
+    "name": "HRMS leave",
+    "route": "/admin/hrms/leave",
+    "actualPath": "/admin/hrms/leave",
+    "heading": "Leave Management Center",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff Staff Onboarding Payroll Engine Leave Approval Center PF & ESI Compliance Performance Reviews System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN HRMS LEAVE "
+  },
+  {
+    "name": "HRMS compliance",
+    "route": "/admin/hrms/compliance",
+    "actualPath": "/admin/hrms/compliance",
+    "heading": "PF & ESI Compliance",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff Staff Onboarding Payroll Engine Leave Approval Center PF & ESI Compliance Performance Reviews System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN HRMS COMPLI"
+  },
+  {
+    "name": "HRMS performance",
+    "route": "/admin/hrms/performance",
+    "actualPath": "/admin/hrms/performance",
+    "heading": "Performance Review Board",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Hostel HRMS & Staff Staff Onboarding Payroll Engine Leave Approval Center PF & ESI Compliance Performance Reviews System A ADMIN-001 ADMIN Sign Out ADMIN-001 ADMIN ROOT ADMIN HRMS PERFOR"
+  },
+  {
+    "name": "Finance chart of accounts",
+    "route": "/admin/finance/coa",
+    "actualPath": "/admin/finance/coa",
+    "heading": "Chart of Accounts",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Overview Fees Dashboard Fee Collection Chart of Accounts Journal Entries Trial Balance Expenses & Invoices Vendor Management Payroll & Salary Financial Statements Tally Integration Hoste"
+  },
+  {
+    "name": "Finance journal",
+    "route": "/admin/finance/journal",
+    "actualPath": "/admin/finance/journal",
+    "heading": "Journal Entries",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Overview Fees Dashboard Fee Collection Chart of Accounts Journal Entries Trial Balance Expenses & Invoices Vendor Management Payroll & Salary Financial Statements Tally Integration Hoste"
+  },
+  {
+    "name": "Finance trial balance",
+    "route": "/admin/finance/trial-balance",
+    "actualPath": "/admin/finance/trial-balance",
+    "heading": "Trial Balance",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Overview Fees Dashboard Fee Collection Chart of Accounts Journal Entries Trial Balance Expenses & Invoices Vendor Management Payroll & Salary Financial Statements Tally Integration Hoste"
+  },
+  {
+    "name": "Finance expenses",
+    "route": "/admin/finance/expenses",
+    "actualPath": "/admin/finance/expenses",
+    "heading": "Expense Tracking",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Overview Fees Dashboard Fee Collection Chart of Accounts Journal Entries Trial Balance Expenses & Invoices Vendor Management Payroll & Salary Financial Statements Tally Integration Hoste"
+  },
+  {
+    "name": "Finance vendors",
+    "route": "/admin/finance/vendors",
+    "actualPath": "/admin/finance/vendors",
+    "heading": "Vendor Management & Payments",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Overview Fees Dashboard Fee Collection Chart of Accounts Journal Entries Trial Balance Expenses & Invoices Vendor Management Payroll & Salary Financial Statements Tally Integration Hoste"
+  },
+  {
+    "name": "Finance salary payouts",
+    "route": "/admin/finance/salary-payouts",
+    "actualPath": "/admin/finance/salary-payouts",
+    "heading": "Salary Payouts",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Overview Fees Dashboard Fee Collection Chart of Accounts Journal Entries Trial Balance Expenses & Invoices Vendor Management Payroll & Salary Financial Statements Tally Integration Hoste"
+  },
+  {
+    "name": "Finance reports",
+    "route": "/admin/finance/reports",
+    "actualPath": "/admin/finance/reports",
+    "heading": "Financial Reports",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Overview Fees Dashboard Fee Collection Chart of Accounts Journal Entries Trial Balance Expenses & Invoices Vendor Management Payroll & Salary Financial Statements Tally Integration Hoste"
+  },
+  {
+    "name": "Finance tally",
+    "route": "/admin/finance/tally",
+    "actualPath": "/admin/finance/tally",
+    "heading": "Tally ERP 9 Integration",
+    "status": "PASS",
+    "flags": [],
+    "sample": "SCHOOLOS Dashboard Students Faculty Academic Transport Finance & Accounts Overview Fees Dashboard Fee Collection Chart of Accounts Journal Entries Trial Balance Expenses & Invoices Vendor Management Payroll & Salary Financial Statements Tally Integration Hoste"
+  }
+]

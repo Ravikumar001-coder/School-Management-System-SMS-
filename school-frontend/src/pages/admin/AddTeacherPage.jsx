@@ -1,96 +1,88 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { 
+  User, Mail, Phone, MapPin, Briefcase, GraduationCap, 
+  Calendar, CreditCard, ShieldCheck, Clock, Trash2, Heart,
+  Globe, BookOpen, School, FileText, ArrowLeft, Activity,
+  AlertCircle, CheckCircle2, ChevronRight, Landmark, Receipt
+} from 'lucide-react';
 import PageHeader from '../../components/common/PageHeader';
 import { useToast } from '../../context/ToastContext';
 import { teacherApi } from '../../api/teacherApi';
 import { subjectApi } from '../../api/subjectApi';
 import { classApi } from '../../api/classApi';
 import { fileApi } from '../../api/fileApi';
+import usePersistedForm from '../../hooks/usePersistedForm';
 
 const Field = ({ label, error, children }) => (
-  <div>
-    <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+  <div className="space-y-1.5">
+    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{label}</label>
     {children}
-    {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+    {error && <p className="text-red-500 text-[10px] mt-1 font-medium italic">{error}</p>}
   </div>
 );
 
-const inputCls = `w-full border border-gray-300 rounded-lg px-3 py-2.5
-                  text-sm focus:outline-none focus:ring-2
-                  focus:ring-green-500 transition`;
+const inputCls = `w-full border border-slate-200 rounded-xl px-4 py-3
+                  text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2
+                  focus:ring-indigo-500 transition-all placeholder:text-slate-300 bg-white shadow-sm`;
 
 const AddTeacherPage = () => {
   const navigate = useNavigate();
-  const { showToast } = useToast();
+  const toast = useToast();
 
-  const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    department: '',
-    qualification: '',
-    salary: '',
-    dateOfBirth: '',
-    joiningDate: '',
-    gender: '',
-    profilePhoto: '',
-    status: 'ACTIVE',
-    subjectIds: [],
-    assignedClassIds: [],
+  const { 
+    formData: form, 
+    handleChange, 
+    setFormData: setForm,
+    clearDraft 
+  } = usePersistedForm('add_teacher_form_hrms', {
+    firstName: '', lastName: '', email: '', phone: '',
+    departmentId: '', designation: '', qualification: '', specialization: '',
+    salary: '', dateOfBirth: '', joiningDate: new Date().toISOString().split('T')[0],
+    gender: '', bloodGroup: '', address: '', emergencyContact: '',
+    profilePhoto: '', status: 'ACTIVE',
+    // HRMS Enterprise Fields
+    employmentType: 'FULL_TIME', workShift: 'General', experienceYears: '',
+    bankAccountNo: '', ifscCode: '', panCard: '', aadharCard: '',
+    pfNumber: '', esiNumber: '', paymentMode: 'BANK_TRANSFER',
+    probationEndDate: '', contractEndDate: '', biometricId: '',
+    subjectIds: [], assignedClassIds: [],
   });
+
   const [subjects, setSubjects] = useState([]);
   const [classes, setClasses] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    Promise.all([
-      subjectApi.getAll().catch(() => ({ data: { data: [] } })),
-      classApi.getAll().catch(() => ({ data: { data: [] } })),
-    ]).then(([subjectRes, classRes]) => {
-      setSubjects(subjectRes.data?.data || []);
-      setClasses(classRes.data?.data || []);
-    });
+    const fetchMetadata = async () => {
+      try {
+        const [subRes, classRes, deptRes] = await Promise.all([
+          subjectApi.getAll(),
+          classApi.getAll(),
+          teacherApi.getDepartments ? teacherApi.getDepartments() : Promise.resolve({ data: { data: [] } })
+        ]);
+        setSubjects(subRes.data?.data || []);
+        setClasses(classRes.data?.data || []);
+        setDepartments(deptRes.data?.data || []);
+      } catch (err) {
+        toast.showToast('Failed to load system metadata', 'error');
+      }
+    };
+    fetchMetadata();
   }, []);
-
-  const photoUrl = useMemo(() => fileApi.toPublicUrl(form.profilePhoto), [form.profilePhoto]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-    if (fieldErrors[name]) {
-      setFieldErrors((prev) => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  const validate = () => {
-    const errors = {};
-
-    if (!form.firstName.trim()) errors.firstName = 'First name is required.';
-    if (!form.lastName.trim()) errors.lastName = 'Last name is required.';
-    if (!form.email.trim()) errors.email = 'Email is required.';
-    if (form.salary !== '' && (Number.isNaN(Number(form.salary)) || Number(form.salary) < 0)) {
-      errors.salary = 'Salary must be a valid non-negative number.';
-    }
-
-    setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
 
   const handlePhotoChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-
     setUploadingPhoto(true);
     try {
       const path = await fileApi.uploadImage(file);
       setForm((prev) => ({ ...prev, profilePhoto: path }));
-      showToast('Photo uploaded successfully', 'success');
+      toast.showToast('Photo uploaded successfully', 'success');
     } catch (err) {
-      showToast(err.response?.data || 'Photo upload failed.', 'error');
+      toast.showToast('Photo upload failed', 'error');
     } finally {
       setUploadingPhoto(false);
     }
@@ -103,237 +95,214 @@ const AddTeacherPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validate()) {
-      showToast('Please fix validation errors', 'error');
-      return;
-    }
-
-    const selectedSubjects = subjects.filter((s) => form.subjectIds.includes(s.id));
-    const specialization = form.department.trim() || selectedSubjects.map((s) => s.name).join(', ');
-
     setLoading(true);
     try {
       await teacherApi.create({
-        firstName: form.firstName.trim(),
-        lastName: form.lastName.trim(),
-        email: form.email,
-        phone: form.phone,
-        qualification: form.qualification,
-        specialization,
+        ...form,
         salary: form.salary === '' ? null : Number(form.salary),
-        dateOfBirth: form.dateOfBirth || null,
-        joiningDate: form.joiningDate || null,
-        gender: form.gender,
-        profilePhoto: form.profilePhoto || null,
-        status: form.status,
-        subjectIds: form.subjectIds,
-        assignedClassIds: form.assignedClassIds,
+        departmentId: form.departmentId || null,
+        experienceYears: form.experienceYears === '' ? 0 : Number(form.experienceYears)
       });
-      showToast('Teacher created successfully!', 'success');
+      toast.showToast('Staff member onboarded successfully!', 'success');
+      clearDraft();
       setTimeout(() => navigate('/admin/teachers'), 1200);
     } catch (err) {
-      showToast(err.response?.data?.message || 'Failed to add teacher.', 'error');
+      toast.showToast(err.response?.data?.message || 'Onboarding failed.', 'error');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <>
-      <PageHeader
-        title="Add Teacher (A) Form"
-        subtitle="Create teacher personal and professional profile"
-        action={
-          <button
-            onClick={() => navigate('/admin/teachers')}
-            className="text-gray-600 hover:text-gray-800 text-sm"
-          >
-            ← Back to Teachers
-          </button>
-        }
-      />
+    <div className="max-w-6xl mx-auto pb-20 animate-fade-in">
+      {/* ── Header Area ────────────────────────────────────────────────── */}
+      <div className="flex items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl font-black text-slate-800 tracking-tight">Staff Onboarding (HRMS)</h1>
+          <p className="text-slate-500 font-medium text-sm">Create an enterprise-hardened employee record</p>
+        </div>
+        <button 
+          onClick={() => navigate('/admin/teachers')}
+          className="flex items-center gap-2 px-6 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all shadow-sm"
+        >
+          <ArrowLeft size={16} /> Staff Directory
+        </button>
+      </div>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-white rounded-xl shadow p-5">
-          <h3 className="text-2xl font-semibold text-gray-900 mb-4">Personal Details</h3>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        
+        {/* SECTION 1: IDENTITY & PROFILE */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+          <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
+            <User size={16} className="text-indigo-600" /> Identity & Profile
+          </h3>
 
-          <div className="flex flex-col sm:flex-row gap-4 mb-4">
-            <div className="w-28 h-28 rounded-full bg-green-50 border border-green-100 overflow-hidden flex items-center justify-center text-3xl font-bold text-green-700">
-              {photoUrl ? (
-                <img src={photoUrl} alt="Teacher" className="w-full h-full object-cover" />
-              ) : (
-                (form.firstName || form.lastName || 'T').trim().charAt(0).toUpperCase()
-              )}
-            </div>
-            <div className="flex-1 space-y-3">
-              <Field label="First Name *" error={fieldErrors.firstName}>
-                <input
-                  name="firstName"
-                  value={form.firstName}
-                  onChange={handleChange}
-                  className={inputCls}
-                  placeholder="e.g. Priya"
-                />
-              </Field>
-              <Field label="Last Name *" error={fieldErrors.lastName}>
-                <input
-                  name="lastName"
-                  value={form.lastName}
-                  onChange={handleChange}
-                  className={inputCls}
-                  placeholder="e.g. Sharma"
-                />
-              </Field>
-              <label className="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg text-sm cursor-pointer hover:bg-blue-700 transition">
+          <div className="flex flex-col lg:flex-row gap-8">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-32 h-32 rounded-[2rem] bg-indigo-50 border-4 border-white shadow-xl flex items-center justify-center overflow-hidden ring-1 ring-slate-100">
+                {form.profilePhoto ? (
+                  <img src={fileApi.toPublicUrl(form.profilePhoto)} alt="Preview" className="w-full h-full object-cover" />
+                ) : (
+                  <User size={48} className="text-indigo-200" />
+                )}
+              </div>
+              <label className="bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold cursor-pointer hover:bg-indigo-700 transition shadow-lg shadow-indigo-100">
                 {uploadingPhoto ? 'Uploading...' : 'Upload Photo'}
                 <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
               </label>
             </div>
+
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Field label="First Name *">
+                <input name="firstName" value={form.firstName} onChange={handleChange} className={inputCls} placeholder="Alice" required />
+              </Field>
+              <Field label="Last Name *">
+                <input name="lastName" value={form.lastName} onChange={handleChange} className={inputCls} placeholder="Johnson" required />
+              </Field>
+              <Field label="Personal Email *">
+                <input type="email" name="email" value={form.email} onChange={handleChange} className={inputCls} placeholder="alice@school.com" required />
+              </Field>
+              <Field label="Phone Number">
+                <input name="phone" value={form.phone} onChange={handleChange} className={inputCls} placeholder="+1 000-000-0000" />
+              </Field>
+              <Field label="Date of Birth *">
+                <input type="date" name="dateOfBirth" value={form.dateOfBirth} onChange={handleChange} className={inputCls} required />
+              </Field>
+              <Field label="Gender *">
+                <select name="gender" value={form.gender} onChange={handleChange} className={inputCls} required>
+                  <option value="">Select</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </Field>
+            </div>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="Date of Birth">
-              <input type="date" name="dateOfBirth" value={form.dateOfBirth} onChange={handleChange} className={inputCls} />
-            </Field>
-
-            <Field label="Gender">
-              <select name="gender" value={form.gender} onChange={handleChange} className={inputCls}>
-                <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
+        {/* SECTION 2: PROFESSIONAL ASSIGNMENT */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+          <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
+            <Briefcase size={16} className="text-indigo-600" /> Professional & Employment
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Field label="Department *">
+              <select name="departmentId" value={form.departmentId} onChange={handleChange} className={inputCls} required>
+                <option value="">Choose Dept</option>
+                {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
               </select>
             </Field>
-
-            <Field label="Phone Number">
-              <input name="phone" value={form.phone} onChange={handleChange} className={inputCls} placeholder="+123456789" />
+            <Field label="Designation *">
+              <input name="designation" value={form.designation} onChange={handleChange} className={inputCls} placeholder="e.g. Senior Teacher" required />
             </Field>
-
-            <Field label="Email Address *" error={fieldErrors.email}>
-              <input type="email" name="email" value={form.email} onChange={handleChange} className={inputCls} placeholder="teacher@sms.com" required />
+            <Field label="Employment Type">
+              <select name="employmentType" value={form.employmentType} onChange={handleChange} className={inputCls}>
+                <option value="FULL_TIME">Full Time</option>
+                <option value="PART_TIME">Part Time</option>
+                <option value="CONTRACT">Contract</option>
+                <option value="VISITING">Visiting</option>
+              </select>
+            </Field>
+            <Field label="Work Shift">
+              <input name="workShift" value={form.workShift} onChange={handleChange} className={inputCls} placeholder="e.g. Morning" />
+            </Field>
+            <Field label="Experience (Years)">
+              <input type="number" name="experienceYears" value={form.experienceYears} onChange={handleChange} className={inputCls} placeholder="0" />
+            </Field>
+            <Field label="Joining Date *">
+              <input type="date" name="joiningDate" value={form.joiningDate} onChange={handleChange} className={inputCls} required />
+            </Field>
+            <Field label="Qualification">
+              <input name="qualification" value={form.qualification} onChange={handleChange} className={inputCls} placeholder="e.g. M.Ed, PhD" />
+            </Field>
+            <Field label="Monthly Salary">
+              <input type="number" name="salary" value={form.salary} onChange={handleChange} className={inputCls} placeholder="0.00" />
             </Field>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow p-5">
-          <h3 className="text-2xl font-semibold text-gray-900 mb-4">Professional Details &amp; Account Info</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="Department/Subject">
-              <input
-                name="department"
-                value={form.department}
-                onChange={handleChange}
-                className={inputCls}
-                placeholder="e.g. Department of Science"
-              />
+        {/* SECTION 3: PAYROLL & BANKING */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+          <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
+            <Landmark size={16} className="text-emerald-600" /> Payroll & Banking
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Field label="PAN Card Number *">
+              <input name="panCard" value={form.panCard} onChange={handleChange} className={inputCls} placeholder="ABCDE1234F" required />
             </Field>
-
-            <Field label="Qualification">
-              <input
-                name="qualification"
-                value={form.qualification}
-                onChange={handleChange}
-                className={inputCls}
-                placeholder="e.g. M.Sc, B.Ed"
-              />
+            <Field label="Aadhar Card Number *">
+              <input name="aadharCard" value={form.aadharCard} onChange={handleChange} className={inputCls} placeholder="12-digit number" required />
             </Field>
-
-            <Field label="Salary" error={fieldErrors.salary}>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                name="salary"
-                value={form.salary}
-                onChange={handleChange}
-                className={inputCls}
-                placeholder="e.g. 42000"
-              />
+            <Field label="Bank Account No">
+              <input name="bankAccountNo" value={form.bankAccountNo} onChange={handleChange} className={inputCls} placeholder="Account Number" />
             </Field>
-
-            <Field label="Subjects">
-              <select
-                multiple
-                value={form.subjectIds.map(String)}
-                onChange={(e) => onMultiSelect('subjectIds', e)}
-                className={`${inputCls} h-28`}
-              >
-                {subjects.map((s) => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
-                ))}
+            <Field label="IFSC Code">
+              <input name="ifscCode" value={form.ifscCode} onChange={handleChange} className={inputCls} placeholder="IFSC" />
+            </Field>
+            <Field label="PF Number">
+              <input name="pfNumber" value={form.pfNumber} onChange={handleChange} className={inputCls} placeholder="PF-XXXX" />
+            </Field>
+            <Field label="ESI Number">
+              <input name="esiNumber" value={form.esiNumber} onChange={handleChange} className={inputCls} placeholder="ESI-XXXX" />
+            </Field>
+            <Field label="Payment Mode">
+              <select name="paymentMode" value={form.paymentMode} onChange={handleChange} className={inputCls}>
+                <option value="BANK_TRANSFER">Bank Transfer</option>
+                <option value="CASH">Cash</option>
+                <option value="CHEQUE">Cheque</option>
               </select>
             </Field>
+          </div>
+        </div>
 
-            <Field label="Assigned Classes">
-              <select
-                multiple
-                value={form.assignedClassIds.map(String)}
-                onChange={(e) => onMultiSelect('assignedClassIds', e)}
-                className={`${inputCls} h-28`}
-              >
-                {classes.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name} - {c.section}</option>
-                ))}
-              </select>
+        {/* SECTION 4: LIFECYCLE & ACADEMIC */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+          <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
+            <Clock size={16} className="text-indigo-600" /> Lifecycle & Assignments
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Field label="Probation End Date">
+              <input type="date" name="probationEndDate" value={form.probationEndDate} onChange={handleChange} className={inputCls} />
             </Field>
-
-            <Field label="Date of Joining">
-              <input type="date" name="joiningDate" value={form.joiningDate} onChange={handleChange} className={inputCls} />
+            <Field label="Contract End Date">
+              <input type="date" name="contractEndDate" value={form.contractEndDate} onChange={handleChange} className={inputCls} />
             </Field>
-
-            <Field label="Account Username">
-              <input
-                value={`Auto-generated (Teacher ID, e.g. TCH-${new Date().getFullYear()}-001)`}
-                className={`${inputCls} bg-gray-50`}
-                readOnly
-              />
+            <Field label="Biometric ID">
+              <input name="biometricId" value={form.biometricId} onChange={handleChange} className={inputCls} placeholder="BIO-XXXX" />
             </Field>
-
-            <Field label="Initial Password">
-              <input value="Same as Teacher ID" className={`${inputCls} bg-gray-50`} readOnly />
-            </Field>
-
-            <Field label="Role">
-              <select value="TEACHER" className={`${inputCls} bg-gray-50`} disabled>
-                <option value="TEACHER">Teacher</option>
-              </select>
-            </Field>
-
-            <div className="md:col-span-2 flex items-center justify-between border rounded-lg px-3 py-2.5">
-              <span className="text-sm font-medium text-gray-700">Status</span>
-              <button
-                type="button"
-                onClick={() => setForm((prev) => ({ ...prev, status: prev.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE' }))}
-                className={`relative inline-flex h-6 w-12 items-center rounded-full transition ${form.status === 'ACTIVE' ? 'bg-green-500' : 'bg-gray-300'}`}
-              >
-                <span
-                  className={`inline-block h-5 w-5 transform rounded-full bg-white transition ${form.status === 'ACTIVE' ? 'translate-x-6' : 'translate-x-1'}`}
-                />
-              </button>
+            <div className="lg:col-span-1">
+               <Field label="Subject Assignments">
+                  <select multiple value={form.subjectIds.map(String)} onChange={(e) => onMultiSelect('subjectIds', e)} className={`${inputCls} h-32`}>
+                    {subjects.map(s => <option key={s.id} value={s.id}>{s.name} ({s.code})</option>)}
+                  </select>
+               </Field>
+            </div>
+            <div className="lg:col-span-2">
+               <Field label="Assigned Classes (Class Teacher)">
+                  <select multiple value={form.assignedClassIds.map(String)} onChange={(e) => onMultiSelect('assignedClassIds', e)} className={`${inputCls} h-32`}>
+                    {classes.map(c => <option key={c.id} value={c.id}>{c.name} - {c.section}</option>)}
+                  </select>
+               </Field>
             </div>
           </div>
+        </div>
 
-          <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
-            <button
-              type="submit"
-              disabled={loading || uploadingPhoto}
-              className="bg-blue-700 text-white px-8 py-2.5 rounded-lg text-sm hover:bg-blue-800 disabled:opacity-60 font-medium"
-            >
-              {loading ? 'Saving...' : 'Save Teacher'}
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate('/admin/teachers')}
-              className="bg-cyan-100 text-cyan-800 px-6 py-2.5 rounded-lg text-sm hover:bg-cyan-200 font-medium"
-            >
+        {/* ACTIONS */}
+        <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+          <button type="button" onClick={() => clearDraft(true)} className="text-slate-400 hover:text-rose-500 text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-colors">
+            <Trash2 size={14} /> Clear Draft
+          </button>
+          <div className="flex gap-4">
+            <button type="button" onClick={() => navigate('/admin/teachers')} className="px-8 py-3 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all border border-slate-200">
               Cancel
+            </button>
+            <button type="submit" disabled={loading || uploadingPhoto} className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-3 rounded-xl text-sm font-black shadow-lg shadow-indigo-100 transition-all disabled:opacity-50">
+              {loading ? 'Hiring Staff...' : 'Finalize Onboarding'}
             </button>
           </div>
         </div>
       </form>
-    </>
+    </div>
   );
 };
 

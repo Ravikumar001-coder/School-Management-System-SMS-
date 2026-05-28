@@ -36,9 +36,10 @@ public class ParentSuperAppService {
     private final ConsentFormRepository consentFormRepository;
     private final ConsentResponseRepository consentResponseRepository;
     private final MarkRepository markRepository;
+    private final ClassDiaryRepository classDiaryRepository;
 
     private void verifyParentAccess(String parentMobile, Long studentId) {
-        Parent parent = parentRepository.findByMobileNumberAndDeletedAtIsNull(parentMobile)
+        Parent parent = parentRepository.findByPhoneAndDeletedAtIsNull(parentMobile)
                 .orElseThrow(() -> new ResourceNotFoundException("Parent", 0L));
         
         boolean hasAccess = parent.getStudentLinks().stream()
@@ -157,7 +158,7 @@ public class ParentSuperAppService {
     @Transactional
     public void submitLeaveRequest(String parentMobile, Long studentId, LeaveRequest request) {
         verifyParentAccess(parentMobile, studentId);
-        Parent parent = parentRepository.findByMobileNumberAndDeletedAtIsNull(parentMobile).orElseThrow();
+        Parent parent = parentRepository.findByPhoneAndDeletedAtIsNull(parentMobile).orElseThrow();
         Student student = studentRepository.findById(studentId).orElseThrow();
 
         request.setParent(parent);
@@ -173,7 +174,7 @@ public class ParentSuperAppService {
     @Transactional(readOnly = true)
     public List<CircularItem> getCirculars(String parentMobile, Long studentId) {
         verifyParentAccess(parentMobile, studentId);
-        Parent parent = parentRepository.findByMobileNumberAndDeletedAtIsNull(parentMobile).orElseThrow();
+        Parent parent = parentRepository.findByPhoneAndDeletedAtIsNull(parentMobile).orElseThrow();
         
         List<Announcement> announcements = announcementRepository.findByAudienceInOrderByCreatedAtDesc(List.of("ALL", "PARENTS"));
         List<CircularRead> readStatus = circularReadRepository.findByParentId(parent.getId());
@@ -210,7 +211,7 @@ public class ParentSuperAppService {
     @Transactional
     public void submitComplaint(String parentMobile, Long studentId, Complaint request) {
         verifyParentAccess(parentMobile, studentId);
-        Parent parent = parentRepository.findByMobileNumberAndDeletedAtIsNull(parentMobile).orElseThrow();
+        Parent parent = parentRepository.findByPhoneAndDeletedAtIsNull(parentMobile).orElseThrow();
         Student student = studentRepository.findById(studentId).orElseThrow();
 
         request.setParent(parent);
@@ -244,7 +245,7 @@ public class ParentSuperAppService {
     @Transactional
     public void bookPtmSlot(String parentMobile, Long studentId, Long slotId) {
         verifyParentAccess(parentMobile, studentId);
-        Parent parent = parentRepository.findByMobileNumberAndDeletedAtIsNull(parentMobile).orElseThrow();
+        Parent parent = parentRepository.findByPhoneAndDeletedAtIsNull(parentMobile).orElseThrow();
         Student student = studentRepository.findById(studentId).orElseThrow();
         PtmSlot slot = ptmSlotRepository.findById(slotId).orElseThrow();
 
@@ -316,7 +317,7 @@ public class ParentSuperAppService {
     @Transactional
     public void submitConsentResponse(String parentMobile, Long studentId, Long formId, ConsentResponse response) {
         verifyParentAccess(parentMobile, studentId);
-        Parent parent = parentRepository.findByMobileNumberAndDeletedAtIsNull(parentMobile).orElseThrow();
+        Parent parent = parentRepository.findByPhoneAndDeletedAtIsNull(parentMobile).orElseThrow();
         Student student = studentRepository.findById(studentId).orElseThrow();
         ConsentForm form = consentFormRepository.findById(formId).orElseThrow();
 
@@ -324,5 +325,29 @@ public class ParentSuperAppService {
         response.setParent(parent);
         response.setStudent(student);
         consentResponseRepository.save(response);
+    }
+
+    @Transactional(readOnly = true)
+    public java.util.List<java.util.Map<String, Object>> getClassDiaryForParent(
+            String parentMobile, Long studentId, LocalDate from, LocalDate to) {
+        verifyParentAccess(parentMobile, studentId);
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student", studentId));
+        if (student.getClassRoom() == null) return java.util.Collections.emptyList();
+        return classDiaryRepository
+                .findByClassRoomIdAndEntryDateBetweenOrderByEntryDateDesc(
+                        student.getClassRoom().getId(), from, to)
+                .stream().map(d -> {
+                    java.util.Map<String, Object> m = new java.util.LinkedHashMap<>();
+                    m.put("id", d.getId());
+                    m.put("entryDate", d.getEntryDate());
+                    m.put("subject", d.getSubject().getName());
+                    m.put("topicsCovered", d.getTopicsCovered());
+                    m.put("homeworkAssigned", d.getHomeworkAssigned());
+                    m.put("announcements", d.getAnnouncements());
+                    m.put("behaviorNote", d.getBehaviorNote());
+                    m.put("teacherName", d.getTeacher().getFirstName() + " " + d.getTeacher().getLastName());
+                    return m;
+                }).collect(Collectors.toList());
     }
 }

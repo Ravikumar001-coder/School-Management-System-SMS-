@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation, Link } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
+import GlobalSearchModal from '../dashboard/GlobalSearchModal';
 import { ChevronRight, Home } from 'lucide-react';
 
 /**
@@ -12,6 +13,7 @@ import { ChevronRight, Home } from 'lucide-react';
 const AppLayout = () => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
 
   // Close mobile sidebar on route change
@@ -19,11 +21,29 @@ const AppLayout = () => {
     setIsMobileOpen(false);
   }, [location.pathname]);
 
+  // Keyboard shortcut Ctrl + K for global search
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const contentMarginClass = isCollapsed ? 'lg:ml-20' : 'lg:ml-64';
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-700">
       
+      {/* Global Search Modal */}
+      <GlobalSearchModal 
+        isOpen={isSearchOpen} 
+        onClose={() => setIsSearchOpen(false)} 
+      />
+
       {/* 1. Global Navigation Shell */}
       <Sidebar 
         isOpen={isMobileOpen} 
@@ -32,11 +52,12 @@ const AppLayout = () => {
       />
 
       <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${contentMarginClass}`}>
-        
+         
         {/* 2. Unified Header */}
         <TopBar 
           onMobileMenuClick={() => setIsMobileOpen(true)}
           onDesktopMenuToggle={() => setIsCollapsed(!isCollapsed)}
+          onSearchClick={() => setIsSearchOpen(true)}
         />
 
         {/* 3. Main Operational Content */}

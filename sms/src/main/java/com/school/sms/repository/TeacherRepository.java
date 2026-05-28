@@ -40,7 +40,25 @@ public interface TeacherRepository
            "LOWER(t.email)     LIKE LOWER(CONCAT('%',:keyword,'%')))")
     List<Teacher> searchTeachers(String keyword);
 
+    @Query("SELECT DISTINCT t FROM Teacher t " +
+           "LEFT JOIN t.department d " +
+           "LEFT JOIN t.subjects s " +
+           "LEFT JOIN s.classRoom c " +
+           "WHERE t.deletedAt IS NULL " +
+           "AND (:deptId IS NULL OR d.id = :deptId) " +
+           "AND (:subjectId IS NULL OR s.id = :subjectId) " +
+           "AND (:classId IS NULL OR c.id = :classId) " +
+           "AND (:keyword IS NULL OR LOWER(t.firstName) LIKE LOWER(CONCAT('%',:keyword,'%')) OR LOWER(t.lastName) LIKE LOWER(CONCAT('%',:keyword,'%')))")
+    Page<Teacher> findFiltered(Long deptId, Long subjectId, Long classId, String keyword, Pageable pageable);
+
     boolean existsByEmailAndDeletedAtIsNull(String email);
     
     boolean existsByEmployeeIdAndDeletedAtIsNull(String employeeId);
+
+    boolean existsByPanCardAndDeletedAtIsNull(String panCard);
+
+    boolean existsByAadharCardAndDeletedAtIsNull(String aadharCard);
+
+    long countByDeletedAtIsNull();
+    long countByDepartmentId(Long departmentId);
 }

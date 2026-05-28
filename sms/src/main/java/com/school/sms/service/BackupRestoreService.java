@@ -53,7 +53,6 @@ public class BackupRestoreService {
         performBackup("SYSTEM", "Scheduled daily backup");
     }
 
-    @Transactional
     public SystemBackup manualBackup(String notes) {
         String username = "SYSTEM";
         if (SecurityContextHolder.getContext().getAuthentication() != null) {
@@ -84,6 +83,7 @@ public class BackupRestoreService {
             String mysqldumpPath = resolveMysqlTool("mysqldump.exe");
             ProcessBuilder processBuilder = new ProcessBuilder(
                     mysqldumpPath,
+                    "-h127.0.0.1",
                     "-u" + dbUser,
                     dbPassword.isEmpty() ? "" : "-p" + dbPassword,
                     "--add-drop-table",
@@ -95,11 +95,16 @@ public class BackupRestoreService {
             
             // Handle empty password correctly
             if (dbPassword.isEmpty()) {
-                processBuilder.command().remove(2); // Remove the empty -p argument
+                processBuilder.command().remove(3); // Remove the empty -p argument
             }
 
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
+            process.getOutputStream().close(); // Close stdin immediately
+            String output;
+            try (var is = process.getInputStream()) {
+                output = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+            }
             int exitCode = process.waitFor();
 
             if (exitCode == 0) {
@@ -109,8 +114,8 @@ public class BackupRestoreService {
                 log.info("Backup successful: {}", fileName);
             } else {
                 backup.setBackupStatus("FAILED");
-                backup.setNotes("Process exited with code: " + exitCode);
-                log.error("Backup failed with exit code: {}", exitCode);
+                backup.setNotes("Exit code: " + exitCode + ", Output: " + output);
+                log.error("Backup failed with exit code: {}, Output: {}", exitCode, output);
             }
         } catch (Exception e) {
             log.error("Backup failed", e);
@@ -121,7 +126,6 @@ public class BackupRestoreService {
         return backupRepository.save(backup);
     }
 
-    @Transactional
     public SystemBackup restoreBackup(Long backupId) {
         Optional<SystemBackup> backupOpt = backupRepository.findById(backupId);
         if (backupOpt.isEmpty()) {
@@ -139,18 +143,23 @@ public class BackupRestoreService {
             String mysqlPath = resolveMysqlTool("mysql.exe");
             ProcessBuilder processBuilder = new ProcessBuilder(
                     mysqlPath,
+                    "-h127.0.0.1",
                     "-u" + dbUser,
                     dbPassword.isEmpty() ? "" : "-p" + dbPassword,
                     DB_NAME
             );
             
             if (dbPassword.isEmpty()) {
-                processBuilder.command().remove(2);
+                processBuilder.command().remove(3);
             }
 
             processBuilder.redirectInput(file);
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
+            String output;
+            try (var is = process.getInputStream()) {
+                output = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+            }
             int exitCode = process.waitFor();
 
             if (exitCode == 0) {
@@ -158,8 +167,8 @@ public class BackupRestoreService {
                 log.info("Restore successful for: {}", backup.getFileName());
             } else {
                 backup.setRestoreStatus("FAILED");
-                log.error("Restore failed with exit code: {}", exitCode);
-                throw new RuntimeException("Restore failed with exit code: " + exitCode);
+                log.error("Restore failed with exit code: {}, Output: {}", exitCode, output);
+                throw new RuntimeException("Restore failed with exit code: " + exitCode + ", Output: " + output);
             }
         } catch (Exception e) {
             log.error("Restore failed", e);

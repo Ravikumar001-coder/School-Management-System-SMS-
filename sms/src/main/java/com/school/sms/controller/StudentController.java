@@ -6,18 +6,21 @@ import com.school.sms.dto.request.StudentRequest;
 import com.school.sms.dto.response.ApiResponse;
 import com.school.sms.dto.response.StudentResponse;
 import com.school.sms.service.StudentService;
+import com.school.sms.service.ExcelExportService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/students")
@@ -25,6 +28,7 @@ import java.util.List;
 public class StudentController {
 
     private final StudentService studentService;
+    private final ExcelExportService excelExportService;
 
     // GET all students with pagination
     @GetMapping
@@ -36,23 +40,40 @@ public class StudentController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy
     ) {
-        System.out.println("[DEBUG] StudentController.getAllStudents - params: keyword=" + keyword + ", classId=" + classId);
-        long totalInDb = studentService.countTotalStudents();
-        System.out.println("[DEBUG] Total students in DB (Hibernate count): " + totalInDb);
-        
-        try {
-             // Direct Native SQL check to verify the connection is seeing the table
-             Long nativeCount = studentService.nativeCountStudents();
-             System.out.println("[DEBUG] Total students in DB (NATIVE SQL count): " + nativeCount);
-        } catch (Exception e) {
-             System.err.println("[DEBUG] Native SQL check failed: " + e.getMessage());
-        }
-
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
         Page<StudentResponse> students = studentService.getStudentsFiltered(keyword, classId, pageable);
-        
-        System.out.println("[DEBUG] Found students in this page: " + students.getNumberOfElements());
         return ResponseEntity.ok(ApiResponse.success("Students fetched", students));
+    }
+
+    // Export Students to Excel
+    @GetMapping("/export")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    public ResponseEntity<byte[]> exportStudents() {
+        try {
+            List<StudentResponse> students = studentService.getAllStudentsList();
+            List<String> headers = List.of("Student ID", "First Name", "Last Name", "Email", "Phone", "Status");
+            
+            List<Map<String, Object>> data = students.stream().map(s -> {
+                Map<String, Object> row = new HashMap<>();
+                row.put("Student ID", s.getStudentId() != null ? s.getStudentId() : "");
+                row.put("First Name", s.getFirstName() != null ? s.getFirstName() : "");
+                row.put("Last Name", s.getLastName() != null ? s.getLastName() : "");
+                row.put("Email", s.getEmail() != null ? s.getEmail() : "");
+                row.put("Phone", s.getPhone() != null ? s.getPhone() : "");
+                row.put("Status", s.getStatus() != null ? s.getStatus() : "");
+                return row;
+            }).collect(Collectors.toList());
+
+            byte[] excelBytes = excelExportService.exportToExcel("Students", headers, data);
+
+            HttpHeaders headers_http = new HttpHeaders();
+            headers_http.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers_http.setContentDisposition(ContentDisposition.attachment().filename("students_list.xlsx").build());
+
+            return new ResponseEntity<>(excelBytes, headers_http, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     // GET student by ID

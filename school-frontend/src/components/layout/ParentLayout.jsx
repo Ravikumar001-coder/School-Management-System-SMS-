@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Users, BookOpen, CreditCard, Settings, ArrowLeft, Bell, User } from 'lucide-react';
+import { Users, BookOpen, CreditCard, Settings, ArrowLeft, Bell, User, BookMarked } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const ParentLayout = () => {
@@ -71,10 +71,11 @@ const ParentLayout = () => {
       {/* ── FLOATING BOTTOM NAV ── */}
       <div className="fixed bottom-6 left-6 right-6 h-20 bg-slate-900/90 backdrop-blur-2xl rounded-[2rem] border border-white/10 px-8 flex justify-between items-center z-[100] shadow-2xl shadow-slate-950/40">
          {[
-           { icon: Users, label: 'Home', path: '/parent/dashboard' },
-           { icon: BookOpen, label: 'Study', path: '/parent/homework' },
-           { icon: CreditCard, label: 'Pay', path: '/parent/fees' },
-           { icon: Settings, label: 'Config', path: '/parent/profile' }
+          { icon: Users,      label: 'Home',  path: '/parent/dashboard' },
+           { icon: BookOpen,   label: 'Study', path: '/parent/homework' },
+           { icon: BookMarked, label: 'Diary', path: '/parent/diary' },
+           { icon: CreditCard, label: 'Pay',   path: '/parent/fees' },
+           { icon: Settings,   label: 'Config',path: '/parent/profile' }
          ].map((item, i) => {
            const isActive = location.pathname === item.path;
            return (

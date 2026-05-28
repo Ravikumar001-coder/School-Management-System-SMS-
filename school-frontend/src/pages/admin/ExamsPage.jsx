@@ -178,6 +178,12 @@ const ExamsPage = () => {
                           >
                             Marks
                           </button>
+                          <button
+                            onClick={() => navigate(`/admin/exams/${exam.id}/rankings`)}
+                            className="text-amber-700 hover:text-amber-900 font-medium"
+                          >
+                            Rankings
+                          </button>
                         </div>
                       </td>
                     </tr>

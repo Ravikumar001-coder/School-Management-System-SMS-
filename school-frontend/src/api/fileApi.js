@@ -1,5 +1,4 @@
-import axios from 'axios';
-
+import api from './axios';
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080/api/v1';
 const SERVER_BASE = API_BASE.replace(/\/api\/v1\/?$/, '');
 
@@ -8,10 +7,9 @@ export const fileApi = {
     const formData = new FormData();
     formData.append('file', file);
 
-    const token = localStorage.getItem('token');
-    const response = await axios.post(`${API_BASE}/files/upload`, formData, {
+    const response = await api.post('/files/upload', formData, {
       headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        'Content-Type': 'multipart/form-data',
       },
     });
 
@@ -20,7 +18,8 @@ export const fileApi = {
 
   toPublicUrl: (path) => {
     if (!path) return '';
-    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    if (typeof path === 'object') return ''; // Safety check
+    if (String(path).startsWith('http://') || String(path).startsWith('https://')) return path;
     return `${SERVER_BASE}${path}`;
   },
 };

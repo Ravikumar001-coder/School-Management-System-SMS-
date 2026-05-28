@@ -59,6 +59,15 @@ public class Homework {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "scheduled_publish_at")
+    private LocalDateTime scheduledPublishAt;
+
+    @Column(name = "status")
+    private String status; // DRAFT, SCHEDULED, PUBLISHED
+
+    @Column(name = "resource_links", columnDefinition = "TEXT")
+    private String resourceLinks; // JSON string for video/resource links
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

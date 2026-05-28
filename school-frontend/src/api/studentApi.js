@@ -9,4 +9,5 @@ export const studentApi = {
   delete:    (id)              => api.delete(`/students/${id}`),
   search:    (keyword)         => api.get(`/students/search?keyword=${keyword}`),
   byClass:   (classId)        => api.get(`/students/class/${classId}`),
+  exportExcel: () => api.get('/students/export', { responseType: 'blob' }),
 };

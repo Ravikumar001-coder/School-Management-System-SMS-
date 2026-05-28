@@ -14,6 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(callSuper = true)
 public class Parent extends SoftDeletableEntity {
 
     @Id
@@ -24,23 +25,26 @@ public class Parent extends SoftDeletableEntity {
     private String parentUuid;
 
     @Column(nullable = false)
-    private String fullName;
+    private String firstName;
+    
+    private String lastName;
 
     @Column(nullable = false, unique = true)
-    private String mobileNumber;
+    private String phone; // Changed from mobileNumber to match migration
 
-    private String alternateMobile;
+    private String alternatePhone;
+    
+    @Column(unique = true)
     private String email;
-    private String gender;
-    private String relationshipDefault; // father, mother, guardian
-    private String photoUrl;
-
+    
+    private String occupation;
+    
     @Column(columnDefinition = "TEXT")
     private String address;
-    private String city;
-    private String state;
-    private String pincode;
-    private String occupation;
+
+    @OneToOne
+    @JoinColumn(name = "user_id", unique = true)
+    private User user; // For portal login
 
     @Builder.Default
     private boolean isActive = true;
@@ -50,12 +54,6 @@ public class Parent extends SoftDeletableEntity {
 
     private String pinHash;
     private LocalDateTime lastLoginAt;
-
-    private Long createdByAdminId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "academic_year_id")
-    private AcademicYear academicYear;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "branch_id")
@@ -68,10 +66,16 @@ public class Parent extends SoftDeletableEntity {
     @PrePersist
     public void prePersist() {
         if (parentUuid == null) {
-            parentUuid = UUID.randomUUID().toString();
+            parentUuid = "PAR-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         }
-        if (branch == null) {
-            // Logic to set default branch could go here or in service
-        }
+    }
+
+    // Legacy Bridge for Auth / Security
+    public String getFullName() {
+        return (firstName + " " + (lastName != null ? lastName : "")).trim();
+    }
+
+    public String getMobileNumber() {
+        return phone;
     }
 }

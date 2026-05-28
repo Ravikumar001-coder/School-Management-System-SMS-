@@ -8,6 +8,7 @@ import com.school.sms.model.ClassRoom;
 import com.school.sms.model.Subject;
 import com.school.sms.model.Teacher;
 import com.school.sms.repository.ClassRoomRepository;
+import com.school.sms.repository.DepartmentRepository;
 import com.school.sms.repository.SubjectRepository;
 import com.school.sms.repository.TeacherRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class SubjectService {
     private final SubjectRepository subjectRepository;
     private final ClassRoomRepository classRoomRepository;
     private final TeacherRepository teacherRepository;
+    private final DepartmentRepository departmentRepository;
 
     @Transactional
     public SubjectResponse createSubject(SubjectRequest request) {
@@ -41,7 +43,7 @@ public class SubjectService {
                 .name(request.getName())
                 .code(request.getCode())
                 .description(request.getDescription())
-                .department(request.getDepartment())
+                .department(resolveDepartment(request.getDepartment()))
                 .classRoom(classRoom)
                 .assignedTeacher(assignedTeacher)
                 .totalMarks(request.getTotalMarks() != null 
@@ -85,7 +87,7 @@ public class SubjectService {
         subject.setName(req.getName());
         subject.setCode(req.getCode());
         subject.setDescription(req.getDescription());
-        subject.setDepartment(req.getDepartment());
+        subject.setDepartment(resolveDepartment(req.getDepartment()));
         subject.setAssignedTeacher(assignedTeacher);
         subject.setClassRoom(classRoom);
         if (req.getTotalMarks()  != null) 
@@ -129,7 +131,7 @@ public class SubjectService {
                 .name(s.getName())
                 .code(s.getCode())
                 .description(s.getDescription())
-                .department(s.getDepartment())
+                .department(s.getDepartment() != null ? s.getDepartment().getName() : "General")
                 .classRoomId(s.getClassRoom() != null ? s.getClassRoom().getId() : null)
                 .className(className)
                 .classSection(classSection)
@@ -156,6 +158,16 @@ public class SubjectService {
         }
         return classRoomRepository.findById(classRoomId)
                 .orElseThrow(() -> new ResourceNotFoundException("ClassRoom", classRoomId));
+    }
+
+    private com.school.sms.model.Department resolveDepartment(String name) {
+        if (name == null || name.isEmpty()) {
+            return null;
+        }
+        return departmentRepository.findByName(name).orElseGet(() -> {
+            com.school.sms.model.Department dept = com.school.sms.model.Department.builder().name(name).build();
+            return departmentRepository.save(dept);
+        });
     }
 
     private void syncTeacherAndClassBindings(Subject subject, Teacher teacher, ClassRoom classRoom) {

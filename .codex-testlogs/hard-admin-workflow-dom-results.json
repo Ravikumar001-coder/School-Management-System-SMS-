@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Department Add/Delete",
+    "status": "FAIL",
+    "error": "Error: Browser Use encountered an error interacting with this webpage's clipboard: Browser Use virtual clipboard is not installed"
+  },
+  {
+    "name": "Broadcast Notice",
+    "status": "FAIL",
+    "error": "Error: Browser Use encountered an error interacting with this webpage's clipboard: Browser Use virtual clipboard is not installed"
+  },
+  {
+    "name": "Generate Tally XML",
+    "status": "FAIL",
+    "error": "Error: Browser Use encountered an error interacting with this webpage's clipboard: Browser Use virtual clipboard is not installed"
+  }
+]

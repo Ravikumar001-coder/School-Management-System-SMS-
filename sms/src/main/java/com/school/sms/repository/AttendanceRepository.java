@@ -9,16 +9,17 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AttendanceRepository 
         extends JpaRepository<Attendance, Long> {
 
-    // Check if attendance already marked
-    boolean existsByStudentIdAndDate(Long studentId, LocalDate date);
+    boolean existsByStudentIdAndDateAndSubjectIdAndAcademicYearIdAndPeriodNumber(
+        Long studentId, LocalDate date, Long subjectId, Long academicYearId, Integer periodNumber);
 
-    boolean existsByStudentIdAndDateAndSubjectId(
-        Long studentId, LocalDate date, Long subjectId);
+    Optional<Attendance> findByStudentIdAndDateAndSubjectIdAndAcademicYearIdAndPeriodNumber(
+        Long studentId, LocalDate date, Long subjectId, Long academicYearId, Integer periodNumber);
 
     // Get all attendance for a student in date range
     List<Attendance> findByStudentIdAndDateBetween(
@@ -28,16 +29,19 @@ public interface AttendanceRepository
     List<Attendance> findByClassRoomIdAndDate(
         Long classRoomId, LocalDate date);
 
+    List<Attendance> findByClassRoomIdAndDateAndSubjectIdAndPeriodNumber(
+        Long classRoomId, LocalDate date, Long subjectId, Integer periodNumber);
+
     // Count by status for a student
-    Long countByStudentIdAndStatus(Long studentId, 
-                                    AttendanceStatus status);
+    Long countByStudentIdAndStatus(Long studentId, AttendanceStatus status);
 
     // All attendance by date
     List<Attendance> findByDate(LocalDate date);
 
+    List<Attendance> findByDateBetween(LocalDate start, LocalDate end);
+
     // Attendance for specific student and date
-    List<Attendance> findByStudentIdAndDate(
-        Long studentId, LocalDate date);
+    List<Attendance> findByStudentIdAndDate(Long studentId, LocalDate date);
 
     // Monthly attendance report
     @Query("SELECT a FROM Attendance a " +
@@ -52,7 +56,11 @@ public interface AttendanceRepository
            "WHERE a.student.id = :studentId " +
            "AND a.status = 'PRESENT' " +
            "AND a.date BETWEEN :fromDate AND :toDate")
-    Long countPresentDays(Long studentId, 
-                           LocalDate fromDate, 
-                           LocalDate toDate);
+    Long countPresentDays(Long studentId, LocalDate fromDate, LocalDate toDate);
+
+    @Query("SELECT COUNT(a) FROM Attendance a WHERE a.student.id IN :studentIds AND a.status = :status AND a.academicYear.id = :yearId")
+    Long countByStudentIdsAndStatusAndYear(List<Long> studentIds, AttendanceStatus status, Long yearId);
+
+    @Query("SELECT COUNT(a) FROM Attendance a WHERE a.student.id IN :studentIds AND a.academicYear.id = :yearId")
+    Long countByStudentIdsAndYear(List<Long> studentIds, Long yearId);
 }

@@ -4,7 +4,9 @@ package com.school.sms.controller;
 import com.school.sms.dto.request.BulkMarkRequest;
 import com.school.sms.dto.request.ExamRequest;
 import com.school.sms.dto.response.*;
+import com.school.sms.dto.response.StudentRankResponse;
 import com.school.sms.service.ExamService;
+import com.school.sms.service.MarkCalculationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -20,6 +22,7 @@ import java.util.Map;
 public class ExamController {
 
     private final ExamService examService;
+    private final MarkCalculationService markCalculationService;
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
@@ -83,5 +86,16 @@ public class ExamController {
         return ResponseEntity.ok(ApiResponse.success(
             "Class topper",
             examService.getClassTopper(examId)));
+    }
+
+    // Class Rankings
+    @GetMapping("/{examId}/class/{classId}/rankings")
+    @PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
+    public ResponseEntity<ApiResponse<List<StudentRankResponse>>> getRankings(
+            @PathVariable Long examId,
+            @PathVariable Long classId) {
+        return ResponseEntity.ok(ApiResponse.success(
+            "Class rankings",
+            markCalculationService.calculateClassRankings(classId, examId)));
     }
 }

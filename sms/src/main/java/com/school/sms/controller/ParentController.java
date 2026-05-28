@@ -50,8 +50,8 @@ public class ParentController {
     @GetMapping("/my-children")
     @PreAuthorize("hasRole('PARENT')")
     public ResponseEntity<ApiResponse<List<ParentResponse.StudentLinkResponse>>> getMyChildren() {
-        String mobile = SecurityContextHolder.getContext().getAuthentication().getName();
-        return ResponseEntity.ok(ApiResponse.success("Children fetched", parentService.getChildrenByParentMobile(mobile)));
+        String phone = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(ApiResponse.success("Children fetched", parentService.getChildrenByParentPhone(phone)));
     }
 
     @DeleteMapping("/{id}")

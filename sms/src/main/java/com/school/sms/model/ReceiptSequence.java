@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "receipt_sequences", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"school_code", "academic_year_id", "sequence_type"})
+        @UniqueConstraint(name = "UK_school_year_type", columnNames = {"school_code", "academic_year_id", "sequence_type"})
 })
 @Getter
 @Setter

@@ -25,6 +25,8 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
     @Query("SELECT a FROM AuditLog a WHERE a.changedAt BETWEEN :from AND :to ORDER BY a.changedAt DESC")
     Page<AuditLog> findByDateRange(LocalDateTime from, LocalDateTime to, Pageable pageable);
 
+    List<AuditLog> findTop10ByActorIdOrderByChangedAtDesc(Long actorId);
+
     // NOTE: No delete methods. AuditLog is an append-only table.
     // The @Repository does NOT expose deleteById or deleteAll from JpaRepository
     // at the service layer — AuditLogService intentionally omits those methods.

@@ -3,7 +3,10 @@ package com.school.sms.controller;
 
 import com.school.sms.dto.request.FeePaymentRequest;
 import com.school.sms.dto.response.*;
+import com.school.sms.model.FeePayment;
+import com.school.sms.repository.FeePaymentRepository;
 import com.school.sms.service.FeeService;
+import com.school.sms.service.DocumentGenerationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -19,6 +22,8 @@ import java.util.Map;
 public class FeeController {
 
     private final FeeService feeService;
+    private final DocumentGenerationService documentGenerationService;
+    private final FeePaymentRepository feePaymentRepository;
 
     // Collect payment
     @PostMapping("/pay")
@@ -49,6 +54,27 @@ public class FeeController {
         return ResponseEntity.ok(ApiResponse.success(
             "Fee payment",
             feeService.getPaymentById(paymentId)));
+    }
+
+    // PDF Download
+    @GetMapping("/{paymentId}/receipt")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN') or " +
+                  "(hasRole('STUDENT') and @feeSecurityService.isOwnPayment(#paymentId))")
+    public ResponseEntity<byte[]> downloadReceipt(@PathVariable Long paymentId) {
+        try {
+            FeePayment payment = feePaymentRepository.findById(paymentId)
+                    .orElseThrow(() -> new RuntimeException("Payment not found"));
+            
+            byte[] pdfBytes = documentGenerationService.generateFeeReceiptPdf(payment);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(ContentDisposition.attachment().filename("receipt_" + payment.getReceiptNumber() + ".pdf").build());
+            
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     // Student fee summary

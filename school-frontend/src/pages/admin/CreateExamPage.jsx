@@ -6,6 +6,8 @@ import { classApi } from '../../api/classApi';
 import { subjectApi } from '../../api/subjectApi';
 import { examApi } from '../../api/examApi';
 
+import usePersistedForm from '../../hooks/usePersistedForm';
+
 const emptyRow = {
   subjectId: '',
   examDate: new Date().toISOString().split('T')[0],
@@ -15,26 +17,36 @@ const emptyRow = {
   passingMarks: 40,
 };
 
+
 const CreateExamPage = () => {
   const navigate = useNavigate();
   const toast = useToast();
   const [classes, setClasses] = useState([]);
   const [subjects, setSubjects] = useState([]);
-  const [subjectRows, setSubjectRows] = useState([{ ...emptyRow }]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
-  const [form, setForm] = useState({
-    name: '',
-    examCode: '',
-    examType: 'Theory',
-    term: 'Term 1',
-    classRoomId: '',
-    active: true,
-    publishToParents: true,
-    allowReevaluation: false,
-    gradeScale: '',
+  // ── Combined Form & Row State with Persistence ────────────────────────────
+  const { 
+    formData: state, 
+    setFormData: setState,
+    clearDraft 
+  } = usePersistedForm('create_exam_form', {
+    form: {
+      name: '',
+      examCode: '',
+      examType: 'Theory',
+      term: 'Term 1',
+      classRoomId: '',
+      active: true,
+      publishToParents: true,
+      allowReevaluation: false,
+      gradeScale: '',
+    },
+    subjectRows: [{ ...emptyRow }]
   });
+
+  // Destructure for easier use in template
+  const { form, subjectRows } = state;
 
   useEffect(() => {
     Promise.all([classApi.getAll(), subjectApi.getAll()])
@@ -43,15 +55,18 @@ const CreateExamPage = () => {
         const subjectList = subjectRes.data.data || [];
         setClasses(classList);
         setSubjects(subjectList);
-        setForm((prev) => {
-          if (prev.classRoomId || classList.length === 0) return prev;
-          return { ...prev, classRoomId: String(classList[0].id) };
+        
+        setState((prev) => {
+          const newState = { ...prev };
+          // Only auto-fill if not already restored from draft
+          if (!newState.form.classRoomId && classList.length > 0) {
+            newState.form.classRoomId = String(classList[0].id);
+          }
+          if (newState.subjectRows.length === 1 && !newState.subjectRows[0].subjectId && subjectList.length > 0) {
+            newState.subjectRows[0].subjectId = String(subjectList[0].id);
+          }
+          return newState;
         });
-        if (subjectList.length > 0) {
-          setSubjectRows((prev) => prev.map((row, i) => (
-            i === 0 ? { ...row, subjectId: String(subjectList[0].id) } : row
-          )));
-        }
       })
       .catch((err) => {
         toast.showToast(err.response?.data?.message || 'Failed to load class and subject data.', 'error');
@@ -63,19 +78,36 @@ const CreateExamPage = () => {
     return cls ? `${cls.name} ${cls.section}` : 'Select class';
   }, [classes, form.classRoomId]);
 
+  const updateForm = (key, value) => {
+    setState((prev) => ({
+      ...prev,
+      form: { ...prev.form, [key]: value }
+    }));
+  };
+
   const updateRow = (index, key, value) => {
-    setSubjectRows((prev) => prev.map((row, i) => (i === index ? { ...row, [key]: value } : row)));
+    setState((prev) => {
+      const newRows = [...prev.subjectRows];
+      newRows[index] = { ...newRows[index], [key]: value };
+      return { ...prev, subjectRows: newRows };
+    });
   };
 
   const addRow = () => {
     const fallbackSubject = subjects[0] ? String(subjects[0].id) : '';
-    setSubjectRows((prev) => [...prev, { ...emptyRow, subjectId: fallbackSubject }]);
+    setState((prev) => ({
+      ...prev,
+      subjectRows: [...prev.subjectRows, { ...emptyRow, subjectId: fallbackSubject }]
+    }));
   };
 
   const removeRow = (index) => {
-    setSubjectRows((prev) => {
-      if (prev.length === 1) return prev;
-      return prev.filter((_, i) => i !== index);
+    setState((prev) => {
+      if (prev.subjectRows.length === 1) return prev;
+      return {
+        ...prev,
+        subjectRows: prev.subjectRows.filter((_, i) => i !== index)
+      };
     });
   };
 
@@ -113,6 +145,7 @@ const CreateExamPage = () => {
       }));
 
       toast.showToast('Exam schedule created successfully.', 'success');
+      clearDraft();
       setTimeout(() => navigate('/admin/exams'), 800);
     } catch (err) {
       toast.showToast(err.response?.data?.message || 'Failed to create exam schedule.', 'error');
@@ -131,7 +164,7 @@ const CreateExamPage = () => {
             <label className="text-sm font-medium text-gray-700 block mb-1">Exam Name</label>
             <input
               value={form.name}
-              onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+              onChange={(e) => updateForm('name', e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Exam Name"
             />
@@ -141,7 +174,7 @@ const CreateExamPage = () => {
             <label className="text-sm font-medium text-gray-700 block mb-1">Exam Type</label>
             <select
               value={form.examType}
-              onChange={(e) => setForm((prev) => ({ ...prev, examType: e.target.value }))}
+              onChange={(e) => updateForm('examType', e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="Theory">Theory</option>
@@ -154,7 +187,7 @@ const CreateExamPage = () => {
             <label className="text-sm font-medium text-gray-700 block mb-1">Term</label>
             <select
               value={form.term}
-              onChange={(e) => setForm((prev) => ({ ...prev, term: e.target.value }))}
+              onChange={(e) => updateForm('term', e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="Term 1">Term 1</option>
@@ -167,7 +200,7 @@ const CreateExamPage = () => {
             <label className="text-sm font-medium text-gray-700 block mb-1">Exam Code</label>
             <input
               value={form.examCode}
-              onChange={(e) => setForm((prev) => ({ ...prev, examCode: e.target.value }))}
+              onChange={(e) => updateForm('examCode', e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="MATH01024"
             />
@@ -179,7 +212,7 @@ const CreateExamPage = () => {
             <label className="text-sm font-medium text-gray-700 block mb-1">Class</label>
             <select
               value={form.classRoomId}
-              onChange={(e) => setForm((prev) => ({ ...prev, classRoomId: e.target.value }))}
+              onChange={(e) => updateForm('classRoomId', e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {classes.map((c) => (
@@ -192,7 +225,7 @@ const CreateExamPage = () => {
             <input
               type="checkbox"
               checked={form.active}
-              onChange={(e) => setForm((prev) => ({ ...prev, active: e.target.checked }))}
+              onChange={(e) => updateForm('active', e.target.checked)}
               className="w-4 h-4 accent-blue-600"
             />
             Active
@@ -304,7 +337,7 @@ const CreateExamPage = () => {
               <label className="text-sm font-medium text-gray-700 block mb-1">Grade Scale</label>
               <select
                 value={form.gradeScale}
-                onChange={(e) => setForm((prev) => ({ ...prev, gradeScale: e.target.value }))}
+                onChange={(e) => updateForm('gradeScale', e.target.value)}
                 className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Default</option>
@@ -317,7 +350,7 @@ const CreateExamPage = () => {
               <input
                 type="checkbox"
                 checked={form.publishToParents}
-                onChange={(e) => setForm((prev) => ({ ...prev, publishToParents: e.target.checked }))}
+                onChange={(e) => updateForm('publishToParents', e.target.checked)}
                 className="w-4 h-4 accent-blue-600"
               />
               Publish Results to Parents
@@ -327,7 +360,7 @@ const CreateExamPage = () => {
               <input
                 type="checkbox"
                 checked={form.allowReevaluation}
-                onChange={(e) => setForm((prev) => ({ ...prev, allowReevaluation: e.target.checked }))}
+                onChange={(e) => updateForm('allowReevaluation', e.target.checked)}
                 className="w-4 h-4 accent-blue-600"
               />
               Allow Re-evaluation
@@ -335,7 +368,14 @@ const CreateExamPage = () => {
           </div>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-between items-center pt-4 border-t">
+          <button
+            type="button"
+            onClick={() => clearDraft(true)}
+            className="text-gray-400 hover:text-red-500 text-xs flex items-center gap-1"
+          >
+            🗑️ Clear Draft
+          </button>
           <button
             onClick={handleSave}
             disabled={loading}

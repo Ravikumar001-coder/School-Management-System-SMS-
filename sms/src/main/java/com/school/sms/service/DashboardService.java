@@ -45,6 +45,7 @@ public class DashboardService {
     private final ActivityLogRepository activityLogRepository;
     private final AcademicEventRepository academicEventRepository;
     private final ExamRepository examRepository;
+    private final UserSessionRepository userSessionRepository;
 
     public DashboardResponse getAdminDashboard() {
 
@@ -94,16 +95,24 @@ public class DashboardService {
             "ABSENT",  todayAttendance.size() - presentToday
         );
 
-        // Mock data for 6-month trends to prevent DB complexity for now
-        // A full implementation would involve GROUP BY MONTH() queries
-        List<Map<String, Object>> trends = List.of(
-            Map.of("month", "Jan", "revenue", 50000, "attendance", 40000),
-            Map.of("month", "Feb", "revenue", 250000, "attendance", 200000),
-            Map.of("month", "Mar", "revenue", 320000, "attendance", 240000),
-            Map.of("month", "Apr", "revenue", 500000, "attendance", 450000),
-            Map.of("month", "May", "revenue", 530000, "attendance", 500000),
-            Map.of("month", "Jun", "revenue", 750000, "attendance", 350000)
-        );
+        // Real 6-month trends
+        List<Map<String, Object>> trends = IntStream.range(0, 6)
+                .mapToObj(i -> {
+                    LocalDate d = today.minusMonths(5 - i);
+                    LocalDate start = d.withDayOfMonth(1);
+                    LocalDate end = d.withDayOfMonth(d.lengthOfMonth());
+                    
+                    Double revenue = feePaymentRepository.getMonthlyCollection(start, end);
+                    long attCount = attendanceRepository.findByDateBetween(start, end).stream()
+                            .filter(a -> a.getStatus() == AttendanceStatus.PRESENT)
+                            .count();
+                            
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("month", d.getMonth().name().substring(0, 3));
+                    map.put("revenue", revenue != null ? revenue : 0.0);
+                    map.put("attendance", (double) attCount);
+                    return map;
+                }).collect(Collectors.toList());
 
         // Fetch Total Departments
         long totalDepartments = departmentRepository.count();
@@ -113,25 +122,24 @@ public class DashboardService {
                 .stream()
                 .collect(Collectors.toMap(
                         row -> (String) row[0],
-                        row -> (Long) row[1]
+                        row -> (Long) row[1],
+                        (v1, v2) -> v1
                 ));
 
-        // Fetch Recent Activity
-        List<Map<String, Object>> recentActivity = activityLogRepository.findAll().stream()
-                .limit(5)
+        // Fetch Recent Activity (Optimized: No more findAll().stream().limit())
+        List<Map<String, Object>> recentActivity = activityLogRepository.findTop10ByOrderByTimestampDesc().stream()
                 .map(log -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("user", log.getUser() != null ? log.getUser() : "System");
                     map.put("avatar", log.getAvatar() != null ? log.getAvatar() : "S");
                     map.put("message", log.getMessage() != null ? log.getMessage() : "");
-                    map.put("timestamp", log.getTimestamp() != null ? log.getTimestamp().toString() : "");
+                    map.put("timestamp", log.getTimestamp() != null ? formatRelativeTime(log.getTimestamp()) : "");
                     map.put("isSystem", "System".equals(log.getUser()));
                     return map;
                 }).collect(Collectors.toList());
 
-        // Fetch Upcoming Deadlines
-        List<Map<String, Object>> upcomingDeadlines = academicEventRepository.findAll().stream()
-                .limit(5)
+        // Fetch Upcoming Deadlines (Optimized: No more findAll().stream().limit())
+        List<Map<String, Object>> upcomingDeadlines = academicEventRepository.findTop5ByOrderByLastDateAsc().stream()
                 .map(event -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("title", event.getTitle() != null ? event.getTitle() : "");
@@ -139,6 +147,9 @@ public class DashboardService {
                     map.put("deadlineText", event.getDeadlineText() != null ? event.getDeadlineText() : "");
                     return map;
                 }).collect(Collectors.toList());
+
+        // Fetch Active Sessions Count
+        long activeSessionsCount = userSessionRepository.findByActiveTrue().size();
 
         return DashboardResponse.builder()
                 .totalStudents(totalStudents)
@@ -157,6 +168,7 @@ public class DashboardService {
                 .enrollmentByDepartment(enrollmentByDepartment)
                 .recentActivity(recentActivity)
                 .upcomingDeadlines(upcomingDeadlines)
+                .activeSessionsCount(activeSessionsCount)
                 .build();
     }
 
@@ -277,5 +289,13 @@ public class DashboardService {
             "totalMarks", mark.getTotalMarks() != null ? mark.getTotalMarks() : 0,
             "grade", mark.getGrade() != null ? mark.getGrade() : "N/A"
         );
+    }
+
+    private String formatRelativeTime(LocalDateTime time) {
+        java.time.Duration duration = java.time.Duration.between(time, LocalDateTime.now());
+        long hours = duration.toHours();
+        if (hours < 1) return duration.toMinutes() + "m ago";
+        if (hours < 24) return hours + "h ago";
+        return duration.toDays() + "d ago";
     }
 }

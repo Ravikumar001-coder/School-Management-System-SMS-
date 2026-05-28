@@ -44,6 +44,9 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     @Query("SELECT s.department.name, COUNT(s.id) FROM Student s WHERE s.department IS NOT NULL GROUP BY s.department.name")
     List<Object[]> countStudentsByDepartment();
 
+    @Query("SELECT COUNT(s) FROM Student s WHERE s.admissionDate BETWEEN :startDate AND :endDate")
+    Long countByAdmissionDateBetween(java.time.LocalDate startDate, java.time.LocalDate endDate);
+
     @Query("SELECT s FROM Student s LEFT JOIN s.classRoom c WHERE " +
            "s.deletedAt IS NULL AND " +
            "(:classId IS NULL OR c.id = :classId) AND " +
@@ -59,4 +62,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     @Query(value = "SELECT COUNT(*) FROM students", nativeQuery = true)
     Long countNative();
+
+    boolean existsByEmailAndDeletedAtIsNull(String email);
 }

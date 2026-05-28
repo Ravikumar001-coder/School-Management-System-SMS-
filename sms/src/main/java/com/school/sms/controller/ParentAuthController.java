@@ -37,9 +37,8 @@ public class ParentAuthController {
     public ResponseEntity<ApiResponse<Object>> requestOtp(@RequestBody Map<String, String> body) {
         String mobile = body.get("mobileNumber");
         
-        Optional<Parent> parentOpt = parentRepository.findByMobileNumberAndDeletedAtIsNull(mobile);
+        Optional<Parent> parentOpt = parentRepository.findByPhoneAndDeletedAtIsNull(mobile);
         if (parentOpt.isEmpty()) {
-            // Don't leak if account exists or not, but for Phase 0 we can be explicit
             return ResponseEntity.status(404).body(ApiResponse.error("Mobile number not registered. Please contact school office."));
         }
 
@@ -102,14 +101,14 @@ public class ParentAuthController {
         parentRepository.save(parent);
 
         // Issue real JWT
-        var userDetails = new User(parent.getMobileNumber(), "", Collections.singleton(new SimpleGrantedAuthority("ROLE_PARENT")));
+        var userDetails = new User(parent.getPhone(), "", Collections.singleton(new SimpleGrantedAuthority("ROLE_PARENT")));
         String token = jwtService.generateToken(userDetails);
 
         return ResponseEntity.ok(ApiResponse.success("Authentication successful", Map.of(
                 "token", token,
                 "parent", Map.of(
                         "id", parent.getId(),
-                        "name", parent.getFullName(),
+                        "name", parent.getFirstName() + " " + (parent.getLastName() != null ? parent.getLastName() : ""),
                         "uuid", parent.getParentUuid()
                 )
         )));
@@ -124,7 +123,7 @@ public class ParentAuthController {
             return ResponseEntity.status(400).body(ApiResponse.error("Mobile number and Student ID are required."));
         }
 
-        Optional<Parent> parentOpt = parentRepository.findByMobileNumberAndDeletedAtIsNull(mobile);
+        Optional<Parent> parentOpt = parentRepository.findByPhoneAndDeletedAtIsNull(mobile);
         if (parentOpt.isEmpty()) {
             return ResponseEntity.status(401).body(ApiResponse.error("Invalid mobile number or student ID."));
         }
@@ -147,14 +146,14 @@ public class ParentAuthController {
         parentRepository.save(parent);
 
         // Issue JWT
-        var userDetails = new User(parent.getMobileNumber(), "", Collections.singleton(new SimpleGrantedAuthority("ROLE_PARENT")));
+        var userDetails = new User(parent.getPhone(), "", Collections.singleton(new SimpleGrantedAuthority("ROLE_PARENT")));
         String token = jwtService.generateToken(userDetails);
 
         return ResponseEntity.ok(ApiResponse.success("Login successful", Map.of(
                 "token", token,
                 "parent", Map.of(
                         "id", parent.getId(),
-                        "name", parent.getFullName(),
+                        "name", parent.getFirstName() + " " + (parent.getLastName() != null ? parent.getLastName() : ""),
                         "uuid", parent.getParentUuid()
                 )
         )));

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        body { font-family: 'Helvetica', 'Arial', sans-serif; color: #333; margin: 0; padding: 20px; }
+        .header { text-align: center; border-bottom: 2px solid #2563eb; padding-bottom: 10px; margin-bottom: 20px; }
+        .school-name { font-size: 24px; font-weight: bold; color: #1e40af; }
+        .receipt-title { font-size: 18px; margin-top: 5px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+        .details-grid { width: 100%; margin-bottom: 30px; }
+        .details-grid td { padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
+        .label { color: #64748b; font-weight: bold; width: 30%; }
+        .value { color: #0f172a; font-weight: bold; }
+        .amount-section { background: #f8faff; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; text-align: center; margin-top: 20px; }
+        .amount-label { font-size: 14px; color: #64748b; margin-bottom: 5px; }
+        .amount-value { font-size: 32px; font-weight: bold; color: #2563eb; }
+        .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 20px; }
+        .stamp { margin-top: 40px; float: right; width: 150px; height: 60px; border: 2px dashed #cbd5e1; text-align: center; line-height: 60px; color: #cbd5e1; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="school-name">SchoolOS Management System</div>
+        <div class="receipt-title">Official Fee Receipt</div>
+    </div>
+
+    <table class="details-grid">
+        <tr>
+            <td class="label">Receipt Number</td>
+            <td class="value" th:text="${receiptNumber}">R-123456</td>
+        </tr>
+        <tr>
+            <td class="label">Date</td>
+            <td class="value" th:text="${paymentDate}">2024-08-30</td>
+        </tr>
+        <tr>
+            <td class="label">Student Name</td>
+            <td class="value" th:text="${studentName}">Ravi Kumar</td>
+        </tr>
+        <tr>
+            <td class="label">Student ID</td>
+            <td class="value" th:text="${studentId}">STU-001</td>
+        </tr>
+        <tr>
+            <td class="label">Class / Section</td>
+            <td class="value" th:text="${className}">Class 10 - A</td>
+        </tr>
+        <tr>
+            <td class="label">Payment Purpose</td>
+            <td class="value" th:text="${month}">August Fees</td>
+        </tr>
+        <tr>
+            <td class="label">Payment Mode</td>
+            <td class="value" th:text="${paymentMode}">CASH</td>
+        </tr>
+    </table>
+
+    <div class="amount-section">
+        <div class="amount-label">Total Amount Paid</div>
+        <div class="amount-value" th:text="'₹' + ${amount}">₹5,000.00</div>
+    </div>
+
+    <div class="stamp">
+        AUTHORIZED SIGN
+    </div>
+
+    <div class="footer">
+        This is a computer-generated receipt and does not require a physical signature.<br/>
+        Thank you for your payment.
+    </div>
+</body>
+</html>

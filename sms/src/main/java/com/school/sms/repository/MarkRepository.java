@@ -24,6 +24,12 @@ public interface MarkRepository
 
     List<Mark> findByExamId(Long examId);
 
+    default List<Mark> findByExam_Id(Long examId) {
+        return findByExamId(examId);
+    }
+
+    long countByExamId(Long examId);
+
     // Report card - all marks for a student in a year
     @Query("SELECT m FROM Mark m " +
            "WHERE m.student.id = :studentId " +

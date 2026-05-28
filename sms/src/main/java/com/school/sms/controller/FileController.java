@@ -29,28 +29,37 @@ public class FileController {
     private final com.school.sms.repository.StudentRepository studentRepository;
     private final com.school.sms.repository.TeacherRepository teacherRepository;
     private final com.school.sms.service.AuthService authService;
+    private final com.school.sms.repository.ExamPaperRepository examPaperRepository;
 
     public FileController(com.school.sms.repository.UploadedFileRepository fileRepository,
                           com.school.sms.repository.UserRepository userRepository,
                           com.school.sms.repository.StudentRepository studentRepository,
                           com.school.sms.repository.TeacherRepository teacherRepository,
-                          com.school.sms.service.AuthService authService) {
+                          com.school.sms.service.AuthService authService,
+                          com.school.sms.repository.ExamPaperRepository examPaperRepository) {
         this.fileRepository = fileRepository;
         this.userRepository = userRepository;
         this.studentRepository = studentRepository;
         this.teacherRepository = teacherRepository;
         this.authService = authService;
+        this.examPaperRepository = examPaperRepository;
     }
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(
             @RequestParam("file") MultipartFile file) throws IOException {
 
-        // Validate file type
+        // Validate file type: images, PDF, DOC/DOCX
         String contentType = file.getContentType();
-        if (contentType == null || !contentType.startsWith("image/")) {
+        boolean isValidType = contentType != null && (
+                contentType.startsWith("image/") ||
+                contentType.equals("application/pdf") ||
+                contentType.equals("application/msword") ||
+                contentType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+        );
+        if (!isValidType) {
             return ResponseEntity.badRequest()
-                    .body("Only image files are allowed!");
+                    .body("Only images, PDF, and DOC/DOCX files are allowed!");
         }
 
         // Validate file size (max 5MB)
@@ -59,27 +68,30 @@ public class FileController {
                     .body("File size exceeds 5MB limit!");
         }
 
-        // Generate unique filename
-        String originalFilename = Objects.requireNonNullElse(file.getOriginalFilename(), "upload.jpg");
-        String extension = originalFilename
-                .substring(originalFilename.lastIndexOf("."));
+        // Generate unique filename preserving extension
+        String originalFilename = Objects.requireNonNullElse(file.getOriginalFilename(), "upload.bin");
+        String extension = originalFilename.contains(".")
+                ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                : ".bin";
         String newFilename = UUID.randomUUID().toString() + extension;
 
-        // Save file
+        // Save file to disk
         Path uploadPath = Paths.get(uploadDir);
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
-
         Path filePath = uploadPath.resolve(newFilename);
         Files.copy(file.getInputStream(), filePath);
 
         // Record in DB
-        String currentUsername = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
-        com.school.sms.model.User owner = userRepository.findByUsernameOrEmail(currentUsername, currentUsername).orElse(null);
+        String currentUsername = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication().getName();
+        com.school.sms.model.User owner = userRepository
+                .findByUsernameOrEmail(currentUsername, currentUsername).orElse(null);
 
         com.school.sms.model.UploadedFile fileEntity = com.school.sms.model.UploadedFile.builder()
                 .filename(newFilename)
+                .originalFilename(originalFilename)
                 .globalFilename(originalFilename)
                 .contentType(contentType)
                 .size(file.getSize())
@@ -88,7 +100,6 @@ public class FileController {
                 .build();
         fileRepository.save(fileEntity);
 
-        // Return file URL
         return ResponseEntity.ok("/api/v1/files/" + newFilename);
     }
 
@@ -99,50 +110,67 @@ public class FileController {
         Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
         Path filePath = uploadPath.resolve(filename).normalize();
 
+        // Path traversal guard
         if (!filePath.startsWith(uploadPath) || !Files.exists(filePath)) {
             return ResponseEntity.notFound().build();
         }
 
-        // Security Check
-        String currentUsername = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
-        com.school.sms.model.User currentUser = userRepository.findByUsernameOrEmail(currentUsername, currentUsername).orElse(null);
-        
+        // Auth check
+        String currentUsername = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication().getName();
+        com.school.sms.model.User currentUser = userRepository
+                .findByUsernameOrEmail(currentUsername, currentUsername).orElse(null);
+
         if (currentUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        // Secure Exam Paper lock check – only admins/teachers can download locked papers
+        String fileUrl = "/api/v1/files/" + filename;
+        java.util.Optional<com.school.sms.model.ExamPaper> examOpt =
+                examPaperRepository.findByFileUrlAndDeletedAtIsNull(fileUrl);
+        if (examOpt.isPresent()) {
+            com.school.sms.model.ExamPaper exam = examOpt.get();
+            boolean stillLocked = Boolean.TRUE.equals(exam.getIsLocked())
+                    || (exam.getUnlockAt() != null
+                        && exam.getUnlockAt().isAfter(java.time.LocalDateTime.now()));
+            if (stillLocked && !currentUser.isAdmin() && !currentUser.isTeacher()) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+        }
+
         com.school.sms.model.UploadedFile fileEntity = fileRepository.findByFilename(filename).orElse(null);
-        
-        // If file is recorded in DB, check ownership
+
+        // If file is recorded in DB, check ownership or admin/teacher role
         if (fileEntity != null) {
-            boolean isOwner = fileEntity.getOwner() != null && fileEntity.getOwner().getId().equals(currentUser.getId());
+            boolean isOwner = fileEntity.getOwner() != null
+                    && fileEntity.getOwner().getId().equals(currentUser.getId());
             boolean isAdmin = currentUser.isAdmin();
             boolean isTeacher = currentUser.isTeacher();
-            boolean isOwnProfilePhoto = checkProfilePhotoAccess(currentUser, "/api/v1/files/" + filename);
+            boolean isOwnProfilePhoto = checkProfilePhotoAccess(currentUser, fileUrl);
 
             if (!isOwner && !isAdmin && !isTeacher && !isOwnProfilePhoto) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
-        }
-        // If file is NOT in DB (legacy or seeded), allow only ADMIN/TEACHER for now to be safe
-        else {
+        } else {
+            // Legacy / seeded files: restrict to admin or teacher, or profile photo owner
             if (!currentUser.isAdmin() && !currentUser.isTeacher()) {
-                 boolean isOwnPhoto = checkProfilePhotoAccess(currentUser, "/api/v1/files/" + filename);
-                 if (!isOwnPhoto) {
-                     return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-                 }
+                boolean isOwnPhoto = checkProfilePhotoAccess(currentUser, fileUrl);
+                if (!isOwnPhoto) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                }
             }
         }
 
         Resource resource = new UrlResource(filePath.toUri());
-        String contentType = Files.probeContentType(filePath);
-        if (contentType == null) {
-            contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        String detectedContentType = Files.probeContentType(filePath);
+        if (detectedContentType == null) {
+            detectedContentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
         }
 
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.CACHE_CONTROL, "public, max-age=86400")
-                .contentType(MediaType.parseMediaType(contentType))
+                .contentType(MediaType.parseMediaType(detectedContentType))
                 .body(resource);
     }
 

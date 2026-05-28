@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Department Add/Delete",
+    "status": "FAIL",
+    "error": "Error: Browser Use encountered an error interacting with this webpage's clipboard: Browser Use virtual clipboard is not installed\nlocator.type failed for selector internal:attr=[placeholder=\"e.g. Science, Arts, HR\"s]"
+  },
+  {
+    "name": "Broadcast Notice",
+    "status": "FAIL",
+    "error": "Error: Browser Use encountered an error interacting with this webpage's clipboard: Browser Use virtual clipboard is not installed\nlocator.type failed for selector internal:attr=[placeholder=\"e.g. Annual Sports Meet 2026\"s]"
+  },
+  {
+    "name": "Generate Tally XML",
+    "status": "FAIL",
+    "error": "Error: Browser Use encountered an error interacting with this webpage's clipboard: Browser Use virtual clipboard is not installed\nlocator.type failed for selector internal:attr=[placeholder=\"Start date\"s]"
+  }
+]

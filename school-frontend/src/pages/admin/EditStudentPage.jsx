@@ -1,332 +1,399 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { 
+  User, Mail, Phone, MapPin, Briefcase, GraduationCap, 
+  Calendar, CreditCard, ShieldCheck, Clock, Trash2, Heart,
+  Globe, BookOpen, School, FileText, ArrowLeft, Activity, Award, Tag
+} from 'lucide-react';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useToast } from '../../context/ToastContext';
 import { studentApi } from '../../api/studentApi';
 import { classApi } from '../../api/classApi';
-import { attendanceApi } from '../../api/attendanceApi';
-import { examApi } from '../../api/examApi';
 import { fileApi } from '../../api/fileApi';
 import { getCurrentAcademicYear } from '../../utils/helpers';
+import usePersistedForm from '../../hooks/usePersistedForm';
 
-const inputCls = `w-full border border-gray-300 rounded-lg px-3 
-                  py-2.5 text-sm focus:outline-none 
-                  focus:ring-2 focus:ring-blue-500`;
+const Field = ({ label, children, error }) => (
+  <div className="space-y-1.5">
+    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{label}</label>
+    {children}
+    {error && <p className="text-red-500 text-[10px] mt-1 font-medium italic">{error}</p>}
+  </div>
+);
+
+const inputCls = `w-full border border-slate-200 rounded-xl px-4 py-3
+                  text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2
+                  focus:ring-indigo-500 transition-all placeholder:text-slate-300 bg-white shadow-sm`;
 
 const EditStudentPage = () => {
-  const { id }    = useParams();
-  const navigate  = useNavigate();
+  const { id } = useParams();
+  const navigate = useNavigate();
   const toast = useToast();
-  const [loading, setLoading]   = useState(true);
-  const [saving, setSaving]     = useState(false);
-  const [error, setError]       = useState('');
-  const [success, setSuccess]   = useState('');
-  const [classes, setClasses]   = useState([]);
-  const [attendance, setAttendance] = useState(null);
-  const [report, setReport] = useState([]);
-  const [form, setForm]         = useState({});
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [classes, setClasses] = useState([]);
+
+  // ── Persistent Form State ────────────────────────────────────────────────
+  const { 
+    formData: form, 
+    setFormData: setForm,
+    handleChange,
+    clearDraft,
+    isRestored
+  } = usePersistedForm(`edit_student_form_enterprise_${id}`, {});
 
   useEffect(() => {
-    const today = new Date();
-    const from = new Date(today.getFullYear(), 0, 1)
-      .toISOString().split('T')[0];
-    const to = today.toISOString().split('T')[0];
-
     Promise.all([studentApi.getById(id), classApi.getAll()])
-      .then(async ([sRes, cRes]) => {
+      .then(([sRes, cRes]) => {
         const s = sRes.data?.data || sRes.data;
         const classList = cRes.data?.data || cRes.data || [];
-        const selectedClassId = s.classRoomId
-          ? String(s.classRoomId)
-          : (() => {
-              const classByName = classList.find(
-                c => `${c.name} - ${c.section}` === s.className
-              );
-              return classByName ? String(classByName.id) : '';
-            })();
-
-        const selectedClass = classList.find((c) => String(c.id) === selectedClassId);
-
-        const [aRes, rcRes] = await Promise.all([
-          attendanceApi.studentReport(id, from, to).catch(() => ({ data: { data: null } })),
-          examApi.reportCard(id, s.academicYear || getCurrentAcademicYear()).catch(() => ({ data: { data: [] } })),
-        ]);
-
-        setForm({
-          firstName: s.firstName, lastName: s.lastName,
-          email: s.email, phone: s.phone || '',
+        
+        // Hydrate Enterprise Form Structure
+        const dbForm = {
+          firstName: s.firstName || '',
+          lastName: s.lastName || '',
+          email: s.email || '',
+          phone: s.phone || '',
           dateOfBirth: s.dateOfBirth || '',
-          gender: s.gender || '', address: s.address || '',
-          parentName: s.parentName || '',
-          parentPhone: s.parentPhone || '',
-          parentEmail: s.parentEmail || '',
-          guardianRelationship: s.guardianRelationship || 'Parent',
+          gender: s.gender || '',
+          address: s.address || '',
           bloodGroup: s.bloodGroup || '',
-          classRoomId: selectedClassId,
-          className: selectedClass?.name || (s.className?.split(' - ')[0] || ''),
-          section: selectedClass?.section || (s.className?.split(' - ')[1] || ''),
-          academicYear: s.academicYear || getCurrentAcademicYear(),
-          studentId: s.studentId || '',
           profilePhoto: s.profilePhoto || '',
-        });
+          // Compliance
+          aadharCard: s.aadharCard || '',
+          nationality: s.nationality || 'Indian',
+          religion: s.religion || '',
+          category: s.category || 'General',
+          medicalConditions: s.medicalConditions || '',
+          emergencyContact: s.emergencyContact || '',
+          // Academic
+          studentId: s.studentId || '',
+          classRoomId: s.classRoomId || '',
+          rollNumber: s.rollNumber || '',
+          section: s.section || '',
+          academicYear: s.academicYear || getCurrentAcademicYear(),
+          admissionDate: s.admissionDate || '',
+          admissionClass: s.admissionClass || '',
+          admissionSource: s.admissionSource || 'Direct',
+          isNewAdmission: s.isNewAdmission !== undefined ? s.isNewAdmission : true,
+          previousSchool: s.previousSchool || '',
+          graduationDate: s.graduationDate || '',
+          promotedFromClassroomId: s.promotedFromClassroomId || '',
+          previousStudentId: s.previousStudentId || '',
+          transferCertificateNo: s.transferCertificateNo || '',
+          courses: s.courses || '',
+          status: s.status || 'ACTIVE',
+          // Parent (Hydrated from relational link)
+          parent: {
+            id: s.parentId || null,
+            firstName: s.parentName?.split(' ')[0] || '',
+            lastName: s.parentName?.split(' ').slice(1).join(' ') || '',
+            phone: s.parentPhone || '',
+            email: s.parentEmail || '',
+            occupation: s.parentOccupation || '',
+            address: s.parentAddress || ''
+          },
+          guardianRelationship: s.guardianRelationship || s.parentRelationship || 'FATHER',
+          isPrimaryGuardian: true
+        };
+
+        setForm(prev => ({ ...dbForm, ...prev }));
         setClasses(classList);
-        setAttendance(aRes.data?.data || null);
-        setReport(Array.isArray(rcRes.data?.data) ? rcRes.data.data : []);
       })
-      .catch(err => {
-        toast.showToast(err.response?.data?.message || 'Failed to load student details.', 'error');
-      })
+      .catch(() => toast.showToast('Failed to load student data', 'error'))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, isRestored]);
 
-  const classNames = useMemo(() => [...new Set(classes.map((c) => c.name))], [classes]);
-
-  const sectionsForClass = useMemo(() => {
-    if (!form.className) return [];
-    return [...new Set(classes.filter((c) => c.name === form.className).map((c) => c.section))];
-  }, [classes, form.className]);
-
-  const attendancePercent = Number(attendance?.percentage || 0);
-  const attendanceRing = {
-    background: `conic-gradient(#16a34a ${attendancePercent * 3.6}deg, #dbeafe 0deg)`,
-  };
-
-  const gradeSummary = useMemo(() => {
-    const counts = {};
-    report.forEach((item) => {
-      const key = item?.grade || 'NA';
-      counts[key] = (counts[key] || 0) + 1;
-    });
-    const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 4);
-    const max = entries[0]?.[1] || 1;
-    return entries.map(([grade, count], index) => ({
-      grade,
-      height: Math.max(24, Math.round((count / max) * 90)),
-      color: ['#16a34a', '#2563eb', '#d97706', '#7c3aed'][index % 4],
-    }));
-  }, [report]);
-
-  const handleChange = e => {
+  const handleParentChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'className') {
-      setForm(prev => ({ ...prev, className: value, section: '', classRoomId: '' }));
-      return;
-    }
-    if (name === 'section') {
-      const selected = classes.find((c) => c.name === form.className && c.section === value);
-      setForm(prev => ({ ...prev, section: value, classRoomId: selected ? String(selected.id) : '' }));
-      return;
-    }
-    setForm({ ...form, [name]: value });
+    setForm(prev => ({
+      ...prev,
+      parent: { ...prev.parent, [name]: value }
+    }));
   };
 
   const handlePhotoChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    setError('');
     setUploadingPhoto(true);
     try {
       const path = await fileApi.uploadImage(file);
-      setForm((prev) => ({ ...prev, profilePhoto: path }));
+      setForm(prev => ({ ...prev, profilePhoto: path }));
+      toast.showToast('Photo updated successfully', 'success');
     } catch (err) {
-      setError(err.response?.data || 'Photo upload failed.');
+      toast.showToast('Photo upload failed', 'error');
     } finally {
       setUploadingPhoto(false);
     }
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
-      if (!form.classRoomId) {
-        toast.showToast('Please select a class.', 'error');
-        setSaving(false);
-        return;
-      }
       await studentApi.update(id, {
-        ...form, classRoomId: Number(form.classRoomId)
+        ...form,
+        classRoomId: Number(form.classRoomId)
       });
-      toast.showToast('Student updated successfully!', 'success');
-      setTimeout(() => navigate(`/admin/students/${id}`), 1500);
+      toast.showToast('Student profile updated!', 'success');
+      clearDraft();
+      setTimeout(() => navigate(`/admin/students/${id}`), 1000);
     } catch (err) {
-      toast.showToast(err.response?.data?.message || 'Update failed.', 'error');
+      toast.showToast(err.response?.data?.message || 'Update failed', 'error');
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) return <><LoadingSpinner /></>;
+  if (loading) return <div className="h-[60vh] flex items-center justify-center"><LoadingSpinner /></div>;
 
   return (
-    <>
-      <div className="mb-4 text-sm text-gray-500">
-        Home &gt; Students &gt; Edit Student Profile
+    <div className="max-w-[1600px] mx-auto pb-20 animate-fade-in px-4 md:px-8">
+      <div className="flex items-center justify-between gap-4 mb-8">
+        <div className="flex items-center gap-4">
+          <button 
+            type="button"
+            onClick={() => navigate(`/admin/students/${id}`)}
+            className="p-2.5 rounded-xl border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 transition-all shadow-sm"
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <div>
+            <h1 className="text-2xl font-black text-slate-800 tracking-tight">Edit Profile</h1>
+            <p className="text-slate-500 font-medium text-sm">Modifying record for <span className="text-indigo-600 font-bold">{form.firstName} {form.lastName}</span></p>
+          </div>
+        </div>
       </div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-4">Edit Student (A) Form</h1>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow p-5 md:p-6">
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-5">
-          <div className="xl:col-span-8">
-            <div className="flex gap-4">
-              <div className="w-24 h-24 rounded-full bg-blue-100 border-4 border-blue-50 overflow-hidden flex items-center justify-center text-blue-700 text-3xl font-bold">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        
+        {/* SECTION 1: IDENTITY */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+          <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
+            <User size={16} className="text-indigo-600" /> Identity & Profile
+          </h3>
+
+          <div className="flex flex-col lg:flex-row gap-8">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-32 h-32 rounded-[2rem] bg-indigo-50 border-4 border-white shadow-xl flex items-center justify-center overflow-hidden ring-1 ring-slate-100">
                 {form.profilePhoto ? (
-                  <img src={fileApi.toPublicUrl(form.profilePhoto)} alt="Student" className="w-full h-full object-cover" />
+                  <img src={fileApi.toPublicUrl(form.profilePhoto)} alt="Preview" className="w-full h-full object-cover" />
                 ) : (
-                  <>{form.firstName?.[0]}{form.lastName?.[0]}</>
+                  <span className="text-3xl font-black text-indigo-200">{form.firstName?.[0]}{form.lastName?.[0]}</span>
                 )}
               </div>
-              <div className="flex-1">
-                <h2 className="text-4xl font-bold text-gray-900 leading-tight">
-                  {form.firstName} {form.lastName} | {form.studentId || `STU${id}`}
-                </h2>
-                <p className="text-2xl text-gray-700 mt-1">Student ID: {form.studentId || `STU${id}`}</p>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3 max-w-md">
-                  <input name="firstName" value={form.firstName || ''} onChange={handleChange} className={inputCls} placeholder="First Name" required />
-                  <input name="lastName" value={form.lastName || ''} onChange={handleChange} className={inputCls} placeholder="Last Name" required />
-                </div>
-                <label className="inline-flex items-center mt-3 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm cursor-pointer hover:bg-blue-700 transition">
-                  {uploadingPhoto ? 'Uploading...' : 'Update Photo'}
-                  <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
-                </label>
-              </div>
+              <label className="bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold cursor-pointer hover:bg-indigo-700 transition shadow-lg shadow-indigo-100">
+                {uploadingPhoto ? 'Uploading...' : 'Change Photo'}
+                <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
+              </label>
             </div>
 
-            <div className="mt-4">
-              <h3 className="text-3xl font-semibold text-gray-900 mb-2">Personal Details</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
-                  <input type="date" name="dateOfBirth" value={form.dateOfBirth || ''} onChange={handleChange} className={inputCls} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
-                  <select name="gender" value={form.gender || ''} onChange={handleChange} className={inputCls}>
-                    <option value="">Select Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                  <input name="phone" value={form.phone || ''} onChange={handleChange} className={inputCls} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                  <input type="email" name="email" value={form.email || ''} onChange={handleChange} className={inputCls} required />
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <h3 className="text-3xl font-semibold text-gray-900 mb-2">Academic Details</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Class</label>
-                  <select name="className" value={form.className || ''} onChange={handleChange} className={inputCls} required>
-                    <option value="">Select Class</option>
-                    {classNames.map((name) => (
-                      <option key={name} value={name}>{name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Section</label>
-                  <select name="section" value={form.section || ''} onChange={handleChange} className={inputCls} required>
-                    <option value="">Select Section</option>
-                    {sectionsForClass.map((sec) => (
-                      <option key={sec} value={sec}>{sec}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Academic Year</label>
-                  <input name="academicYear" value={form.academicYear || ''} onChange={handleChange} className={inputCls} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                  <input name="address" value={form.address || ''} onChange={handleChange} className={inputCls} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Blood Group</label>
-                  <select name="bloodGroup" value={form.bloodGroup || ''} onChange={handleChange} className={inputCls}>
-                    <option value="">Select</option>
-                    {['A+','A-','B+','B-','O+','O-','AB+','AB-'].map((b) => (
-                      <option key={b} value={b}>{b}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="mt-3 text-sm text-gray-700 space-y-1">
-                <p><span className="font-medium">Admission Number:</span> {form.studentId ? `ADM-${form.studentId}` : '-'}</p>
-                <p><span className="font-medium">Admission Date:</span> {form.dateOfBirth || '-'}</p>
-              </div>
-            </div>
-        </div>
-
-          <div className="xl:col-span-4 space-y-4">
-            <div className="rounded-xl border border-gray-200 p-4">
-              <h3 className="text-2xl font-semibold text-gray-900 mb-2">Parent/Guardian Information</h3>
-              <div className="space-y-2">
-                <input name="parentName" value={form.parentName || ''} onChange={handleChange} className={inputCls} placeholder="Guardian Name" required />
-                <input name="parentPhone" value={form.parentPhone || ''} onChange={handleChange} className={inputCls} placeholder="Guardian Phone Number" />
-                <input type="email" name="parentEmail" value={form.parentEmail || ''} onChange={handleChange} className={inputCls} placeholder="Guardian Email" />
-                <select name="guardianRelationship" value={form.guardianRelationship || 'Parent'} onChange={handleChange} className={inputCls}>
-                  <option value="Parent">Parent</option>
-                  <option value="Father">Father</option>
-                  <option value="Mother">Mother</option>
-                  <option value="Guardian">Guardian</option>
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Field label="First Name *">
+                <input name="firstName" value={form.firstName} onChange={handleChange} className={inputCls} required />
+              </Field>
+              <Field label="Last Name *">
+                <input name="lastName" value={form.lastName} onChange={handleChange} className={inputCls} required />
+              </Field>
+              <Field label="Student ID (Fixed)">
+                <input name="studentId" value={form.studentId} className={`${inputCls} bg-slate-50 text-slate-400 font-bold border-dashed`} readOnly disabled />
+              </Field>
+              <Field label="Personal Email *">
+                <input type="email" name="email" value={form.email} onChange={handleChange} className={inputCls} required />
+              </Field>
+              <Field label="Phone *">
+                <input name="phone" value={form.phone} onChange={handleChange} className={inputCls} required />
+              </Field>
+              <Field label="Date of Birth *">
+                <input type="date" name="dateOfBirth" value={form.dateOfBirth} onChange={handleChange} className={inputCls} required />
+              </Field>
+              <Field label="Gender *">
+                <select name="gender" value={form.gender} onChange={handleChange} className={inputCls} required>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
                 </select>
+              </Field>
+              <Field label="Blood Group">
+                <select name="bloodGroup" value={form.bloodGroup} onChange={handleChange} className={inputCls}>
+                  <option value="">Select</option>
+                  {['A+','A-','B+','B-','O+','O-','AB+','AB-'].map(b => <option key={b} value={b}>{b}</option>)}
+                </select>
+              </Field>
+              <div className="md:col-span-2">
+                <Field label="Full Address">
+                  <input name="address" value={form.address} onChange={handleChange} className={inputCls} />
+                </Field>
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="rounded-xl border border-gray-200 p-4">
-                <h3 className="text-2xl font-semibold text-gray-900 mb-3">Attendance Summary</h3>
-                <div className="flex items-center justify-center py-2">
-                  <div className="w-32 h-32 rounded-full p-2" style={attendanceRing}>
-                    <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-3xl font-bold text-gray-900">
-                      {attendancePercent}%
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-3 text-sm text-gray-600">
-                  Present: {attendance?.presentDays || 0} | Absent: {attendance?.absentDays || 0}
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-gray-200 p-4">
-                <h3 className="text-2xl font-semibold text-gray-900 mb-3">Report Card Summary</h3>
-                <div className="flex items-end gap-3 h-32">
-                  {gradeSummary.length > 0 ? gradeSummary.map((g) => (
-                    <div key={g.grade} className="flex-1 text-center">
-                      <div className="text-xs font-semibold text-gray-700 mb-1">{g.grade}</div>
-                      <div className="mx-auto rounded-t" style={{ width: '28px', height: `${g.height}px`, backgroundColor: g.color }} />
-                    </div>
-                  )) : <p className="text-sm text-gray-500">No report data</p>}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-3 justify-end pt-2">
-              <button type="submit" disabled={saving}
-                className="bg-blue-600 text-white px-8 py-2.5 rounded-lg text-sm hover:bg-blue-700 disabled:opacity-60 font-medium">
-                {saving ? 'Saving...' : 'Save Changes'}
-              </button>
-              <button type="button" onClick={() => navigate(`/admin/students/${id}`)}
-                className="bg-gray-100 text-gray-700 px-6 py-2.5 rounded-lg text-sm hover:bg-gray-200 font-medium">
-                Cancel
-              </button>
             </div>
           </div>
         </div>
+
+        {/* SECTION 2: COMPLIANCE */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+          <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
+            <ShieldCheck size={16} className="text-indigo-600" /> Compliance & Health
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Field label="Aadhar Card Number">
+              <input name="aadharCard" value={form.aadharCard} onChange={handleChange} className={inputCls} />
+            </Field>
+            <Field label="Nationality">
+              <input name="nationality" value={form.nationality} onChange={handleChange} className={inputCls} />
+            </Field>
+            <Field label="Religion">
+              <input name="religion" value={form.religion} onChange={handleChange} className={inputCls} />
+            </Field>
+            <Field label="Category">
+              <select name="category" value={form.category} onChange={handleChange} className={inputCls}>
+                <option value="General">General</option>
+                <option value="OBC">OBC</option>
+                <option value="SC">SC</option>
+                <option value="ST">ST</option>
+              </select>
+            </Field>
+            <div className="md:col-span-4">
+              <Field label="Medical Conditions">
+                <textarea name="medicalConditions" value={form.medicalConditions} onChange={handleChange} className={`${inputCls} min-h-[80px]`} />
+              </Field>
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION 3: ACADEMIC */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+          <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
+            <BookOpen size={16} className="text-indigo-600" /> Academic Assignment
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Field label="Current Class *">
+              <select name="classRoomId" value={form.classRoomId} onChange={handleChange} className={inputCls} required>
+                {classes.map(c => (
+                  <option key={c.id} value={c.id}>{c.name} — {c.section}</option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Roll Number">
+              <input name="rollNumber" value={form.rollNumber} onChange={handleChange} className={inputCls} />
+            </Field>
+            <Field label="Personal Section">
+              <input name="section" value={form.section} onChange={handleChange} className={inputCls} placeholder="e.g. A, B, C" />
+            </Field>
+            <Field label="Admission Date">
+              <input type="date" name="admissionDate" value={form.admissionDate} onChange={handleChange} className={inputCls} />
+            </Field>
+            <Field label="Admission Class">
+              <input name="admissionClass" value={form.admissionClass} onChange={handleChange} className={inputCls} placeholder="e.g. Grade 10" />
+            </Field>
+            <Field label="Admission Source">
+              <input name="admissionSource" value={form.admissionSource} onChange={handleChange} className={inputCls} />
+            </Field>
+            <Field label="New Admission Status">
+              <select name="isNewAdmission" value={form.isNewAdmission} onChange={(e) => setForm(prev => ({ ...prev, isNewAdmission: e.target.value === 'true' }))} className={inputCls}>
+                <option value="true">Yes (First Session)</option>
+                <option value="false">No (Continuing)</option>
+              </select>
+            </Field>
+            <Field label="Previous School">
+              <input name="previousSchool" value={form.previousSchool} onChange={handleChange} className={inputCls} />
+            </Field>
+            <Field label="Enrollment Status">
+              <select name="status" value={form.status} onChange={handleChange} className={inputCls}>
+                <option value="ACTIVE">Active</option>
+                <option value="INACTIVE">Inactive</option>
+                <option value="GRADUATED">Graduated</option>
+                <option value="SUSPENDED">Suspended</option>
+              </select>
+            </Field>
+            <Field label="Academic Session">
+              <input name="academicYear" value={form.academicYear} className={`${inputCls} bg-slate-50 text-slate-400 font-semibold border-dashed`} readOnly disabled />
+            </Field>
+          </div>
+        </div>
+
+        {/* SECTION 4: ELECTIVES */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+          <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
+            <BookOpen size={16} className="text-amber-500" /> Registered Electives & Courses
+          </h3>
+          <Field label="Registered Courses (Text Payload)">
+            <textarea name="courses" value={form.courses} onChange={handleChange} className={`${inputCls} min-h-[80px]`} placeholder="List elective subjects or special courses registered..." />
+          </Field>
+        </div>
+
+        {/* SECTION 5: PROMOTIONS & TRANSFERS */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+          <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
+            <Award size={16} className="text-purple-600" /> Promotions & Transfers
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Field label="Promoted From Class ID">
+              <input type="number" name="promotedFromClassroomId" value={form.promotedFromClassroomId} onChange={handleChange} className={inputCls} placeholder="e.g. 5" />
+            </Field>
+            <Field label="Previous Student ID">
+              <input name="previousStudentId" value={form.previousStudentId} onChange={handleChange} className={inputCls} placeholder="e.g. STU-2023-009" />
+            </Field>
+            <Field label="Transfer Certificate (TC) No">
+              <input name="transferCertificateNo" value={form.transferCertificateNo} onChange={handleChange} className={inputCls} placeholder="TC-XXXXX" />
+            </Field>
+            <Field label="Graduation Date">
+              <input type="date" name="graduationDate" value={form.graduationDate} onChange={handleChange} className={inputCls} />
+            </Field>
+          </div>
+        </div>
+
+        {/* SECTION 6: FAMILY */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+          <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
+            <Heart size={16} className="text-rose-500" /> Family & Guardian
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Field label="Parent First Name *">
+              <input name="firstName" value={form.parent.firstName} onChange={handleParentChange} className={inputCls} required />
+            </Field>
+            <Field label="Parent Last Name">
+              <input name="lastName" value={form.parent.lastName} onChange={handleParentChange} className={inputCls} />
+            </Field>
+            <Field label="Relationship *">
+              <select name="guardianRelationship" value={form.guardianRelationship} onChange={handleChange} className={inputCls} required>
+                <option value="FATHER">Father</option>
+                <option value="MOTHER">Mother</option>
+                <option value="GUARDIAN">Guardian</option>
+              </select>
+            </Field>
+            <Field label="Parent Phone *">
+              <input name="phone" value={form.parent.phone} onChange={handleParentChange} className={inputCls} required />
+            </Field>
+            <Field label="Parent Email">
+              <input name="email" value={form.parent.email} onChange={handleParentChange} className={inputCls} />
+            </Field>
+            <Field label="Parent Occupation">
+              <input name="occupation" value={form.parent.occupation} onChange={handleParentChange} className={inputCls} />
+            </Field>
+            <Field label="Emergency Contact Phone">
+              <input name="emergencyContact" value={form.emergencyContact} onChange={handleChange} className={inputCls} placeholder="Secondary emergency phone" />
+            </Field>
+          </div>
+        </div>
+
+        {/* ACTIONS */}
+        <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+          <button type="button" onClick={() => clearDraft(true)} className="text-slate-400 hover:text-rose-500 text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-colors">
+            <Trash2 size={14} /> Clear Draft
+          </button>
+          <div className="flex gap-4">
+            <button type="button" onClick={() => navigate(`/admin/students/${id}`)} className="px-8 py-3 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all border border-slate-200">
+              Cancel
+            </button>
+            <button type="submit" disabled={saving || uploadingPhoto} className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-3 rounded-xl text-sm font-black shadow-lg shadow-indigo-100 transition-all disabled:opacity-50">
+              {saving ? 'Saving Changes...' : 'Update Record'}
+            </button>
+          </div>
+        </div>
       </form>
-    </>
+    </div>
   );
 };
 

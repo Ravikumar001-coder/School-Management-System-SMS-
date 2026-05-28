@@ -12,8 +12,13 @@ import {
   Database,
   FileText,
   UserCircle,
-  Monitor
+  Monitor,
+  Truck,
+  Home,
+  Briefcase,
+  Megaphone
 } from 'lucide-react';
+
 
 /**
  * Global Menu Configuration
@@ -61,17 +66,81 @@ export const menuConfig = [
       { id: 'parents',  title: 'Parent Directory', path: '/admin/parents' },
       { id: 'classes', title: 'Classes & Sections', path: '/admin/classes', permission: 'CLASSES_VIEW' },
       { id: 'subjects', title: 'Subject Registry', path: '/admin/subjects', permission: 'CLASSES_VIEW' },
+      { id: 'departments', title: 'Departments', path: '/admin/departments', permission: 'CLASSES_VIEW' },
+      { id: 'timetable', title: 'School Timetable', path: '/admin/timetable', permission: 'CLASSES_VIEW' },
       { id: 'exams', title: 'Exams & Results', path: '/admin/exams', permission: 'ATTENDANCE_VIEW' }
     ]
   },
   {
+    id: 'communication',
+    title: 'Communication',
+    icon: Megaphone,
+    roles: ['ADMIN', 'SUPERADMIN'],
+    children: [
+      { id: 'notices', title: 'Bulletin Board', path: '/admin/notices', permission: 'SYSTEM_ADMIN' }
+    ]
+  },
+  {
+    id: 'transport',
+    title: 'Transport',
+    icon: Truck,
+    roles: ['ADMIN', 'SUPERADMIN'],
+    children: [
+      { id: 'transport-dashboard', title: 'Fleet Dashboard', path: '/admin/transport/dashboard' },
+      { id: 'transport-tracking', title: 'Live Tracking', path: '/admin/transport/tracking' },
+      { id: 'transport-playback', title: 'GPS Playback', path: '/admin/transport/playback' },
+      { id: 'transport-routes', title: 'Route Manager', path: '/admin/transport/routes' },
+      { id: 'transport-vehicles', title: 'Vehicle Manager', path: '/admin/transport/vehicles' },
+      { id: 'transport-drivers', title: 'Driver Manager', path: '/admin/transport/drivers' },
+      { id: 'transport-assignments', title: 'Student Assignment', path: '/admin/transport/assignments' }
+    ]
+  },
+  {
     id: 'finance',
-    title: 'Finance',
+    title: 'Finance & Accounts',
     icon: CreditCard,
     roles: ['ADMIN', 'SUPERADMIN'],
     children: [
+      { id: 'finance-dashboard', title: 'Overview', path: '/admin/finance/dashboard' },
       { id: 'fees-list', title: 'Fees Dashboard', path: '/admin/fees', permission: 'FEES_VIEW' },
-      { id: 'fees-collect', title: 'Fee Collection', path: '/admin/fees/collect', permission: 'FEES_EDIT' }
+      { id: 'fees-collect', title: 'Fee Collection', path: '/admin/fees/collect', permission: 'FEES_EDIT' },
+      { id: 'finance-coa', title: 'Chart of Accounts', path: '/admin/finance/coa' },
+      { id: 'finance-journal', title: 'Journal Entries', path: '/admin/finance/journal' },
+      { id: 'finance-tb', title: 'Trial Balance', path: '/admin/finance/trial-balance' },
+      { id: 'finance-expenses', title: 'Expenses & Invoices', path: '/admin/finance/expenses' },
+      { id: 'finance-vendors', title: 'Vendor Management', path: '/admin/finance/vendors' },
+      { id: 'finance-salary', title: 'Payroll & Salary', path: '/admin/finance/salary-payouts' },
+      { id: 'finance-reports', title: 'Financial Statements', path: '/admin/finance/reports' },
+      { id: 'finance-tally', title: 'Tally Integration', path: '/admin/finance/tally' }
+    ]
+  },
+  {
+    id: 'hostel',
+    title: 'Hostel',
+    icon: Home,
+    roles: ['ADMIN', 'SUPERADMIN'],
+    children: [
+      { id: 'hostel-dashboard', title: 'Warden Dashboard', path: '/admin/hostel/dashboard' },
+      { id: 'hostel-infrastructure', title: 'Infrastructure', path: '/admin/hostel/infrastructure' },
+      { id: 'hostel-allocations', title: 'Allocations', path: '/admin/hostel/allocations' },
+      { id: 'hostel-attendance', title: 'Attendance', path: '/admin/hostel/attendance' },
+      { id: 'hostel-mess-dashboard', title: 'Mess Dashboard', path: '/admin/hostel/mess/dashboard' },
+      { id: 'hostel-mess-plans', title: 'Mess Plans', path: '/admin/hostel/mess/plans' },
+      { id: 'hostel-mess-bills', title: 'Mess Bills', path: '/admin/hostel/mess/bills' },
+      { id: 'hostel-mess-payments', title: 'Mess Payments', path: '/admin/hostel/mess/payments' }
+    ]
+  },
+  {
+    id: 'hrms',
+    title: 'HRMS & Staff',
+    icon: Briefcase,
+    roles: ['ADMIN', 'SUPERADMIN'],
+    children: [
+      { id: 'hrms-onboarding', title: 'Staff Onboarding', path: '/admin/hrms/onboarding' },
+      { id: 'hrms-payroll', title: 'Payroll Engine', path: '/admin/hrms/payroll' },
+      { id: 'hrms-leave', title: 'Leave Approval Center', path: '/admin/hrms/leave' },
+      { id: 'hrms-compliance', title: 'PF & ESI Compliance', path: '/admin/hrms/compliance' },
+      { id: 'hrms-performance', title: 'Performance Reviews', path: '/admin/hrms/performance' }
     ]
   },
   {

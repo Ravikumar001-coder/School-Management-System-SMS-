@@ -48,6 +48,13 @@ This project is configured with security best practices:
    npm run dev
    ```
 
+## 📚 Detailed Documentation
+
+- [Project Current State](docs/PROJECT_CURRENT_STATE.md)
+- [Design System](docs/design.md)
+- [Forensic Audit Report](docs/audit-report.md)
+- [Development Workflow](docs/task.md)
+
 
 ## 🛡️ Security Policy
 
