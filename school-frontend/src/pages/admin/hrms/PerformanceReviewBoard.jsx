@@ -82,23 +82,21 @@ const PerformanceReviewBoard = () => {
     {
       title: 'Action',
       render: (_, r) => r.status !== 'COMPLETED' ? (
-        <Button type="primary" size="small" onClick={() => showReviewModal(r)} icon={<Edit size={14} />}>
-          Manager Review
-        </Button>
+        <button onClick={() => showReviewModal(r)} className="bg-[#1E40AF] text-white px-4 py-2 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all flex items-center gap-2 hover:bg-[#1E3A8A]"><Edit size={14} /> Manager Review</button>
       ) : (
-        <Button icon={<CheckCircle size={14} />} size="small" disabled>Completed</Button>
+        <button disabled className="bg-slate-300 text-slate-500 px-4 py-2 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all flex items-center gap-2"><CheckCircle size={14} /> Completed</button>
       )
     }
   ];
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="bg-gray-50 min-h-screen p-6 animate-fade-in">
+      <div className="flex justify-between items-center mb-6 bg-white p-5 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
         <h1 className="text-2xl font-bold">Performance Review Board</h1>
       </div>
       
       {selectedCycle && (
-        <Card title={`Active Cycle: ${selectedCycle.cycleName}`} className="mb-6">
+        <Card title={`Active Cycle: ${selectedCycle.cycleName}`} className="mb-6 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
           <Table columns={columns} dataSource={reviews} loading={loading} />
         </Card>
       )}

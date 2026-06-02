@@ -47,18 +47,18 @@ const TallyExportUI = () => {
     };
 
     return (
-        <div className="p-6">
+        <div className="bg-gray-50 min-h-screen p-6 animate-fade-in">
             <h1 className="text-2xl font-bold mb-6">Tally ERP 9 Integration</h1>
             
             <div className="flex gap-6">
                 <div className="w-1/3">
-                    <Card className="h-full">
+                    <Card className="h-full rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
                         <Steps orientation="vertical" current={current} items={exportSteps} />
                     </Card>
                 </div>
                 
                 <div className="w-2/3">
-                    <Card className="h-full">
+                    <Card className="h-full rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
                         {current === 0 && (
                             <Form layout="vertical" form={form} onFinish={handleGenerate}>
                                 <Form.Item label="Branch" name="branchId" initialValue={1}>
@@ -81,9 +81,9 @@ const TallyExportUI = () => {
                                 </Form.Item>
 
                                 <div className="text-right mt-6">
-                                    <Button type="primary" htmlType="submit" loading={loading} icon={<CheckCircle size={16} />}>
-                                        Generate Tally XML
-                                    </Button>
+                                    <button type="submit" className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all hover:bg-[#1E3A8A] flex items-center gap-2" disabled={loading}>
+                                        <CheckCircle size={16} /> Generate Tally XML
+                                    </button>
                                 </div>
                             </Form>
                         )}
@@ -95,10 +95,10 @@ const TallyExportUI = () => {
                                 <p className="text-gray-500 mb-6">Your data has been formatted for Tally ERP 9 XML.</p>
                                 
                                 <div className="space-x-4">
-                                    <Button onClick={() => { setCurrent(0); setXmlData(null); form.resetFields(); }}>Start Over</Button>
-                                    <Button type="primary" className="bg-blue-600" onClick={handleDownload} icon={<Download size={16} />}>
-                                        Download XML File
-                                    </Button>
+                                    <button type="button" className="px-6 py-3 min-h-[44px] rounded-[16px] bg-gray-100 text-gray-700 font-bold text-sm hover:bg-gray-200 transition-all mr-2" onClick={() => { setCurrent(0); setXmlData(null); form.resetFields(); }}>Start Over</button>
+                                    <button type="button" className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all hover:bg-[#1E3A8A] flex items-center gap-2" onClick={handleDownload}>
+                                        <Download size={16} /> Download XML File
+                                    </button>
                                 </div>
                             </div>
                         )}

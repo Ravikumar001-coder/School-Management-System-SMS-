@@ -184,7 +184,7 @@ const AttendancePage = () => {
       />
 
       {/* 1. Configuration Shell */}
-      <section className="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 mb-6 animate-fade-in">
+      <section className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-5 mb-6 animate-fade-in">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
           <FormField label="Academic Class" required>
             <select value={selectedClass} onChange={e => setClassId(e.target.value)} className="select h-12 rounded-xl">
@@ -270,10 +270,10 @@ const AttendancePage = () => {
               </div>
             ) : (
               filteredStudents.map((s, index) => (
-                <div 
-                  key={s.id} 
-                  className={`bg-white rounded-2xl p-4 border transition-all flex items-center justify-between gap-4 group hover:shadow-md
-                    ${attendance[s.id] === 'ABSENT' ? 'border-rose-100 bg-rose-50/10' : 'border-slate-100'}
+                  <div 
+                    key={s.id} 
+                    className={`bg-white rounded-[16px] p-4 border border-[#f1f5f9] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] transition-all flex items-center justify-between gap-4 group hover:-translate-y-1 hover:shadow-lg
+                      ${attendance[s.id] === 'ABSENT' ? 'border-rose-100 bg-rose-50/10' : 'border-[#f1f5f9]'}
                   `}
                 >
                   <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -328,7 +328,7 @@ const AttendancePage = () => {
       {/* 3. Sticky Action Bar */}
       {selectedClass && students.length > 0 && (
         <div className="fixed bottom-[88px] lg:bottom-10 left-6 right-6 md:left-auto md:right-12 md:w-[480px] z-50 animate-bounce-in">
-          <div className="bg-slate-900 rounded-[2rem] p-5 shadow-2xl border border-slate-800 flex items-center justify-between gap-6 overflow-hidden relative">
+          <div className="bg-slate-900 rounded-[16px] p-5 shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-slate-800 flex items-center justify-between gap-6 overflow-hidden relative">
             {/* Visual gradient backdrop */}
             <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-indigo-500/10 to-transparent pointer-events-none"></div>
             
@@ -353,7 +353,7 @@ const AttendancePage = () => {
               variant="primary" 
               loading={saving} 
               onClick={handleSave}
-              className="h-14 px-8 bg-indigo-600 hover:bg-indigo-500 border-none rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-indigo-600/20 group relative z-10"
+              className="h-14 px-8 bg-[#1E40AF] hover:bg-[#1E3A8A] border-none rounded-[16px] text-xs text-white font-black uppercase tracking-widest shadow-md group relative z-10"
             >
               Finalize Records
             </Button>

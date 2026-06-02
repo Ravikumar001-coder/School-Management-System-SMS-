@@ -1,200 +1,263 @@
-// src/pages/parent/ParentLogin.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Smartphone, ShieldCheck, ArrowRight, Loader2 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axios';
+import { Loader2 } from 'lucide-react';
 
 const ParentLogin = () => {
-  const navigate = useNavigate();
-  const toast = useToast();
-  const { login } = useAuth();
-  
-  const [step, setStep] = useState(1); // 1: Mobile/Main, 2: OTP Entry
-  const [loginMethod, setLoginMethod] = useState('otp'); // 'otp' or 'password'
-  const [mobile, setMobile] = useState('');
-  const [otp, setOtp] = useState('');
-  const [studentId, setStudentId] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleRequestOtp = async (e) => {
-    e.preventDefault();
-    if (mobile.length !== 10) return toast.warning('Enter 10-digit mobile.');
-    setLoading(true);
-    try {
-      await api.post('/parent/auth/request-otp', { mobileNumber: mobile });
-      toast.success('OTP sent successfully!');
-      setStep(2);
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Login failed.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await api.post('/parent/auth/verify-otp', { mobileNumber: mobile, otpCode: otp });
-      const { token, parent } = res.data.data;
-      login({ ...parent, roles: ['PARENT'] }, token);
-      
-      toast.success(`Welcome back, ${parent.name}!`);
-      navigate('/parent/dashboard');
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Invalid OTP.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handlePasswordLogin = async (e) => {
-    e.preventDefault();
-    if (mobile.length !== 10) return toast.warning('Enter 10-digit mobile.');
-    if (!studentId) return toast.warning('Enter Student ID.');
+    const navigate = useNavigate();
+    const toast = useToast();
+    const { login } = useAuth();
     
-    setLoading(true);
-    try {
-      const res = await api.post('/parent/auth/login-password', { 
-        mobileNumber: mobile, 
-        studentId: studentId.trim() 
-      });
-      const { token, parent } = res.data.data;
-      
-      login({ ...parent, roles: ['PARENT'] }, token);
-      
-      toast.success(`Welcome back, ${parent.name}!`);
-      navigate('/parent/dashboard');
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Invalid Mobile or Student ID.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    const [step, setStep] = useState(1); // 1: Select Method/Enter Details, 2: OTP Entry
+    const [loginMethod, setLoginMethod] = useState('otp'); // 'otp' or 'password'
+    
+    const [mobile, setMobile] = useState('');
+    const [otp, setOtp] = useState('');
+    const [studentId, setStudentId] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
-  return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
-      <div className="w-full max-w-[440px] animate-fade-in">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-indigo-500/20 rotate-3">
-             <ShieldCheck size={32} className="text-white" />
-          </div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Parent Portal</h1>
-          <p className="text-slate-500 text-sm mt-1 font-medium">India's First Secure Parent Ecosystem</p>
-        </div>
+    const handleRequestOtp = async (e) => {
+        e.preventDefault();
+        if (mobile.length !== 10) return toast.warning('Enter 10-digit mobile number.');
+        setLoading(true);
+        try {
+            await api.post('/parent/auth/request-otp', { mobileNumber: mobile });
+            toast.success('OTP sent successfully!');
+            setStep(2);
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Login failed.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-        <div className="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 p-8">
-          {/* Login Method Toggle */}
-          {step === 1 && (
-            <div className="flex p-1.5 bg-slate-100 rounded-2xl mb-8">
-              <button 
-                onClick={() => setLoginMethod('otp')}
-                className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${loginMethod === 'otp' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
-              >
-                OTP LOGIN
-              </button>
-              <button 
-                onClick={() => setLoginMethod('password')}
-                className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${loginMethod === 'password' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
-              >
-                STUDENT ID
-              </button>
-            </div>
-          )}
+    const handleVerifyOtp = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const res = await api.post('/parent/auth/verify-otp', { mobileNumber: mobile, otpCode: otp });
+            const { token, parent } = res.data.data;
+            login({ ...parent, roles: ['PARENT'] }, token);
+            
+            toast.success(`Welcome back, ${parent.name}!`);
+            navigate('/parent/dashboard');
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Invalid OTP.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-          {step === 1 ? (
-            <form onSubmit={loginMethod === 'otp' ? handleRequestOtp : handlePasswordLogin} className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Registered Mobile</label>
-                <div className="relative group">
-                  <Smartphone size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
-                  <input 
-                    required
-                    type="tel"
-                    pattern="[0-9]{10}"
-                    value={mobile}
-                    onChange={e => setMobile(e.target.value)}
-                    placeholder="Mobile Number"
-                    className="w-full h-14 bg-slate-50 border-2 border-slate-50 rounded-2xl pl-12 pr-6 focus:bg-white focus:border-indigo-600 outline-none transition-all font-bold tracking-widest"
-                  />
+    const handlePasswordLogin = async (e) => {
+        e.preventDefault();
+        if (mobile.length !== 10) return toast.warning('Enter 10-digit mobile number.');
+        if (!studentId) return toast.warning('Enter Student ID.');
+        
+        setLoading(true);
+        try {
+            const res = await api.post('/parent/auth/login-password', { 
+                mobileNumber: mobile, 
+                studentId: studentId.trim() 
+            });
+            const { token, parent } = res.data.data;
+            
+            login({ ...parent, roles: ['PARENT'] }, token);
+            
+            toast.success(`Welcome back, ${parent.name}!`);
+            navigate('/parent/dashboard');
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Invalid Mobile or Student ID.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Styling constants matching the provided CSS tokens
+    const shadowNeumorphic = "shadow-[4px_4px_10px_rgba(0,0,0,0.05),-4px_-4px_10px_rgba(255,255,255,0.8),15px_15px_30px_rgba(0,0,0,0.05)]";
+    const shadowNeumorphicInset = "shadow-[inset_4px_4px_10px_rgba(0,0,0,0.05),inset_-4px_-4px_10px_rgba(255,255,255,0.8)]";
+    const shadowNeumorphicBtn = "shadow-[4px_4px_10px_rgba(0,0,0,0.1),-2px_-2px_10px_rgba(255,255,255,0.9)]";
+
+    return (
+        <div className="bg-slate-50 font-sans text-slate-800 antialiased min-h-screen flex flex-col justify-center items-center p-4 md:p-8">
+            <main className="w-full max-w-md mx-auto">
+                {/* Brand Header */}
+                <div className="text-center mb-8">
+                    <h1 className="font-bold text-2xl md:text-3xl text-blue-800 mb-2">EduSMS</h1>
+                    <h2 className="font-semibold text-xl text-slate-600">Parent Portal</h2>
+                    <p className="text-sm text-slate-500 mt-1">Access your child's academic updates</p>
                 </div>
-              </div>
 
-              {loginMethod === 'password' && (
-                <div className="space-y-2 animate-slide-up">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Child Student ID</label>
-                  <div className="relative group">
-                    <ShieldCheck size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
-                    <input 
-                      required
-                      type="text"
-                      value={studentId}
-                      onChange={e => setStudentId(e.target.value)}
-                      placeholder="STU-202X-XXX"
-                      className="w-full h-14 bg-slate-50 border-2 border-slate-50 rounded-2xl pl-12 pr-6 focus:bg-white focus:border-indigo-600 outline-none transition-all font-bold tracking-wider uppercase"
-                    />
-                  </div>
-                  <p className="text-[10px] text-slate-400 px-1 italic">Use any child's Student ID as password.</p>
+                {/* Login Card */}
+                <div className={`bg-white rounded-xl ${shadowNeumorphic} p-6 md:p-8 border border-slate-100`}>
+                    
+                    {/* Tabs */}
+                    {step === 1 && (
+                        <div className={`flex bg-slate-50 rounded-lg p-1 mb-8 ${shadowNeumorphicInset}`} role="tablist">
+                            <button 
+                                onClick={() => setLoginMethod('otp')}
+                                className={`flex-1 py-2 px-4 rounded-md text-xs text-center transition-all duration-300 focus:outline-none ${loginMethod === 'otp' ? `bg-white ${shadowNeumorphic} text-blue-800 font-semibold` : 'text-slate-500 hover:text-slate-800'}`}
+                            >
+                                OTP Login
+                            </button>
+                            <button 
+                                onClick={() => setLoginMethod('password')}
+                                className={`flex-1 py-2 px-4 rounded-md text-xs text-center transition-all duration-300 focus:outline-none ${loginMethod === 'password' ? `bg-white ${shadowNeumorphic} text-blue-800 font-semibold` : 'text-slate-500 hover:text-slate-800'}`}
+                            >
+                                Student ID Login
+                            </button>
+                        </div>
+                    )}
+
+                    {step === 1 ? (
+                        <>
+                            {/* OTP Login Form */}
+                            {loginMethod === 'otp' && (
+                                <form onSubmit={handleRequestOtp} className="space-y-6 animate-fade-in">
+                                    <div className="space-y-2">
+                                        <label className="block text-xs font-medium text-slate-600 ml-1">Registered Mobile Number</label>
+                                        <div className="relative">
+                                            <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 material-symbols-outlined">phone_iphone</span>
+                                            <input 
+                                                required
+                                                type="tel"
+                                                pattern="[0-9]{10}"
+                                                value={mobile}
+                                                onChange={e => setMobile(e.target.value)}
+                                                className={`w-full pl-10 pr-4 py-3 bg-slate-50 rounded-lg ${shadowNeumorphicInset} border-none focus:ring-2 focus:ring-blue-800 focus:outline-none text-sm text-slate-800 transition-shadow`}
+                                                placeholder="9876543210"
+                                            />
+                                        </div>
+                                    </div>
+                                    <button 
+                                        type="submit" 
+                                        disabled={loading}
+                                        className={`w-full py-3 bg-blue-800 text-white rounded-lg ${shadowNeumorphicBtn} hover:bg-blue-900 transition-all duration-200 font-semibold text-sm flex justify-center items-center gap-2 disabled:opacity-50`}
+                                    >
+                                        {loading ? <Loader2 className="animate-spin" size={20} /> : (
+                                            <>
+                                                <span>Send OTP</span>
+                                                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>send</span>
+                                            </>
+                                        )}
+                                    </button>
+                                </form>
+                            )}
+
+                            {/* Password Login Form */}
+                            {loginMethod === 'password' && (
+                                <form onSubmit={handlePasswordLogin} className="space-y-6 animate-fade-in">
+                                    <div className="space-y-2">
+                                        <label className="block text-xs font-medium text-slate-600 ml-1">Registered Mobile Number</label>
+                                        <div className="relative">
+                                            <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 material-symbols-outlined">phone_iphone</span>
+                                            <input 
+                                                required
+                                                type="tel"
+                                                pattern="[0-9]{10}"
+                                                value={mobile}
+                                                onChange={e => setMobile(e.target.value)}
+                                                className={`w-full pl-10 pr-4 py-3 bg-slate-50 rounded-lg ${shadowNeumorphicInset} border-none focus:ring-2 focus:ring-blue-800 focus:outline-none text-sm text-slate-800 transition-shadow`}
+                                                placeholder="9876543210"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-center ml-1">
+                                            <label className="block text-xs font-medium text-slate-600">Child's Student ID</label>
+                                        </div>
+                                        <div className="relative">
+                                            <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 material-symbols-outlined">badge</span>
+                                            <input 
+                                                required
+                                                type={showPassword ? "text" : "password"}
+                                                value={studentId}
+                                                onChange={e => setStudentId(e.target.value)}
+                                                className={`w-full pl-10 pr-10 py-3 bg-slate-50 rounded-lg ${shadowNeumorphicInset} border-none focus:ring-2 focus:ring-blue-800 focus:outline-none text-sm text-slate-800 transition-shadow`}
+                                                placeholder="STU-202X-XXX"
+                                            />
+                                            <button 
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none material-symbols-outlined"
+                                            >
+                                                {showPassword ? 'visibility' : 'visibility_off'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        type="submit" 
+                                        disabled={loading}
+                                        className={`w-full py-3 bg-blue-800 text-white rounded-lg ${shadowNeumorphicBtn} hover:bg-blue-900 transition-all duration-200 font-semibold text-sm flex justify-center items-center gap-2 disabled:opacity-50`}
+                                    >
+                                        {loading ? <Loader2 className="animate-spin" size={20} /> : (
+                                            <>
+                                                <span>Login</span>
+                                                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>login</span>
+                                            </>
+                                        )}
+                                    </button>
+                                </form>
+                            )}
+                        </>
+                    ) : (
+                        /* OTP Verification Form */
+                        <form onSubmit={handleVerifyOtp} className="space-y-6 animate-fade-in">
+                            <div className="space-y-2 text-center">
+                                <label className="block text-sm font-bold text-slate-800">Verification Code</label>
+                                <p className="text-xs text-slate-500 mb-4">Enter 6-digit code sent to +91 {mobile}</p>
+                                <input 
+                                    required
+                                    autoFocus
+                                    type="text"
+                                    maxLength="6"
+                                    value={otp}
+                                    onChange={e => setOtp(e.target.value)}
+                                    placeholder="000000"
+                                    className={`w-full h-16 bg-slate-50 ${shadowNeumorphicInset} border-none rounded-lg text-center outline-none focus:ring-2 focus:ring-blue-800 transition-all text-2xl font-bold tracking-[0.5em] text-blue-800`}
+                                />
+                            </div>
+                            <button 
+                                type="submit"
+                                disabled={loading}
+                                className={`w-full py-3 bg-blue-800 text-white rounded-lg ${shadowNeumorphicBtn} hover:bg-blue-900 transition-all duration-200 font-semibold text-sm flex justify-center items-center gap-2 disabled:opacity-50`}
+                            >
+                                {loading ? <Loader2 className="animate-spin" size={20} /> : <>Complete Login</>}
+                            </button>
+                            <button 
+                                type="button" 
+                                onClick={() => setStep(1)} 
+                                className="w-full text-center text-xs font-medium text-slate-500 hover:text-blue-800 mt-2"
+                            >
+                                Change Mobile Number
+                            </button>
+                        </form>
+                    )}
+
+                    {/* Support Link */}
+                    <div className="mt-8 text-center">
+                        <p className="text-xs text-slate-500">
+                            Need help accessing your account? <br />
+                            <a href="#" className="text-blue-800 hover:text-blue-900 font-semibold transition-colors mt-1 inline-block">Contact School Support</a>
+                        </p>
+                    </div>
                 </div>
-              )}
+            </main>
 
-              <button 
-                disabled={loading}
-                className={`w-full h-14 ${loginMethod === 'otp' ? 'bg-indigo-600 shadow-indigo-500/30' : 'bg-emerald-600 shadow-emerald-500/30'} text-white rounded-2xl font-black text-base shadow-lg flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-50`}
-              >
-                {loading ? (
-                  <Loader2 className="animate-spin" />
-                ) : (
-                  <>
-                    {loginMethod === 'otp' ? 'Get OTP' : 'Login Securely'} 
-                    <ArrowRight size={18} />
-                  </>
-                )}
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleVerifyOtp} className="space-y-6 animate-slide-up">
-              <div className="space-y-2 text-center">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Verification Code</label>
-                <p className="text-xs text-slate-500 mb-4 font-medium">Enter 6-digit code sent to +91 {mobile}</p>
-                <input 
-                  required
-                  autoFocus
-                  type="text"
-                  maxLength="6"
-                  value={otp}
-                  onChange={e => setOtp(e.target.value)}
-                  placeholder="000000"
-                  className="w-full h-16 bg-slate-50 border-2 border-slate-50 rounded-2xl text-center outline-none focus:bg-white focus:border-indigo-600 transition-all text-3xl font-black tracking-[0.5em] text-indigo-600"
-                />
-              </div>
-
-              <button 
-                disabled={loading}
-                className="w-full h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-base shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-50"
-              >
-                {loading ? <Loader2 className="animate-spin" /> : <>Complete Login</>}
-              </button>
-
-              <button 
-                type="button" 
-                onClick={() => setStep(1)} 
-                className="w-full text-center text-[10px] font-black text-slate-400 hover:text-indigo-600 uppercase tracking-widest"
-              >
-                Change Details
-              </button>
-            </form>
-          )}
+            {/* Footer */}
+            <footer className="w-full py-6 px-4 md:px-8 flex flex-col md:flex-row justify-between items-center gap-4 border-t border-slate-200 mt-auto bg-slate-50">
+                <div className="font-semibold text-sm text-slate-900">EduSMS Admin Portal</div>
+                <div className="flex gap-4 text-xs font-medium text-slate-500">
+                    <a href="#" className="hover:text-blue-800 underline transition-all duration-200">Privacy Policy</a>
+                    <a href="#" className="hover:text-blue-800 underline transition-all duration-200">Terms of Service</a>
+                    <a href="#" className="hover:text-blue-800 underline transition-all duration-200">Support</a>
+                </div>
+                <div className="text-xs font-medium text-slate-500">© 2024 EduSMS Admin Portal. All rights reserved.</div>
+            </footer>
         </div>
-
-        <div className="mt-8 text-center">
-           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Powered by Antigravity ERP</p>
-        </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default ParentLogin;

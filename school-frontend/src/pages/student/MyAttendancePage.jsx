@@ -1,6 +1,12 @@
+// src/pages/student/MyAttendancePage.jsx
 import React, { useMemo, useState } from 'react';
 import { attendanceApi } from '../../api/attendanceApi';
 import { useAuth } from '../../context/AuthContext';
+import PageHeader from '../../components/common/PageHeader';
+import StatCard from '../../components/common/StatCard';
+import Button from '../../components/common/Button';
+import { Calendar, Download, PieChart, Activity, AlertTriangle } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 
 const MyAttendancePage = () => {
   const { user } = useAuth();
@@ -8,9 +14,13 @@ const MyAttendancePage = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [from, setFrom] = useState('2024-01-01');
-  const [to, setTo] = useState(
-    new Date().toISOString().split('T')[0]);
+  
+  // Use current month start and end as default
+  const [from, setFrom] = useState(() => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().split('T')[0];
+  });
+  const [to, setTo] = useState(new Date().toISOString().split('T')[0]);
   const [viewMonth, setViewMonth] = useState(() => new Date());
 
   const fetchReport = async () => {
@@ -43,7 +53,7 @@ const MyAttendancePage = () => {
       cells.push(new Date(current.getFullYear(), current.getMonth(), day));
     }
     return {
-      title: current.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }),
+      title: current.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
       cells,
     };
   }, [viewMonth]);
@@ -71,6 +81,7 @@ const MyAttendancePage = () => {
     return Object.values(grouped).map((x) => ({
       ...x,
       percent: x.total ? ((x.attended / x.total) * 100).toFixed(1) : '0.0',
+      percentNum: x.total ? Math.round((x.attended / x.total) * 100) : 0
     }));
   }, [data]);
 
@@ -84,13 +95,11 @@ const MyAttendancePage = () => {
   const getDateKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
   const dayCellClass = (status) => {
-    if (status === 'PRESENT') return 'bg-green-400 text-white';
-    if (status === 'ABSENT') return 'bg-red-400 text-white';
-    if (status === 'LATE') return 'bg-amber-300 text-slate-800';
-    return 'bg-slate-200 text-slate-700';
+    if (status === 'PRESENT') return 'bg-green-100 text-green-700 font-bold border border-green-200';
+    if (status === 'ABSENT') return 'bg-red-100 text-red-700 font-bold border border-red-200';
+    if (status === 'LATE') return 'bg-amber-100 text-amber-700 font-bold border border-amber-200';
+    return 'bg-white text-gray-500 border border-gray-100';
   };
-
-  const cardShadow = { boxShadow: '0 2px 12px rgba(15, 23, 42, 0.08)' };
 
   const downloadReport = () => {
     if (!data?.records?.length) {
@@ -130,191 +139,220 @@ const MyAttendancePage = () => {
   };
 
   return (
-    <>
-      <div className="mb-3 text-sm font-medium text-gray-500">Home {'>'} Academic {'>'} My Attendance ({user?.role || 'S'})</div>
-      <h1 className="mb-5 text-[48px] font-semibold leading-none tracking-tight text-slate-900">My Attendance</h1>
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <PageHeader 
+          title="My Attendance"
+          subtitle="Track your daily class presence and statistics"
+          className="!mb-0"
+        />
+      </div>
 
-      <div className="mb-5 rounded-2xl bg-white p-5" style={cardShadow}>
-        <div className="flex flex-wrap items-end gap-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">From</label>
+      <div className="card shadow-sm border border-gray-100 p-5">
+        <div className="flex flex-col md:flex-row md:items-end gap-4">
+          <div className="flex-1">
+            <label className="mb-1 block text-xs font-bold uppercase tracking-widest text-gray-500">From Date</label>
             <input type="date" value={from}
               onChange={e => setFrom(e.target.value)}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm" />
+              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
           </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">To</label>
+          <div className="flex-1">
+            <label className="mb-1 block text-xs font-bold uppercase tracking-widest text-gray-500">To Date</label>
             <input type="date" value={to}
               onChange={e => setTo(e.target.value)}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm" />
+              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
           </div>
-          <button onClick={fetchReport}
-            className="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">
-            Get Report
-          </button>
-          <button
-            type="button"
-            onClick={downloadReport}
-            className="rounded-lg bg-slate-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={!data?.records?.length}
-          >
-            Download Attendance Report
-          </button>
+          <div className="flex gap-2 w-full md:w-auto">
+            <Button onClick={fetchReport} variant="primary" className="flex-1 md:flex-none py-2.5">
+              Get Report
+            </Button>
+            <Button
+              onClick={downloadReport}
+              variant="outline"
+              className="flex-1 md:flex-none flex items-center justify-center gap-2 py-2.5"
+              disabled={!data?.records?.length}
+            >
+              <Download size={16} />
+              <span className="hidden sm:inline">Export</span>
+            </Button>
+          </div>
         </div>
       </div>
 
       {error && (
-        <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 flex items-center gap-2">
+          <AlertTriangle size={18} />
           {error}
         </div>
       )}
 
       {loading && (
-        <div className="rounded-2xl bg-white p-8 text-center" style={cardShadow}>
-          <p className="text-sm text-gray-600">Loading attendance report...</p>
+        <div className="card text-center p-12 shadow-sm border border-gray-100">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-sm text-gray-500">Loading attendance data...</p>
         </div>
       )}
 
       {data && !loading && (
         <>
-          <div className="mb-5 grid grid-cols-1 gap-4 lg:grid-cols-3">
-            {[
-              {
-                label: 'Overall Attendance',
-                value: `${data.percentage || 0}%`,
-                sub: 'All classes',
-                color: 'from-green-50 to-emerald-100',
-                icon: '📊',
-              },
-              {
-                label: 'Absent Days',
-                value: absentDays,
-                sub: 'Total this term',
-                color: 'from-slate-50 to-indigo-100',
-                icon: '📄',
-              },
-              {
-                label: 'Late Days',
-                value: lateDays,
-                sub: 'Requires promptness',
-                color: 'from-yellow-50 to-amber-100',
-                icon: '💵',
-              },
-            ].map((s, i) => (
-              <div key={i}
-                className={`rounded-2xl bg-gradient-to-r px-5 py-4 ${s.color}`}
-                style={cardShadow}
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-[35px] font-medium leading-tight text-slate-900">{s.label}</p>
-                    <p className="mt-1 text-[52px] font-bold leading-none text-slate-900">{s.value}</p>
-                    <p className="mt-2 text-[24px] leading-tight text-slate-600">{s.sub}</p>
-                  </div>
-                  <span className="text-4xl text-slate-500">{s.icon}</span>
-                </div>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <StatCard 
+              title="Overall Attendance" 
+              value={`${data.percentage || 0}%`} 
+              subtitle="Current Selection"
+              variant={data.percentage >= 75 ? "green" : "red"} 
+              icon={() => <PieChart size={24} className={data.percentage >= 75 ? "text-green-500" : "text-red-500"} />}
+            />
+            <StatCard 
+              title="Absent Days" 
+              value={absentDays} 
+              subtitle="Total missed"
+              variant="orange" 
+              icon={() => <AlertTriangle size={24} className="text-orange-500" />}
+            />
+            <StatCard 
+              title="Late Days" 
+              value={lateDays} 
+              subtitle="Tardiness count"
+              variant="yellow" 
+              icon={() => <Activity size={24} className="text-yellow-500" />}
+            />
           </div>
 
           {data.percentage < 75 && (
-            <div className="bg-red-50 border border-red-200 
-                            text-red-700 p-4 rounded-xl mb-5 text-sm">
-              ⚠️ Your attendance is below 75%. 
-              Please attend classes regularly.
+            <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm flex items-start gap-3 shadow-sm">
+              <AlertTriangle size={20} className="shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold">Attendance Warning</p>
+                <p>Your attendance is below 75%. Please ensure you attend classes regularly to meet academic requirements.</p>
+              </div>
             </div>
           )}
 
-          <div className="mb-5 rounded-2xl bg-white p-4" style={cardShadow}>
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-4">
-                <button type="button" onClick={() => moveMonth(-1)} className="rounded-lg border px-3 py-1 text-lg text-slate-600 hover:bg-slate-100">{'<'}</button>
-                <p className="text-3xl font-semibold text-slate-800">{monthMeta.title}</p>
-                <button type="button" onClick={() => moveMonth(1)} className="rounded-lg border px-3 py-1 text-lg text-slate-600 hover:bg-slate-100">{'>'}</button>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Calendar View */}
+            <div className="card lg:col-span-1 shadow-sm border border-gray-100 flex flex-col">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="card-title mb-0 flex items-center gap-2">
+                  <Calendar size={18} className="text-gray-400" />
+                  Calendar View
+                </h3>
+                <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-1 border border-gray-100">
+                  <button type="button" onClick={() => moveMonth(-1)} className="p-1 rounded hover:bg-white hover:shadow-sm text-gray-600 transition-all">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+                  </button>
+                  <span className="text-xs font-bold text-gray-700 min-w-[80px] text-center">{monthMeta.title}</span>
+                  <button type="button" onClick={() => moveMonth(1)} className="p-1 rounded hover:bg-white hover:shadow-sm text-gray-600 transition-all">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+                  </button>
+                </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-slate-500">Mark All Present</span>
-                <button
-                  type="button"
-                  className="relative h-7 w-14 cursor-not-allowed rounded-full bg-blue-600/70"
-                  title="Students cannot mark attendance"
-                  disabled
-                >
-                  <span className="absolute right-1 top-1 h-5 w-5 rounded-full bg-white" />
-                </button>
-              </div>
-            </div>
-
-            <div className="mb-4 grid grid-cols-7 gap-2 text-center text-[15px] font-semibold text-slate-600">
-              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
-                <div key={d} className="rounded-lg bg-slate-100 py-2">{d}</div>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-7 gap-2">
-              {monthMeta.cells.map((cell, idx) => {
-                if (!cell) {
-                  return <div key={`empty-${idx}`} className="h-10 rounded-lg bg-slate-100/50" />;
-                }
-                const key = getDateKey(cell);
-                const status = recordByDate.get(key);
-                return (
-                  <div key={key} className={`flex h-10 items-center justify-center rounded-lg text-[14px] font-semibold ${dayCellClass(status)}`}>
-                    {cell.getDate()}
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="mt-4 flex flex-wrap gap-4 text-sm">
-              <span className="inline-flex items-center gap-2 text-slate-700"><span className="inline-block h-3 w-3 rounded-full bg-green-400" />Present</span>
-              <span className="inline-flex items-center gap-2 text-slate-700"><span className="inline-block h-3 w-3 rounded-full bg-red-400" />Absent</span>
-              <span className="inline-flex items-center gap-2 text-slate-700"><span className="inline-block h-3 w-3 rounded-full bg-amber-300" />Late</span>
-              <span className="inline-flex items-center gap-2 text-slate-700"><span className="inline-block h-3 w-3 rounded-full bg-slate-300" />No Entry</span>
-            </div>
-          </div>
-
-          <div className="overflow-hidden rounded-2xl bg-white" style={cardShadow}>
-            <table className="w-full text-[15px]">
-              <thead className="border-b bg-slate-50">
-                <tr>
-                  <th className="px-5 py-3.5 text-left text-[14px] font-semibold text-slate-700">Subject</th>
-                  <th className="px-5 py-3.5 text-left text-[14px] font-semibold text-slate-700">Total Classes</th>
-                  <th className="px-5 py-3.5 text-left text-[14px] font-semibold text-slate-700">Attended</th>
-                  <th className="px-5 py-3.5 text-left text-[14px] font-semibold text-slate-700">Attendance %</th>
-                  <th className="px-5 py-3.5 text-left text-[14px] font-semibold text-slate-700">Details</th>
-                </tr>
-              </thead>
-              <tbody>
-                {subjectStats.map((row) => (
-                  <tr key={row.subject} className="border-b hover:bg-slate-50">
-                    <td className="px-5 py-3.5 text-slate-800">{row.subject}</td>
-                    <td className="px-5 py-3.5 text-slate-700">{row.total}</td>
-                    <td className="px-5 py-3.5 text-slate-700">{row.attended}</td>
-                    <td className="px-5 py-3.5 text-slate-700">{row.percent}%</td>
-                    <td className="px-5 py-3.5">
-                      <span className="text-blue-700">View Subject Calendar</span>
-                    </td>
-                  </tr>
+              <div className="grid grid-cols-7 gap-1 text-center mb-2">
+                {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((d) => (
+                  <div key={d} className="text-[10px] font-black uppercase text-gray-400 py-1">{d}</div>
                 ))}
-                {!subjectStats.length && (
-                  <tr>
-                    <td colSpan={5} className="px-5 py-8 text-center text-slate-500">No attendance records in this range.</td>
-                  </tr>
+              </div>
+
+              <div className="grid grid-cols-7 gap-1 flex-1">
+                {monthMeta.cells.map((cell, idx) => {
+                  if (!cell) {
+                    return <div key={`empty-${idx}`} className="aspect-square rounded-lg bg-transparent" />;
+                  }
+                  const key = getDateKey(cell);
+                  const status = recordByDate.get(key);
+                  return (
+                    <div key={key} className={`aspect-square flex items-center justify-center rounded-lg text-xs transition-all ${dayCellClass(status)}`}>
+                      {cell.getDate()}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-6 grid grid-cols-2 gap-2 text-xs">
+                <div className="flex items-center gap-2 text-gray-600"><span className="w-3 h-3 rounded-full bg-green-100 border border-green-200"></span> Present</div>
+                <div className="flex items-center gap-2 text-gray-600"><span className="w-3 h-3 rounded-full bg-red-100 border border-red-200"></span> Absent</div>
+                <div className="flex items-center gap-2 text-gray-600"><span className="w-3 h-3 rounded-full bg-amber-100 border border-amber-200"></span> Late</div>
+                <div className="flex items-center gap-2 text-gray-600"><span className="w-3 h-3 rounded-full bg-white border border-gray-200"></span> None</div>
+              </div>
+            </div>
+
+            {/* Subject Stats */}
+            <div className="card lg:col-span-2 shadow-sm border border-gray-100">
+              <h3 className="card-title mb-6 flex items-center gap-2">
+                <Activity size={18} className="text-gray-400" />
+                Subject-wise Attendance
+              </h3>
+              
+              <div className="h-[200px] w-full mb-6">
+                {subjectStats.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={subjectStats} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                      <XAxis dataKey="subject" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#888' }} />
+                      <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#888' }} domain={[0, 100]} />
+                      <Tooltip 
+                        cursor={{ fill: '#f8fafc' }}
+                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        formatter={(value) => [`${value}%`, 'Attendance']}
+                      />
+                      <Bar dataKey="percentNum" name="Attendance %" radius={[4, 4, 0, 0]} barSize={32}>
+                        {subjectStats.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.percentNum >= 75 ? '#10b981' : '#f43f5e'} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex h-full items-center justify-center border-2 border-dashed border-gray-100 rounded-xl">
+                    <p className="text-gray-400 text-sm">No subject data available.</p>
+                  </div>
                 )}
-              </tbody>
-            </table>
+              </div>
+
+              <div className="overflow-x-auto rounded-xl border border-gray-100">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 text-gray-500 text-[10px] uppercase tracking-widest font-black">
+                    <tr>
+                      <th className="px-4 py-3 text-left">Subject</th>
+                      <th className="px-4 py-3 text-center">Total</th>
+                      <th className="px-4 py-3 text-center">Attended</th>
+                      <th className="px-4 py-3 text-right">Percentage</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {subjectStats.map((row) => (
+                      <tr key={row.subject} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="px-4 py-3 font-bold text-gray-800">{row.subject}</td>
+                        <td className="px-4 py-3 text-center text-gray-600">{row.total}</td>
+                        <td className="px-4 py-3 text-center text-gray-600">{row.attended}</td>
+                        <td className="px-4 py-3 text-right">
+                          <span className={`font-bold ${row.percentNum >= 75 ? 'text-green-600' : 'text-red-600'}`}>
+                            {row.percent}%
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                    {!subjectStats.length && (
+                      <tr>
+                        <td colSpan={4} className="px-4 py-8 text-center text-gray-400">No detailed records found.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </>
       )}
 
       {!loading && !data && (
-        <div className="rounded-2xl bg-white p-10 text-center" style={cardShadow}>
-          <p className="text-sm text-slate-600">Choose a date range and click Get Report.</p>
+        <div className="card text-center p-12 border border-dashed border-gray-200 bg-gray-50/50 shadow-sm">
+          <Calendar size={48} className="mx-auto text-gray-300 mb-4" />
+          <p className="text-gray-500">Select a date range and click Get Report to view your attendance.</p>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

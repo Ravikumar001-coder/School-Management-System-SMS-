@@ -20,6 +20,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
+import java.io.IOException;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
 
 @Slf4j
 @Service
@@ -38,6 +43,7 @@ public class StudentService {
     private final BranchRepository branchRepository;
     private final ParentRepository parentRepository;
     private final ParentStudentLinkRepository parentStudentLinkRepository;
+    private final ExcelExportService excelExportService;
 
     @Transactional
     public StudentResponse createStudent(StudentRequest request) {
@@ -181,6 +187,88 @@ public class StudentService {
 
     public Page<StudentResponse> getStudentsFiltered(String keyword, Long classId, Pageable pageable) {
         return studentRepository.findFiltered(keyword, classId, pageable).map(this::mapToResponse);
+    }
+
+    public Long countStudentsFiltered(Long classId, String section, String statusStr) {
+        StudentStatus status = null;
+        if (statusStr != null && !statusStr.isBlank()) {
+            try {
+                status = StudentStatus.valueOf(statusStr.toUpperCase());
+            } catch (Exception e) {
+                // Ignore invalid status
+            }
+        }
+        return studentRepository.countFiltered(classId, section, status);
+    }
+
+    @Transactional
+    public void performBulkAction(String action, List<Long> studentIds) {
+        List<Student> students = studentRepository.findAllById(studentIds);
+        for (Student s : students) {
+            if ("ACTIVATE".equalsIgnoreCase(action)) {
+                s.setStatus(StudentStatus.ACTIVE);
+                s.setDeletedAt(null);
+            } else if ("DEACTIVATE".equalsIgnoreCase(action)) {
+                s.setStatus(StudentStatus.INACTIVE);
+            } else if ("DELETE".equalsIgnoreCase(action)) {
+                s.softDelete("ADMIN");
+            }
+        }
+        studentRepository.saveAll(students);
+    }
+
+    public void sendBulkSms(List<Long> studentIds, String message) {
+        List<Student> students = studentRepository.findAllById(studentIds);
+        for (Student s : students) {
+            String parentPhone = s.getParentPhone();
+            if (parentPhone == null && s.getParentLinks() != null && !s.getParentLinks().isEmpty()) {
+                parentPhone = s.getParentLinks().get(0).getParent().getPhone();
+            }
+            if (parentPhone != null && !parentPhone.isBlank()) {
+                log.info("[SMS MOCK] Sending SMS to {} (Parent of {} {}): {}", 
+                    parentPhone, s.getFirstName(), s.getLastName(), message);
+            }
+        }
+    }
+
+    public byte[] exportStudents(Long classId, String section, String format) throws IOException {
+        // Fetch filtered students for export. Currently ignoring pagination for full export.
+        // We'll use getStudentsFiltered with a large page size for simplicity.
+        org.springframework.data.domain.PageRequest pr = org.springframework.data.domain.PageRequest.of(0, 10000);
+        List<StudentResponse> students = studentRepository.findFiltered("", classId, pr).stream()
+                .filter(s -> section == null || section.isBlank() || section.equals(s.getClassRoom() != null ? s.getClassRoom().getSection() : ""))
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+
+        List<String> headers = List.of("Student ID", "First Name", "Last Name", "Email", "Phone", "Status");
+        
+        List<Map<String, Object>> data = students.stream().map(s -> {
+            Map<String, Object> row = new HashMap<>();
+            row.put("Student ID", s.getStudentId() != null ? s.getStudentId() : "");
+            row.put("First Name", s.getFirstName() != null ? s.getFirstName() : "");
+            row.put("Last Name", s.getLastName() != null ? s.getLastName() : "");
+            row.put("Email", s.getEmail() != null ? s.getEmail() : "");
+            row.put("Phone", s.getPhone() != null ? s.getPhone() : "");
+            row.put("Status", s.getStatus() != null ? s.getStatus() : "");
+            return row;
+        }).collect(Collectors.toList());
+
+        if ("csv".equalsIgnoreCase(format)) {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            PrintWriter writer = new PrintWriter(out);
+            writer.println(String.join(",", headers));
+            for (Map<String, Object> row : data) {
+                writer.println(headers.stream()
+                        .map(h -> String.valueOf(row.getOrDefault(h, "")))
+                        .map(val -> "\"" + val.replace("\"", "\"\"") + "\"")
+                        .collect(Collectors.joining(",")));
+            }
+            writer.flush();
+            return out.toByteArray();
+        } else {
+            // Default to excel
+            return excelExportService.exportToExcel("Students", headers, data);
+        }
     }
 
     public List<StudentResponse> searchStudents(String keyword) {

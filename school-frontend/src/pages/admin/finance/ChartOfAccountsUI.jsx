@@ -66,15 +66,15 @@ const ChartOfAccountsUI = () => {
     ];
 
     return (
-        <div className="p-6">
+        <div className="bg-gray-50 min-h-screen p-6 animate-fade-in">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Chart of Accounts</h1>
-                <Button type="primary" icon={<Plus size={16} />} onClick={() => { form.resetFields(); setIsModalVisible(true); }}>
-                    New Account
-                </Button>
+                <button className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all flex items-center gap-2 hover:bg-[#1E3A8A]" onClick={() => { form.resetFields(); setIsModalVisible(true); }}>
+                    <Plus size={16} /> New Account
+                </button>
             </div>
             
-            <Card>
+            <Card className="rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
                 <Table 
                     columns={columns} 
                     dataSource={accounts} 

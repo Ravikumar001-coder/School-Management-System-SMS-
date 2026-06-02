@@ -84,7 +84,7 @@ const AuditLogListPage = () => {
         title="Audit Logs"
         subtitle="Operational traceability and system forensics"
         actions={
-          <button onClick={handleExport} className="flex items-center gap-2 border border-slate-200 bg-white hover:bg-slate-50 px-4 py-2 rounded-xl text-sm font-medium transition-all shadow-sm">
+          <button onClick={handleExport} className="flex items-center gap-2 bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-6 py-3 rounded-[16px] text-sm font-bold shadow-md min-h-[44px] transition-all">
             <Download size={16} /> Export Logs
           </button>
         }
@@ -120,7 +120,7 @@ const AuditLogListPage = () => {
       </div>
 
       {/* Logs Table */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+      <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] overflow-hidden">
         {loading ? (
           <div className="py-20"><LoadingSpinner /></div>
         ) : (

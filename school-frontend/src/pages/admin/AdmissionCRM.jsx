@@ -111,7 +111,7 @@ const AdmissionCRM = () => {
           <button
             id="btn-add-lead"
             onClick={openAdd}
-            className="btn-primary flex items-center gap-2"
+            className="bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-6 py-3 rounded-[16px] font-bold shadow-md min-h-[44px] flex items-center gap-2"
           >
             <FiPlus /> New Lead
           </button>
@@ -124,7 +124,7 @@ const AdmissionCRM = () => {
           const style = STATUS_STYLES[status];
           const stageLeads = leads.filter(l => l.status === status);
           return (
-            <div key={status} className={`flex-shrink-0 w-72 rounded-xl border ${style.border} ${style.bg} p-4`}>
+            <div key={status} className={`flex-shrink-0 w-72 rounded-[16px] border ${style.border} ${style.bg} p-4`}>
               {/* Column header */}
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-black uppercase tracking-widest text-gray-600">
@@ -141,7 +141,7 @@ const AdmissionCRM = () => {
                   <p className="text-xs text-gray-400 text-center py-6 italic">No leads here</p>
                 )}
                 {stageLeads.map(lead => (
-                  <div key={lead.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 group hover:shadow-md transition-shadow">
+                  <div key={lead.id} className="bg-white rounded-[16px] p-4 border border-[#f1f5f9] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] group hover:-translate-y-1 hover:shadow-lg transition-all">
                     <div className="flex items-start justify-between mb-2">
                       <div>
                         <h4 className="text-sm font-bold text-gray-800">{lead.studentName}</h4>
@@ -189,7 +189,7 @@ const AdmissionCRM = () => {
       {/* Add / Edit Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 animate-fade-in">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] w-full max-w-md mx-4 p-6 animate-fade-in">
             <h2 className="text-lg font-black text-gray-800 mb-4">
               {editLead ? 'Edit Lead' : 'Add New Lead'}
             </h2>
@@ -218,7 +218,7 @@ const AdmissionCRM = () => {
               </div>
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={() => setModalOpen(false)} className="btn-secondary flex-1">Cancel</button>
-                <button type="submit" disabled={saving} className="btn-primary flex-1">
+                <button type="submit" disabled={saving} className="bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-6 py-3 rounded-[16px] font-bold shadow-md flex-1">
                   {saving ? 'Saving...' : editLead ? 'Update Lead' : 'Add Lead'}
                 </button>
               </div>

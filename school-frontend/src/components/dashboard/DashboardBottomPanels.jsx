@@ -9,7 +9,7 @@ const DashboardBottomPanels = ({ upcomingDeadlines = [], recentActivity = [], lo
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       
       {/* Deadlines */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col">
+      <div className="bg-white rounded-[16px] border border-[#f1f5f9] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] p-6 flex flex-col">
         <h3 className="text-sm font-black text-slate-800 mb-4">Upcoming Deadlines</h3>
         <div className="flex-1 relative">
           {loading ? (
@@ -46,7 +46,7 @@ const DashboardBottomPanels = ({ upcomingDeadlines = [], recentActivity = [], lo
       </div>
 
       {/* System Activity */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col">
+      <div className="bg-white rounded-[16px] border border-[#f1f5f9] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] p-6 flex flex-col">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-sm font-black text-slate-800">System Activity</h3>
           <button 
@@ -90,7 +90,7 @@ const DashboardBottomPanels = ({ upcomingDeadlines = [], recentActivity = [], lo
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col">
+      <div className="bg-white rounded-[16px] border border-[#f1f5f9] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] p-6 flex flex-col">
         <h3 className="text-sm font-black text-slate-800 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-2 gap-4 flex-1">
           {[

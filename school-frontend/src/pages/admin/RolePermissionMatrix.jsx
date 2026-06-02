@@ -141,7 +141,7 @@ const RolePermissionMatrix = () => {
         }
       />
 
-      <div className="card !p-0 overflow-hidden mb-8 animate-fade-in">
+      <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] !p-0 overflow-hidden mb-8 animate-fade-in">
         <div className="overflow-x-auto scrollbar-thin">
           <table className="w-full border-collapse">
             <thead className="sticky top-0 bg-gray-50 z-10 border-b border-gray-100">
@@ -238,7 +238,7 @@ const RolePermissionMatrix = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in pb-12">
         {roles.filter(r => r.name !== 'SUPERADMIN').map(role => (
-          <div key={role.id} className="card !p-5 flex flex-col justify-between hover:shadow-card-hover transition-all group">
+          <div key={role.id} className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] !p-5 flex flex-col justify-between hover:shadow-lg transition-all group">
             <div className="mb-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-black text-gray-800 text-sm uppercase tracking-tight">{role.name}</h3>
@@ -252,7 +252,7 @@ const RolePermissionMatrix = () => {
               loading={savingId === role.id}
               disabled={!isSuperAdmin() && hasSensitivePerms(role)}
               onClick={() => handleSave(role.id)}
-              className="w-full !py-2.5 !text-[10px] !uppercase !tracking-widest"
+              className="w-full !py-2.5 !text-[10px] !uppercase !tracking-widest bg-[#1E40AF] text-white rounded-[16px] hover:bg-[#1E3A8A] font-bold min-h-[44px] shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
               icon={FiSave}
             >
               Sync Rules

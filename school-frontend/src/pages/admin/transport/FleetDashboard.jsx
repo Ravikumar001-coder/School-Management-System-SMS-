@@ -84,7 +84,7 @@ export default function FleetDashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-24">
+    <div className="bg-gray-50 min-h-screen p-6 animate-fade-in pb-24">
       {/* Sticky Header Blueprint */}
       <div className="sticky top-0 bg-white/95 backdrop-blur z-20 border-b border-slate-200 px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center max-w-7xl mx-auto">
@@ -106,7 +106,7 @@ export default function FleetDashboard() {
         
         {/* KPI Strip */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 relative overflow-hidden group">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-5 relative overflow-hidden group">
             <div className="absolute -right-4 -bottom-4 opacity-5 transform group-hover:scale-110 transition-transform duration-300">
               <Truck className="w-24 h-24" />
             </div>
@@ -114,7 +114,7 @@ export default function FleetDashboard() {
             <h3 className="text-3xl font-bold text-slate-900">{loading ? '-' : stats.totalVehicles}</h3>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 relative overflow-hidden group">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-5 relative overflow-hidden group">
             <div className="absolute -right-4 -bottom-4 opacity-5 transform group-hover:scale-110 transition-transform duration-300 text-emerald-600">
               <Activity className="w-24 h-24" />
             </div>
@@ -122,7 +122,7 @@ export default function FleetDashboard() {
             <h3 className="text-3xl font-bold text-emerald-600">{loading ? '-' : stats.activeVehicles}</h3>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 relative overflow-hidden group">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-5 relative overflow-hidden group">
             <div className="absolute -right-4 -bottom-4 opacity-5 transform group-hover:scale-110 transition-transform duration-300 text-blue-600">
               <Navigation className="w-24 h-24" />
             </div>
@@ -130,7 +130,7 @@ export default function FleetDashboard() {
             <h3 className="text-3xl font-bold text-blue-600">{loading ? '-' : stats.totalRoutes}</h3>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 relative overflow-hidden group">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-5 relative overflow-hidden group">
             <div className="absolute -right-4 -bottom-4 opacity-5 transform group-hover:scale-110 transition-transform duration-300">
               <Users className="w-24 h-24" />
             </div>
@@ -149,7 +149,7 @@ export default function FleetDashboard() {
               <h3 className="text-[15px] font-bold text-slate-900">Active Fleet Monitor</h3>
             </div>
             
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-1">
+            <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-1">
               <div className="space-y-1">
                 {loading && vehicles.length === 0 ? (
                   <div className="p-5 space-y-3">

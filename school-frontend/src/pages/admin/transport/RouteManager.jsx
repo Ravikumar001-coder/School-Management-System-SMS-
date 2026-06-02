@@ -206,7 +206,7 @@ export default function RouteManager() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-24">
+    <div className="bg-gray-50 min-h-screen p-6 animate-fade-in pb-24">
       {/* Sticky Top Toolbar Blueprint */}
       <div className="sticky top-0 bg-white/95 backdrop-blur z-20 border-b border-slate-200 px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex flex-wrap gap-4 items-center justify-between max-w-7xl mx-auto">
@@ -224,7 +224,7 @@ export default function RouteManager() {
             </button>
             <button 
               onClick={() => openModal()}
-              className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-6 h-[52px] rounded-xl hover:bg-blue-700 transition-colors shadow-sm font-semibold text-[15px]"
+              className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all flex items-center gap-2 hover:bg-[#1E3A8A]"
             >
               <Plus className="h-5 w-5" />
               <span className="hidden sm:inline">Create New Route</span>
@@ -266,20 +266,20 @@ export default function RouteManager() {
           </div>
         ) : routes.length === 0 ? (
           /* Standard Empty State Blueprint */
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-12 text-center mt-6">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-12 text-center mt-6">
             <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <Map className="h-8 w-8" />
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">No routes active</h3>
             <p className="text-slate-500 max-w-sm mx-auto mb-6">You haven't configured any transport routes yet. Set up your first route to start tracking.</p>
-            <button onClick={() => openModal()} className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-6 h-[52px] rounded-xl hover:bg-blue-700 font-semibold shadow-sm">
+            <button onClick={() => openModal()} className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all flex items-center gap-2 hover:bg-[#1E3A8A] mx-auto mt-4">
               <Plus className="h-5 w-5" /> Create Your First Route
             </button>
           </div>
         ) : (
           <div className="space-y-4">
             {routes.map((route) => (
-              <div key={route.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:border-blue-300 transition-colors group relative">
+              <div key={route.id} className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-5 hover:border-blue-300 transition-colors group relative">
                 <div className="flex flex-col sm:flex-row justify-between gap-4">
                   {/* Left Column */}
                   <div className="flex-1">

@@ -74,7 +74,7 @@ const NoticesPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
         {/* Publisher */}
         <div className="lg:col-span-1">
-          <form onSubmit={handleAdd} className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8 space-y-6">
+          <form onSubmit={handleAdd} className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8 space-y-6">
             <h3 className="text-xl font-bold text-slate-800 flex items-center gap-3">
               <Megaphone size={24} className="text-indigo-500" /> Draft Notice
             </h3>
@@ -123,7 +123,7 @@ const NoticesPage = () => {
               </FormField>
             </div>
 
-            <Button type="submit" loading={saving} fullWidth variant="primary" className="h-12 rounded-2xl">
+            <Button type="submit" loading={saving} fullWidth className="min-h-[44px] rounded-[16px] bg-[#1E40AF] text-white hover:bg-[#1E3A8A] font-bold shadow-md">
               Broadcast Notice
             </Button>
           </form>
@@ -146,7 +146,7 @@ const NoticesPage = () => {
           ) : (
             <div className="space-y-4">
               {notices.map(notice => (
-                <div key={notice.id} className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 group hover:shadow-md transition-all">
+                <div key={notice.id} className="bg-white rounded-[16px] p-6 shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] group hover:-translate-y-1 transition-all">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">

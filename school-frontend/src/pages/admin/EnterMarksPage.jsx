@@ -183,7 +183,7 @@ const EnterMarksPage = () => {
         subtitle={isTeacher ? "Home > Teacher > Exams > Enter Marks" : "Home > Academic > Exams > Enter Marks"} 
       />
 
-      <div className="bg-white rounded-[2rem] shadow-sm border border-slate-50 overflow-hidden mt-6">
+      <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] overflow-hidden mt-6">
         <div className="p-6 border-b bg-slate-50/50 flex flex-col lg:flex-row gap-6 lg:items-end lg:justify-between">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full lg:max-w-2xl">
             <div className="space-y-1.5">
@@ -221,7 +221,7 @@ const EnterMarksPage = () => {
             <button
               onClick={handleSubmit}
               disabled={saving}
-              className="bg-slate-900 text-white px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-800 disabled:opacity-50 shadow-lg shadow-slate-200 active:scale-95 transition-all"
+              className="bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-6 py-3 rounded-[16px] text-xs font-black uppercase tracking-widest shadow-md min-h-[44px] transition-all disabled:opacity-50 active:scale-95"
             >
               {saving ? 'Saving...' : 'Publish Marks'}
             </button>

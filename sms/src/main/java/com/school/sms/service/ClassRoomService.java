@@ -90,6 +90,10 @@ public class ClassRoomService {
         return mapToResponse(c);
     }
 
+    public List<String> getSectionsByClassName(String className) {
+        return classRoomRepository.findDistinctSectionsByClassName(className);
+    }
+
     @Transactional
     public ClassRoomResponse updateClassRoom(
             Long id, ClassRoomRequest request) {

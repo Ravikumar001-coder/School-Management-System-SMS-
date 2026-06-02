@@ -14,9 +14,9 @@ import { fileApi } from '../../api/fileApi';
 
 const StatusBadge = ({ status }) => {
   const styles = {
-    ACTIVE:   'bg-emerald-50 text-emerald-700 border-emerald-200',
-    INACTIVE: 'bg-rose-50    text-rose-700    border-rose-200',
-    ON_LEAVE: 'bg-amber-50   text-amber-700   border-amber-200',
+    ACTIVE:   'bg-[#15803D]/10 text-[#166534] border-[#15803D]/20',
+    INACTIVE: 'bg-[#B91C1C]/10 text-[#991B1B] border-[#B91C1C]/20',
+    ON_LEAVE: 'bg-[#B45309]/10 text-[#92400E] border-[#B45309]/20',
   };
   return (
     <span className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border ${styles[status] || styles.ACTIVE}`}>
@@ -168,7 +168,7 @@ const TeachersListPage = () => {
         subtitle={`${totalElements} teaching staff members`}
         actions={
           <button onClick={() => navigate('/admin/teachers/new')}
-            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition-all shadow-sm">
+            className="flex items-center gap-2 bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-6 py-3 rounded-[16px] font-bold text-sm transition-all shadow-md min-h-[44px]">
             <Plus size={16} /> Hire Teacher
           </button>
         }
@@ -194,7 +194,7 @@ const TeachersListPage = () => {
       )}
 
       {/* Toolbar */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 mb-5 flex flex-wrap gap-3 items-center">
+      <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-4 mb-5 flex flex-wrap gap-3 items-center">
         <div className="relative flex-1 min-w-[200px] group">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
           <input
@@ -253,7 +253,7 @@ const TeachersListPage = () => {
       </div>
 
       {/* Desktop Table */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hidden sm:block">
+      <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] overflow-hidden hidden sm:block">
         {loading ? (
           <div className="py-20 text-center"><LoadingSpinner /></div>
         ) : (
@@ -348,7 +348,7 @@ const TeachersListPage = () => {
       <div className="sm:hidden space-y-3">
         {loading && <div className="py-10 text-center"><LoadingSpinner /></div>}
         {!loading && teachers.map(t => (
-          <div key={t.id} className={`bg-white rounded-2xl border p-4 shadow-sm transition-all ${selected.has(t.id) ? 'border-indigo-400 bg-indigo-50/30' : 'border-slate-100'}`}>
+          <div key={t.id} className={`bg-white rounded-[16px] border p-5 shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] transition-all ${selected.has(t.id) ? 'border-[#1E40AF] bg-[#DBEAFE]/30' : 'border-[#f1f5f9]'}`}>
             <div className="flex items-start justify-between">
               <div className="flex gap-3 min-w-0">
                 <input type="checkbox" checked={selected.has(t.id)} onChange={() => toggleOne(t.id)} className="rounded border-slate-300 mt-1" />

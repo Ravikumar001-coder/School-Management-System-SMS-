@@ -152,7 +152,7 @@ const EditParentPage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
         <div className="lg:col-span-2 space-y-6">
-          <form id="parent-form" onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 space-y-8">
+          <form id="parent-form" onSubmit={handleSubmit} className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8 space-y-8">
             <section>
               <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
                 <ShieldCheck className="text-indigo-500" size={20} /> Identity & Contact
@@ -259,7 +259,7 @@ const EditParentPage = () => {
             </section>
 
             <div className="pt-6 border-t border-slate-50 flex justify-between items-center">
-              <Button type="submit" loading={loading} className="px-12 bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 rounded-2xl h-14 text-base font-bold">
+              <Button type="submit" loading={loading} className="px-8 bg-[#1E40AF] hover:bg-[#1E3A8A] text-white shadow-md rounded-[16px] h-[44px] min-h-[44px] text-sm font-bold">
                 Update Profile
               </Button>
               <button 

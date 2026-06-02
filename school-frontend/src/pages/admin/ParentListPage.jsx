@@ -52,20 +52,20 @@ const ParentListPage = () => {
         subtitle="Manage families and guardian access"
         actions={
           <button onClick={() => navigate('/admin/parents/new')}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition-all shadow-sm">
+            className="flex items-center gap-2 bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-6 py-3 rounded-[16px] font-bold text-sm transition-all shadow-md min-h-[44px]">
             <UserPlus size={16} /> Register Parent
           </button>
         }
       />
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 mb-6 flex gap-3 items-center">
+      <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-4 mb-6 flex gap-3 items-center">
         <div className="relative flex-1 group">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#1E40AF] transition-colors" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search by name or mobile..."
-            className="w-full border border-slate-200 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+            className="w-full border border-slate-200 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-[#1E40AF] focus:border-[#1E40AF] outline-none transition-all"
           />
         </div>
         <button className="flex items-center gap-2 border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 transition-all">
@@ -73,7 +73,7 @@ const ParentListPage = () => {
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+      <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] overflow-hidden">
         {loading ? (
           <div className="py-20"><LoadingSpinner /></div>
         ) : (
@@ -143,7 +143,7 @@ const ParentListPage = () => {
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border
-                        ${p.active ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-slate-50 text-slate-400 border-slate-100'}`}>
+                        ${p.active ? 'bg-[#15803D]/10 text-[#166534] border-[#15803D]/20' : 'bg-[#B91C1C]/10 text-[#991B1B] border-[#B91C1C]/20'}`}>
                         {p.active ? 'Active' : 'Inactive'}
                       </span>
                     </td>

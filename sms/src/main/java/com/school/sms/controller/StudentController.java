@@ -45,32 +45,62 @@ public class StudentController {
         return ResponseEntity.ok(ApiResponse.success("Students fetched", students));
     }
 
-    // Export Students to Excel
+    // GET student count
+    @GetMapping("/count")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'TEACHER')")
+    public ResponseEntity<ApiResponse<Long>> countStudents(
+            @RequestParam(required = false) Long classId,
+            @RequestParam(required = false) String section,
+            @RequestParam(required = false) String status
+    ) {
+        Long count = studentService.countStudentsFiltered(classId, section, status);
+        return ResponseEntity.ok(ApiResponse.success("Student count", count));
+    }
+
+    // POST bulk action
+    @PostMapping("/bulk-action")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    public ResponseEntity<ApiResponse<Object>> bulkAction(
+            @RequestBody Map<String, Object> requestBody
+    ) {
+        String action = (String) requestBody.get("action");
+        List<Integer> idInts = (List<Integer>) requestBody.get("studentIds");
+        List<Long> studentIds = idInts.stream().map(Integer::longValue).collect(Collectors.toList());
+        studentService.performBulkAction(action, studentIds);
+        return ResponseEntity.ok(ApiResponse.success("Bulk action '" + action + "' applied successfully"));
+    }
+
+    // POST bulk SMS
+    @PostMapping("/send-sms")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    public ResponseEntity<ApiResponse<Object>> sendSms(
+            @RequestBody Map<String, Object> requestBody
+    ) {
+        List<Integer> idInts = (List<Integer>) requestBody.get("studentIds");
+        List<Long> studentIds = idInts.stream().map(Integer::longValue).collect(Collectors.toList());
+        String message = (String) requestBody.get("message");
+        studentService.sendBulkSms(studentIds, message);
+        return ResponseEntity.ok(ApiResponse.success("Bulk SMS dispatched successfully"));
+    }
+
+    // Export Students
     @GetMapping("/export")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
-    public ResponseEntity<byte[]> exportStudents() {
+    public ResponseEntity<byte[]> exportStudents(
+            @RequestParam(required = false) Long classId,
+            @RequestParam(required = false) String section,
+            @RequestParam(required = false, defaultValue = "excel") String format
+    ) {
         try {
-            List<StudentResponse> students = studentService.getAllStudentsList();
-            List<String> headers = List.of("Student ID", "First Name", "Last Name", "Email", "Phone", "Status");
+            // Note: CsvExportService/PdfExportService to be wired in StudentService
+            byte[] fileBytes = studentService.exportStudents(classId, section, format);
             
-            List<Map<String, Object>> data = students.stream().map(s -> {
-                Map<String, Object> row = new HashMap<>();
-                row.put("Student ID", s.getStudentId() != null ? s.getStudentId() : "");
-                row.put("First Name", s.getFirstName() != null ? s.getFirstName() : "");
-                row.put("Last Name", s.getLastName() != null ? s.getLastName() : "");
-                row.put("Email", s.getEmail() != null ? s.getEmail() : "");
-                row.put("Phone", s.getPhone() != null ? s.getPhone() : "");
-                row.put("Status", s.getStatus() != null ? s.getStatus() : "");
-                return row;
-            }).collect(Collectors.toList());
-
-            byte[] excelBytes = excelExportService.exportToExcel("Students", headers, data);
-
             HttpHeaders headers_http = new HttpHeaders();
             headers_http.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers_http.setContentDisposition(ContentDisposition.attachment().filename("students_list.xlsx").build());
+            String extension = format.equalsIgnoreCase("csv") ? ".csv" : format.equalsIgnoreCase("pdf") ? ".pdf" : ".xlsx";
+            headers_http.setContentDisposition(ContentDisposition.attachment().filename("students_list" + extension).build());
 
-            return new ResponseEntity<>(excelBytes, headers_http, HttpStatus.OK);
+            return new ResponseEntity<>(fileBytes, headers_http, HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

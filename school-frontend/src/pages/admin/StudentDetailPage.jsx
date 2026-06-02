@@ -13,7 +13,7 @@ import { examApi } from '../../api/examApi';
 import { fileApi } from '../../api/fileApi';
 
 const InfoCard = ({ title, icon: Icon, children, colorCls = "text-indigo-600" }) => (
-  <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-full transition-all hover:shadow-md hover:border-slate-200/60 duration-300">
+  <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-6 h-full transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_15px_-3px_rgb(0,0,0,0.1),0_4px_6px_-4px_rgb(0,0,0,0.1)] duration-300">
     <div className="flex items-center gap-2 mb-6">
       <div className={`p-2 rounded-xl bg-slate-50 ${colorCls}`}>
         <Icon size={18} />
@@ -117,7 +117,7 @@ const StudentDetailPage = () => {
         <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate('/admin/students')}
-            className="p-2.5 rounded-xl border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 transition-all shadow-sm"
+            className="p-2.5 rounded-xl border border-slate-200 text-slate-400 hover:text-[#1E40AF] hover:border-[#1E40AF]/30 hover:bg-[#DBEAFE]/30 transition-all shadow-sm"
           >
             <ArrowLeft size={20} />
           </button>
@@ -136,13 +136,13 @@ const StudentDetailPage = () => {
         <div className="flex items-center gap-3">
           <button 
             onClick={() => navigate(`/admin/students/${id}/edit`)}
-            className="px-6 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 font-bold text-sm hover:border-indigo-200 hover:text-indigo-600 transition-all shadow-sm flex items-center gap-2"
+            className="px-6 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 font-bold text-sm hover:border-[#1E40AF]/30 hover:text-[#1E40AF] transition-all shadow-sm flex items-center gap-2"
           >
             <FileText size={16} /> Edit Profile
           </button>
           <button 
             onClick={() => navigate(`/admin/attendance`)}
-            className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-black text-sm hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 flex items-center gap-2"
+            className="px-6 py-2.5 rounded-xl bg-[#1E40AF] text-white font-black text-sm hover:bg-[#1E3A8A] transition-all shadow-md flex items-center gap-2"
           >
             <CheckCircle2 size={16} /> Manage Attendance
           </button>
@@ -150,23 +150,23 @@ const StudentDetailPage = () => {
       </div>
 
       {/* ── Top Horizontal Profile Persona Card ─────────────────────────── */}
-      <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 p-8 mb-6 flex flex-col lg:flex-row items-center gap-8">
+      <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8 mb-6 flex flex-col lg:flex-row items-center gap-8">
         <div className="relative group">
-          <div className="w-24 h-24 rounded-[2rem] bg-indigo-50 border-4 border-white shadow-lg overflow-hidden flex items-center justify-center ring-1 ring-slate-100 transition-transform group-hover:scale-105 duration-300">
+          <div className="w-24 h-24 rounded-[16px] bg-[#DBEAFE] border-4 border-white shadow-md overflow-hidden flex items-center justify-center ring-1 ring-slate-100 transition-transform group-hover:scale-105 duration-300">
             {student.profilePhoto ? (
               <img src={fileApi.toPublicUrl(student.profilePhoto)} alt="Avatar" className="w-full h-full object-cover" />
             ) : (
-              <span className="text-3xl font-black text-indigo-200">{student.firstName?.[0]}{student.lastName?.[0]}</span>
+              <span className="text-3xl font-black text-[#1E40AF]/50">{student.firstName?.[0]}{student.lastName?.[0]}</span>
             )}
           </div>
-          <div className="absolute -bottom-1 -right-1 bg-indigo-600 text-white p-1.5 rounded-xl shadow-lg border-2 border-white">
+          <div className="absolute -bottom-1 -right-1 bg-[#1E40AF] text-white p-1.5 rounded-xl shadow-lg border-2 border-white">
             <ShieldCheck size={12} />
           </div>
         </div>
 
         <div className="text-center lg:text-left space-y-1 flex-1">
           <h2 className="text-2xl font-black text-slate-800 tracking-tight">{student.firstName} {student.lastName}</h2>
-          <p className="text-indigo-600 font-bold text-sm">ID: {student.studentId} • Roll: {student.rollNumber || 'TBD'}</p>
+          <p className="text-[#1E40AF] font-bold text-sm">ID: {student.studentId} • Roll: {student.rollNumber || 'TBD'}</p>
           <div className="flex flex-wrap justify-center lg:justify-start gap-x-6 gap-y-2 text-xs text-slate-500 font-semibold pt-1">
             <span className="flex items-center gap-1.5"><Mail size={14} className="text-slate-400" /> {student.email || 'No email provided'}</span>
             <span className="flex items-center gap-1.5"><Phone size={14} className="text-slate-400" /> {student.phone || 'No phone provided'}</span>
@@ -180,7 +180,7 @@ const StudentDetailPage = () => {
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Attendance</span>
               <span className={`text-base font-black ${attendancePercent > 80 ? 'text-emerald-600' : 'text-amber-600'}`}>{attendancePercent}%</span>
             </div>
-            <div className="w-8 h-8 rounded-full border-4 border-indigo-50 border-t-indigo-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full border-4 border-[#DBEAFE] border-t-[#1E40AF] flex items-center justify-center">
               <span className="text-[8px] font-black text-slate-700">{attendancePercent}%</span>
             </div>
           </div>
@@ -262,8 +262,8 @@ const StudentDetailPage = () => {
         
         {/* Quick Stats & Performance */}
         <div className="space-y-6">
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex items-center gap-6">
-            <div className="w-16 h-16 rounded-full border-4 border-indigo-50 border-t-indigo-600 flex items-center justify-center flex-shrink-0 shadow-inner">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-6 flex items-center gap-6">
+            <div className="w-16 h-16 rounded-full border-4 border-[#DBEAFE] border-t-[#1E40AF] flex items-center justify-center flex-shrink-0 shadow-inner">
                <span className="text-sm font-black text-slate-800">{attendancePercent}%</span>
             </div>
             <div>
@@ -276,9 +276,9 @@ const StudentDetailPage = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex items-center justify-between group cursor-pointer hover:border-indigo-200 transition-all">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-6 flex items-center justify-between group cursor-pointer hover:border-[#1E40AF]/30 transition-all hover:-translate-y-0.5">
              <div className="flex items-center gap-4">
-               <div className="p-3 rounded-xl bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all border border-indigo-100/30">
+               <div className="p-3 rounded-xl bg-[#DBEAFE] text-[#1E40AF] group-hover:bg-[#1E40AF] group-hover:text-white transition-all border border-[#DBEAFE]">
                   <BookOpen size={20} />
                </div>
                <div>
@@ -286,14 +286,14 @@ const StudentDetailPage = () => {
                   <p className="text-slate-400 text-xs font-medium">Semester grade cards</p>
                </div>
              </div>
-             <ChevronRight size={18} className="text-slate-300 group-hover:text-indigo-600 transition-all" />
+             <ChevronRight size={18} className="text-slate-300 group-hover:text-[#1E40AF] transition-all" />
           </div>
         </div>
 
         {/* Address Card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col justify-between">
+        <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-6 flex flex-col justify-between">
           <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2 uppercase tracking-wider">
-            <MapPin size={16} className="text-indigo-600" /> Residential Address
+            <MapPin size={16} className="text-[#1E40AF]" /> Residential Address
           </h3>
           <p className="text-slate-600 font-semibold text-sm leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100 mt-4 flex-1">
              {student.address || "Permanent residential address not updated in records."}

@@ -88,19 +88,19 @@ const LeaveApprovalCenter = () => {
     { 
       title: 'Actions', 
       render: (_, record) => (
-         <div className="flex space-x-1">
-             <Button size="small" shape="circle" icon={<Check className="w-3 h-3 text-green-600" />} className="border-green-200 hover:bg-green-50" onClick={() => handleApprove(record.id)} />
-             <Button size="small" shape="circle" icon={<X className="w-3 h-3 text-red-600" />} className="border-red-200 hover:bg-red-50" onClick={() => handleReject(record.id)} />
+         <div className="flex gap-2">
+             <button onClick={() => handleApprove(record.id)} className="w-10 h-10 rounded-full border border-green-200 bg-white flex items-center justify-center hover:bg-green-50 transition-colors shadow-sm"><Check className="w-4 h-4 text-green-600" /></button>
+             <button onClick={() => handleReject(record.id)} className="w-10 h-10 rounded-full border border-red-200 bg-white flex items-center justify-center hover:bg-red-50 transition-colors shadow-sm"><X className="w-4 h-4 text-red-600" /></button>
          </div>
       ) 
     }
   ];
 
   return (
-    <div className="p-6 bg-[#f4f7fe] min-h-screen">
+    <div className="bg-gray-50 min-h-screen p-6 animate-fade-in">
       
       {/* Top Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6 bg-white p-5 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Leave Management Center</h1>
           <p className="text-sm text-gray-500">HRMS {'>'} Leave Management</p>
@@ -109,7 +109,7 @@ const LeaveApprovalCenter = () => {
 
       {/* Top Metric Cards */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <Card styles={{ body: { padding: '16px' } }} className="shadow-sm border border-blue-100 rounded-xl">
+        <Card styles={{ body: { padding: '16px' } }} className="rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
             <div className="flex justify-between">
                 <div>
                     <h3 className="text-2xl font-bold text-blue-600 text-center mb-1">{pendingRequests.length}</h3>
@@ -125,7 +125,7 @@ const LeaveApprovalCenter = () => {
         
         {/* Left Column: Calendar & Availability */}
         <div className="w-full xl:w-1/4 space-y-6">
-            <Card title="Department Availability" variant="borderless" className="shadow-sm rounded-xl" styles={{ header: { borderBottom: 0, paddingBottom: 0, fontWeight: 'bold' } }}>
+            <Card title="Department Availability" variant="borderless" className="rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]" styles={{ header: { borderBottom: 0, paddingBottom: 0, fontWeight: 'bold' } }}>
                 <div className="space-y-4 mt-4">
                     <div>
                         <div className="flex justify-between text-xs mb-1"><span>Science</span><span>70%</span></div>
@@ -137,7 +137,7 @@ const LeaveApprovalCenter = () => {
 
         {/* Center Column: Table */}
         <div className="w-full xl:w-3/4">
-            <Card title="Leave Requests" variant="borderless" className="shadow-sm rounded-xl h-full" styles={{ header: { borderBottom: 0, paddingBottom: 0, fontWeight: 'bold' } }}>
+            <Card title="Leave Requests" variant="borderless" className="rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] h-full" styles={{ header: { borderBottom: 0, paddingBottom: 0, fontWeight: 'bold' } }}>
                 <Tabs
                   defaultActiveKey="1"
                   className="mt-2"

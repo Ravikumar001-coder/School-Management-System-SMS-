@@ -208,7 +208,7 @@ const SubjectsPage = () => {
       <h1 className="text-4xl font-bold text-gray-900 mb-4">Subjects Page</h1>
 
 
-      <div className="bg-white rounded-xl shadow border border-gray-100 p-4 mb-4">
+      <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-4 mb-5">
         <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
           <div className="relative w-full md:w-[320px]">
             <input
@@ -233,7 +233,7 @@ const SubjectsPage = () => {
 
             <button
               onClick={openCreate}
-              className="bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-800"
+              className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] text-sm font-bold hover:bg-[#1E3A8A] shadow-md min-h-[44px]"
             >
               Add Subject
             </button>
@@ -241,7 +241,7 @@ const SubjectsPage = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] overflow-hidden">
         {loading ? (
           <div className="p-8 text-sm text-gray-500">Loading subjects...</div>
         ) : (

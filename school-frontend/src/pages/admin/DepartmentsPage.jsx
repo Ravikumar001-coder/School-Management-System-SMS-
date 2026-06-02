@@ -65,9 +65,9 @@ const DepartmentsPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
         {/* Add Form */}
         <div className="lg:col-span-1">
-          <form onSubmit={handleAdd} className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 space-y-4">
+          <form onSubmit={handleAdd} className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-6 space-y-4">
             <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <Plus size={20} className="text-blue-500" /> New Department
+              <Plus size={20} className="text-[#1E40AF]" /> New Department
             </h3>
             <FormField label="Department Name" required>
               <input 
@@ -86,7 +86,7 @@ const DepartmentsPage = () => {
 
         {/* List */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] overflow-hidden">
             <div className="p-6 border-b border-slate-50 flex items-center justify-between">
               <h3 className="font-bold text-slate-800">Existing Departments</h3>
               <span className="text-xs bg-slate-100 px-3 py-1 rounded-full text-slate-500 font-bold uppercase tracking-wider">
@@ -103,7 +103,7 @@ const DepartmentsPage = () => {
                 {departments.map(dept => (
                   <div key={dept.id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-xl bg-[#DBEAFE] text-[#1E40AF] flex items-center justify-center">
                         <Building2 size={20} />
                       </div>
                       <span className="font-semibold text-slate-700">{dept.name}</span>

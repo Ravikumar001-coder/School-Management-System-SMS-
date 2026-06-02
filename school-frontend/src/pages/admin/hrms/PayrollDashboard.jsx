@@ -80,10 +80,10 @@ const PayrollDashboard = () => {
   ];
 
   return (
-    <div className="p-6 bg-[#f4f7fe] min-h-screen">
+    <div className="bg-gray-50 min-h-screen p-6 animate-fade-in">
       
       {/* Top Header & Metrics */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6 bg-white p-5 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Payroll Dashboard</h1>
           <p className="text-sm text-gray-500">Payroll / Dashboard</p>
@@ -92,14 +92,14 @@ const PayrollDashboard = () => {
           <Select defaultValue="October 2024" className="w-40">
              <Option value="October 2024">October 2024</Option>
           </Select>
-          <Button type="primary" className="bg-indigo-600 flex items-center" onClick={handleRunPayroll} loading={loading}>
-            <CheckCircle className="w-4 h-4 mr-2" /> Run Payroll
-          </Button>
+          <button className="bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-6 py-3 rounded-[16px] min-h-[44px] text-sm font-bold shadow-md transition-all flex items-center gap-2" onClick={handleRunPayroll} disabled={loading}>
+            <CheckCircle className="w-4 h-4" /> Run Payroll
+          </button>
         </div>
       </div>
 
       {/* Top Metric Cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+      <div className="grid grid-cols-4 gap-4 mb-6 bg-white p-6 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
         <div className="border-r pr-4">
             <p className="text-xs text-gray-500 mb-1">Gross Payroll</p>
             <h3 className="text-xl font-bold text-gray-800">₹ {summary.gross.toLocaleString()}</h3>
@@ -123,11 +123,11 @@ const PayrollDashboard = () => {
         
         {/* Center Column: Table */}
         <div className="w-full lg:w-3/4">
-            <Card variant="borderless" className="shadow-sm rounded-xl h-full" styles={{ body: { padding: '20px' } }}>
+            <Card variant="borderless" className="rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] h-full" styles={{ body: { padding: '24px' } }}>
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-lg font-bold text-gray-800">Payroll Runs</h2>
                     <div className="flex space-x-2">
-                        <Button icon={<Download className="w-4 h-4 mr-1"/>} size="small" className="text-xs text-gray-600">Export Bank Sheet</Button>
+                        <button className="bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-[16px] min-h-[44px] font-bold text-sm shadow-sm transition-all flex items-center gap-2 hover:bg-slate-50"><Download className="w-4 h-4 mr-1"/> Export Bank Sheet</button>
                     </div>
                 </div>
 
@@ -145,7 +145,7 @@ const PayrollDashboard = () => {
 
         {/* Right Column: Summaries */}
         <div className="w-full lg:w-1/4 space-y-6">
-            <Card title="Quick Actions" variant="borderless" className="shadow-sm rounded-xl" styles={{ header: { borderBottom: 0, paddingBottom: 0, fontWeight: 'bold' } }}>
+            <Card title="Quick Actions" variant="borderless" className="rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]" styles={{ header: { borderBottom: 0, paddingBottom: 0, fontWeight: 'bold' } }}>
                 <div className="space-y-3 mt-4 text-sm">
                     <div className="flex items-center text-gray-600 cursor-pointer hover:text-blue-600">
                         <Lock className="w-4 h-4 mr-3" /> Lock Payroll

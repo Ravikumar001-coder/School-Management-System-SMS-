@@ -167,7 +167,7 @@ const JournalEntryForm = ({ visible, onClose, onSuccess }) => {
               </div>
             </div>
           ))}
-          <Button type="dashed" className="w-full mt-3" onClick={addLine} icon={<Plus size={16} />}>Add Line</Button>
+          <Button type="dashed" className="w-full mt-3 rounded-[16px] min-h-[44px]" onClick={addLine} icon={<Plus size={16} />}>Add Line</Button>
         </div>
         <Form.Item label="Narration" name="narration">
           <Input.TextArea rows={2} />
@@ -180,8 +180,8 @@ const JournalEntryForm = ({ visible, onClose, onSuccess }) => {
           </div>
         </div>
         <div className="text-right mt-6">
-          <Button onClick={onClose} className="mr-2">Cancel</Button>
-          <Button type="primary" htmlType="submit" loading={loading} icon={<Save size={16} />}>Save Voucher</Button>
+          <button type="button" className="px-6 py-3 min-h-[44px] rounded-[16px] bg-gray-100 text-gray-700 font-bold text-sm hover:bg-gray-200 transition-all mr-2" onClick={onClose}>Cancel</button>
+          <button type="submit" className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all hover:bg-[#1E3A8A] flex items-center gap-2" disabled={loading}><Save size={16} /> Save Voucher</button>
         </div>
       </Form>
     </Modal>

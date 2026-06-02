@@ -89,8 +89,8 @@ const StaffOnboardingWizard = () => {
   ];
 
   return (
-    <div className="p-6 bg-[#f4f7fe] min-h-screen">
-      <div className="flex justify-between items-center mb-6">
+    <div className="bg-gray-50 min-h-screen p-6 animate-fade-in">
+      <div className="flex justify-between items-center mb-6 bg-white p-5 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Staff Onboarding Center</h1>
           <p className="text-sm text-gray-500">HRMS {'>'} Onboarding</p>
@@ -102,7 +102,7 @@ const StaffOnboardingWizard = () => {
           <Card
             title="On-boarding Pipeline"
             variant="borderless"
-            className="shadow-sm rounded-xl"
+            className="rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]"
             styles={{ header: { borderBottom: 0, paddingBottom: 0, fontWeight: 'bold' } }}
           >
             <div className="space-y-1 mt-4">
@@ -115,7 +115,7 @@ const StaffOnboardingWizard = () => {
         </div>
 
         <div className="w-full lg:w-2/4">
-          <Card variant="borderless" className="shadow-sm rounded-xl h-full">
+          <Card variant="borderless" className="rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] h-full">
             <h2 className="text-lg font-bold text-gray-800 mb-6">Onboarding Progress</h2>
             
             <Steps current={current} size="small" className="mb-8" type="inline" items={stepItems} />
@@ -204,7 +204,9 @@ const StaffOnboardingWizard = () => {
                 <Divider />
                 
                 <div className="flex justify-end space-x-3">
-                  <Button type="primary" className="bg-blue-600" onClick={() => form.submit()} loading={loading}>Submit for API</Button>
+                  <button type="button" onClick={() => form.submit()} disabled={loading} className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 hover:bg-[#1E3A8A]">
+                    {loading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div> : null} Submit for API
+                  </button>
                 </div>
               </Form>
             )}
@@ -214,7 +216,7 @@ const StaffOnboardingWizard = () => {
                 <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
                 <h2 className="text-2xl font-bold text-gray-800">Onboarding Complete!</h2>
                 <p className="text-gray-500 mt-2">Employee Code: <strong>{onboardedStaff.employeeCode}</strong></p>
-                <Button type="primary" onClick={() => { setCurrent(0); form.resetFields(); setOnboardedStaff(null); }} className="mt-6 bg-blue-600">Onboard Another</Button>
+                <button onClick={() => { setCurrent(0); form.resetFields(); setOnboardedStaff(null); }} className="mt-6 mx-auto bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 hover:bg-[#1E3A8A]">Onboard Another</button>
               </div>
             )}
           </Card>
@@ -224,7 +226,7 @@ const StaffOnboardingWizard = () => {
           <Card
             title="Live Summary"
             variant="borderless"
-            className="shadow-sm rounded-xl text-center"
+            className="rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] text-center"
             styles={{ header: { borderBottom: 0, paddingBottom: 0, fontWeight: 'bold', textAlign: 'left' } }}
           >
             <div className="mt-4 flex flex-col items-center">

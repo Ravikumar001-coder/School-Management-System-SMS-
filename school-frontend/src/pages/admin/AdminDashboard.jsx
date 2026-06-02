@@ -64,18 +64,18 @@ const AdminDashboardContent = () => {
   }, [execute, isConnected]);
 
   const quickActionButtons = [
-    { label: 'Admit Student', icon: UserPlus, actionType: 'ADD_STUDENT', bg: 'bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100' },
-    { label: 'Add Staff', icon: User, actionType: 'ADD_STAFF', bg: 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100' },
-    { label: 'Add Teacher', icon: Shield, actionType: 'ADD_TEACHER', bg: 'bg-indigo-50 text-indigo-600 border-indigo-100 hover:bg-indigo-100' },
-    { label: 'Collect Fees', icon: Landmark, actionType: 'COLLECT_FEES', bg: 'bg-amber-50 text-amber-600 border-amber-100 hover:bg-amber-100' },
-    { label: 'Create Invoice', icon: FileText, actionType: 'CREATE_INVOICE', bg: 'bg-rose-50 text-rose-600 border-rose-100 hover:bg-rose-100' },
-    { label: 'Run Payroll', icon: Briefcase, actionType: 'RUN_PAYROLL', bg: 'bg-purple-50 text-purple-600 border-purple-100 hover:bg-purple-100' },
-    { label: 'Mark Attendance', icon: Users, actionType: 'MARK_ATTENDANCE', bg: 'bg-sky-50 text-sky-600 border-sky-100 hover:bg-sky-100' },
-    { label: 'Add Expense', icon: Landmark, actionType: 'ADD_EXPENSE', bg: 'bg-amber-50 text-amber-600 border-amber-100 hover:bg-amber-100' },
-    { label: 'Send Notice', icon: Megaphone, actionType: 'SEND_NOTICE', bg: 'bg-violet-50 text-violet-600 border-violet-100 hover:bg-violet-100' },
-    { label: 'Register Vehicle', icon: Truck, actionType: 'REGISTER_VEHICLE', bg: 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100' },
-    { label: 'Allocate Hostel', icon: Home, actionType: 'ALLOCATE_HOSTEL', bg: 'bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100' },
-    { label: 'Create Exam', icon: BookOpen, actionType: 'CREATE_EXAM', bg: 'bg-teal-50 text-teal-600 border-teal-100 hover:bg-teal-100' },
+    { label: 'Admit Student', icon: UserPlus, actionType: 'ADD_STUDENT' },
+    { label: 'Add Staff', icon: User, actionType: 'ADD_STAFF' },
+    { label: 'Add Teacher', icon: Shield, actionType: 'ADD_TEACHER' },
+    { label: 'Collect Fees', icon: Landmark, actionType: 'COLLECT_FEES' },
+    { label: 'Create Invoice', icon: FileText, actionType: 'CREATE_INVOICE' },
+    { label: 'Run Payroll', icon: Briefcase, actionType: 'RUN_PAYROLL' },
+    { label: 'Mark Attendance', icon: Users, actionType: 'MARK_ATTENDANCE' },
+    { label: 'Add Expense', icon: Landmark, actionType: 'ADD_EXPENSE' },
+    { label: 'Send Notice', icon: Megaphone, actionType: 'SEND_NOTICE' },
+    { label: 'Register Vehicle', icon: Truck, actionType: 'REGISTER_VEHICLE' },
+    { label: 'Allocate Hostel', icon: Home, actionType: 'ALLOCATE_HOSTEL' },
+    { label: 'Create Exam', icon: BookOpen, actionType: 'CREATE_EXAM' },
   ];
 
   return (
@@ -105,17 +105,17 @@ const AdminDashboardContent = () => {
       </ErrorBoundary>
 
       {/* QUICK ACTION CENTER */}
-      <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 mb-6">
-        <h3 className="text-xs font-black text-slate-800 mb-4 flex items-center gap-2">
-          <Sparkles size={16} className="text-indigo-600 animate-pulse" />
-          Enterprise Operational Quick Actions
+      <div className="bg-white p-5 rounded-[16px] border border-[#f1f5f9] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] mb-6">
+        <h3 className="text-[16px] font-semibold text-[#1E40AF] mb-4 flex items-center gap-2">
+          <Sparkles size={16} className="animate-pulse" />
+          Quick Actions
         </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-5">
           {quickActionButtons.map((btn, index) => (
             <button
               key={index}
               onClick={() => setActiveAction(btn.actionType)}
-              className={`flex items-center gap-3 p-3 rounded-xl border font-bold text-xs transition-all text-left ${btn.bg}`}
+              className={`flex items-center gap-3 p-3 rounded-[16px] bg-white border border-[#f1f5f9] text-[#1E40AF] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] hover:-translate-y-0.5 hover:shadow-[0_10px_15px_-3px_rgb(0,0,0,0.1),0_4px_6px_-4px_rgb(0,0,0,0.1)] transition-all text-left font-semibold text-[12px] min-h-[44px]`}
             >
               <btn.icon size={16} className="flex-shrink-0" />
               <span className="leading-tight">{btn.label}</span>
@@ -125,7 +125,7 @@ const AdminDashboardContent = () => {
       </div>
 
       {/* ROW 2: LIVE OPERATIONAL OVERVIEW */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 mb-6">
         <div className="lg:col-span-1">
           <ErrorBoundary>
              <InstitutionHealth healthScore={stats?.summary?.healthScore} loading={loading} />

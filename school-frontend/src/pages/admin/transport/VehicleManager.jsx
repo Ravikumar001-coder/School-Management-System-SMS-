@@ -118,7 +118,7 @@ export default function VehicleManager() {
 
         <form id="vehicleForm" onSubmit={handleSubmit} className="space-y-6">
           {/* SECTION 1: IDENTITY & DETAILS */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8">
             <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
               <Truck size={16} className="text-blue-600" /> Identity & Details
             </h3>
@@ -152,7 +152,7 @@ export default function VehicleManager() {
           </div>
 
           {/* SECTION 2: COMPLIANCE & STATUS */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8">
             <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
               <ShieldCheck size={16} className="text-blue-600" /> Compliance & Status
             </h3>
@@ -179,7 +179,7 @@ export default function VehicleManager() {
           </div>
 
           {/* ACTIONS */}
-          <div className="flex justify-end gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+          <div className="flex justify-end gap-4 bg-white p-6 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
             <button type="button" onClick={() => setIsModalOpen(false)} className="px-8 py-3 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all border border-slate-200">
               Cancel
             </button>
@@ -193,23 +193,23 @@ export default function VehicleManager() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="bg-gray-50 min-h-screen p-6 animate-fade-in"><div className="max-w-7xl mx-auto space-y-6">
       {/* Header Blueprint */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Fleet Management</h1>
           <p className="text-sm text-slate-500 mt-1">Manage vehicles, compliance documents, and statuses</p>
         </div>
         <button 
           onClick={() => handleOpenModal()}
-          className="h-[52px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-sm shadow-blue-600/20 flex items-center gap-2"
+          className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all flex items-center gap-2 hover:bg-[#1E3A8A]"
         >
           <Plus className="h-5 w-5" />
           Add New Vehicle
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+      <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] overflow-hidden">
         {/* Search Bar */}
         <div className="p-4 border-b border-slate-100 bg-slate-50/50">
           <div className="relative w-full sm:max-w-md">
@@ -258,7 +258,7 @@ export default function VehicleManager() {
             }
 
             return (
-              <div key={v.id} className="group relative bg-white border border-slate-200 rounded-2xl p-5 hover:border-blue-300 transition-all hover:shadow-md">
+              <div key={v.id} className="group relative bg-white border border-[#f1f5f9] rounded-[16px] p-5 shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] transition-all">
                 
                 {/* Edit Button - Absolute positioning */}
                 <button 
@@ -308,7 +308,7 @@ export default function VehicleManager() {
           })}
         </div>
       </div>
-
+    </div>
     </div>
   );
 }

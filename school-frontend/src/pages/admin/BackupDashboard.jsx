@@ -114,7 +114,7 @@ const BackupDashboard = () => {
                 </div>
                 <button
                     onClick={handleManualBackup}
-                    className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded shadow hover:bg-indigo-700 transition"
+                    className="flex items-center px-6 py-3 bg-[#1E40AF] hover:bg-[#1E3A8A] text-white rounded-[16px] font-bold shadow-md min-h-[44px] transition-all"
                 >
                     <FiDatabase className="mr-2" /> Run Manual Backup
                 </button>
@@ -122,7 +122,7 @@ const BackupDashboard = () => {
 
             {/* Top Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white p-6 rounded-lg shadow border-l-4 border-green-500">
+                <div className="bg-white p-6 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border-l-4 border-[#15803D]">
                     <div className="flex items-center">
                         <div className="p-3 rounded-full bg-green-100 text-green-500 mr-4">
                             <FiCheckCircle size={24} />
@@ -138,7 +138,7 @@ const BackupDashboard = () => {
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-lg shadow border-l-4 border-blue-500">
+                <div className="bg-white p-6 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border-l-4 border-[#1E40AF]">
                     <div className="flex items-center">
                         <div className="p-3 rounded-full bg-blue-100 text-blue-500 mr-4">
                             <FiDatabase size={24} />
@@ -150,7 +150,7 @@ const BackupDashboard = () => {
                     </div>
                 </div>
 
-                <div className="bg-red-50 p-6 rounded-lg shadow border border-red-200">
+                <div className="bg-[#B91C1C]/10 p-6 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#B91C1C]/20">
                     <div className="flex items-start">
                         <FiAlertTriangle className="text-red-500 mt-1 mr-3 flex-shrink-0" size={24} />
                         <div>
@@ -165,7 +165,7 @@ const BackupDashboard = () => {
             </div>
 
             {/* History Table */}
-            <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
                     <h3 className="text-lg font-bold text-gray-800">Backup History</h3>
                     <button onClick={fetchBackups} className="text-gray-500 hover:text-indigo-600">

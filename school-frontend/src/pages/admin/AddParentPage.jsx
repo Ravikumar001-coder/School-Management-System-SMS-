@@ -111,7 +111,7 @@ const AddParentPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
         {/* Left: Parent Info */}
         <div className="lg:col-span-2 space-y-6">
-          <form id="parent-form" onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 space-y-8">
+          <form id="parent-form" onSubmit={handleSubmit} className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8 space-y-8">
             <section>
               <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
                 <ShieldCheck className="text-indigo-500" size={20} /> Identity & Contact
@@ -227,7 +227,7 @@ const AddParentPage = () => {
             </section>
 
             <div className="pt-6 border-t border-slate-50 flex justify-between items-center">
-              <Button type="submit" loading={loading} className="px-12 bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 rounded-2xl h-14 text-base font-bold">
+              <Button type="submit" loading={loading} className="px-8 bg-[#1E40AF] hover:bg-[#1E3A8A] text-white shadow-md rounded-[16px] h-[44px] min-h-[44px] text-sm font-bold">
                 Finish Registration
               </Button>
               <button 
@@ -243,7 +243,7 @@ const AddParentPage = () => {
 
         {/* Right: Summary / Guidelines */}
         <div className="space-y-6">
-          <div className="bg-indigo-600 rounded-3xl p-8 text-white shadow-xl shadow-indigo-500/30">
+          <div className="bg-[#1E40AF] rounded-[16px] p-8 text-white shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#1E40AF]">
             <h4 className="text-xl font-black mb-4">Quick Guide</h4>
             <ul className="space-y-4">
               <li className="flex items-start gap-3 text-sm font-medium text-indigo-100">
@@ -261,7 +261,7 @@ const AddParentPage = () => {
             </ul>
           </div>
           
-          <div className="bg-slate-900 rounded-3xl p-8 text-white">
+          <div className="bg-slate-900 rounded-[16px] p-8 text-white shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-slate-800">
             <h4 className="text-sm uppercase tracking-widest font-black text-slate-500 mb-6">Security Check</h4>
             <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl">
               <div className="p-3 bg-emerald-500/20 rounded-xl text-emerald-400">

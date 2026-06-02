@@ -58,7 +58,7 @@ export default function RoomAllocation() {
         actions={
           <button
             onClick={() => setActiveModal('WIZARD')}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm"
+            className="bg-[#1E40AF] text-white px-6 py-2 rounded-[16px] min-h-[44px] font-bold text-sm shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] transition-all flex items-center justify-center gap-2 hover:bg-[#1E3A8A]"
           >
             <Plus size={18} /> New Allocation
           </button>
@@ -67,7 +67,7 @@ export default function RoomAllocation() {
 
       {/* Stats row for enterprise feel */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] flex items-center justify-between">
           <div>
             <p className="text-sm font-semibold text-slate-500">Active Allocations</p>
             <p className="text-2xl font-bold text-slate-800">{allocations.filter(a => a.status === 'ACTIVE').length}</p>
@@ -76,7 +76,7 @@ export default function RoomAllocation() {
             <BedDouble size={24} />
           </div>
         </div>
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] flex items-center justify-between">
           <div>
             <p className="text-sm font-semibold text-slate-500">Vacated</p>
             <p className="text-2xl font-bold text-slate-800">{allocations.filter(a => a.status === 'VACATED').length}</p>
@@ -85,7 +85,7 @@ export default function RoomAllocation() {
             <LogOut size={24} />
           </div>
         </div>
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] flex items-center justify-between">
           <div>
             <p className="text-sm font-semibold text-slate-500">Recent Transfers</p>
             <p className="text-2xl font-bold text-slate-800">{allocations.filter(a => a.status === 'TRANSFERRED' || a.transferReason).length}</p>
@@ -96,7 +96,7 @@ export default function RoomAllocation() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+      <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] overflow-hidden">
         {loading ? (
           <div className="py-20 text-center"><LoadingSpinner /></div>
         ) : allocations.length === 0 ? (
@@ -155,10 +155,10 @@ export default function RoomAllocation() {
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         {alloc.status === 'ACTIVE' && (
                           <>
-                            <button onClick={() => openTransfer(alloc)} className="flex items-center gap-1 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors">
+                            <button onClick={() => openTransfer(alloc)} className="flex items-center gap-1 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-[16px] transition-colors">
                               <RefreshCw size={12}/> Transfer
                             </button>
-                            <button onClick={() => openVacate(alloc)} className="flex items-center gap-1 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition-colors">
+                            <button onClick={() => openVacate(alloc)} className="flex items-center gap-1 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 px-4 py-2 rounded-[16px] transition-colors">
                               <LogOut size={12}/> Vacate
                             </button>
                           </>

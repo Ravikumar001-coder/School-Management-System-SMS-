@@ -115,6 +115,41 @@ public class AuthController {
         ));
     }
 
+    // ── POST /auth/forgot-password/request ────────────────────────────────────
+    @PostMapping("/forgot-password/request")
+    public ResponseEntity<?> requestPasswordReset(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        authService.requestPasswordReset(email);
+        return ResponseEntity.ok(Map.of("message", "Password reset code sent if email exists"));
+    }
+
+    // ── POST /auth/forgot-password/verify ─────────────────────────────────────
+    @PostMapping("/forgot-password/verify")
+    public ResponseEntity<?> verifyResetOtp(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        String otpCode = body.get("otpCode");
+        try {
+            authService.verifyResetOtp(email, otpCode);
+            return ResponseEntity.ok(Map.of("message", "OTP verified successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    // ── POST /auth/forgot-password/reset ──────────────────────────────────────
+    @PostMapping("/forgot-password/reset")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        String otpCode = body.get("otpCode");
+        String newPassword = body.get("newPassword");
+        try {
+            authService.resetPassword(email, otpCode, newPassword);
+            return ResponseEntity.ok(Map.of("message", "Password reset successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(Map.of("message", e.getMessage()));
+        }
+    }
+
     // ── Cookie helpers ────────────────────────────────────────────────────────
     private void setRefreshCookie(HttpServletResponse response, String rawToken) {
         String cookieHeader = String.format(

@@ -7,7 +7,7 @@ const OperationalBottomRow = ({ recentActivity = [], loading, onScheduleReportCl
   const [exporting, setExporting] = useState(null);
 
   if (loading) {
-     return <div className="h-64 bg-white rounded-2xl border border-slate-100 animate-pulse w-full mt-6" />;
+     return <div className="h-64 bg-white rounded-[16px] border border-[#f1f5f9] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] animate-pulse w-full mt-6" />;
   }
 
   const handleExport = async (format) => {
@@ -70,7 +70,7 @@ const OperationalBottomRow = ({ recentActivity = [], loading, onScheduleReportCl
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
        
        {/* Activity Feed */}
-       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col h-[300px]">
+       <div className="bg-white rounded-[16px] border border-[#f1f5f9] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] p-5 flex flex-col h-[300px]">
           <div className="flex justify-between items-center mb-4">
              <h3 className="text-xs font-black text-slate-800">Recent Activity Feed</h3>
              <span onClick={onViewAllActivityClick} className="text-[10px] font-bold text-blue-600 cursor-pointer hover:underline">View All</span>
@@ -89,7 +89,7 @@ const OperationalBottomRow = ({ recentActivity = [], loading, onScheduleReportCl
        </div>
 
        {/* Top Classes */}
-       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col h-[300px]">
+       <div className="bg-white rounded-[16px] border border-[#f1f5f9] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] p-5 flex flex-col h-[300px]">
           <div className="flex justify-between items-center mb-4">
              <h3 className="text-xs font-black text-slate-800">Top Performing Classes</h3>
              <span className="text-[10px] font-bold text-slate-500">Attendance</span>
@@ -109,7 +109,7 @@ const OperationalBottomRow = ({ recentActivity = [], loading, onScheduleReportCl
        </div>
 
        {/* Fee Collection Trend */}
-       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col h-[300px]">
+       <div className="bg-white rounded-[16px] border border-[#f1f5f9] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] p-5 flex flex-col h-[300px]">
           <div className="flex justify-between items-center mb-2">
              <h3 className="text-xs font-black text-slate-800">Fee Collection Trend</h3>
              <span className="text-[10px] font-bold text-slate-500">in Lakhs</span>
@@ -130,7 +130,7 @@ const OperationalBottomRow = ({ recentActivity = [], loading, onScheduleReportCl
        </div>
 
        {/* Smart Export Center */}
-       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col h-[300px] bg-gradient-to-br from-white to-slate-50">
+       <div className="bg-white rounded-[16px] border border-[#f1f5f9] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] p-5 flex flex-col h-[300px] bg-gradient-to-br from-white to-[#F8FAFC]">
           <div className="flex items-center gap-2 mb-1">
              <h3 className="text-xs font-black text-slate-800">Quick Export</h3>
           </div>

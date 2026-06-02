@@ -57,6 +57,13 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
            "LOWER(s.email) LIKE LOWER(CONCAT('%', :keyword, '%')))")
     Page<Student> findFiltered(String keyword, Long classId, Pageable pageable);
 
+    @Query("SELECT COUNT(s) FROM Student s LEFT JOIN s.classRoom c WHERE " +
+           "s.deletedAt IS NULL AND " +
+           "(:classId IS NULL OR c.id = :classId) AND " +
+           "(:section IS NULL OR TRIM(:section) = '' OR c.section = :section) AND " +
+           "(:status IS NULL OR s.status = :status)")
+    Long countFiltered(Long classId, String section, StudentStatus status);
+
     @Query("SELECT s FROM Student s WHERE s.deletedAt IS NULL")
     Page<Student> findAllActive(Pageable pageable);
 

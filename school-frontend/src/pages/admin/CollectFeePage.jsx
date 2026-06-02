@@ -273,7 +273,7 @@ const CollectFeePage = () => {
         title="Collect Fee"
         subtitle="Home > Academic > Collect Fee"
         action={
-          <button onClick={() => navigate('/admin/fees')} className="bg-blue-700 text-white px-5 py-2.5 rounded-lg hover:bg-blue-800 text-sm font-semibold">
+          <button onClick={() => navigate('/admin/fees')} className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] hover:bg-[#1E3A8A] text-sm font-bold shadow-md min-h-[44px]">
             Back to Fees Page
           </button>
         }
@@ -281,7 +281,7 @@ const CollectFeePage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         <div className="lg:col-span-3 space-y-4">
-          <div className="bg-white rounded-xl shadow border border-gray-100 p-4">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-4">
             <h3 className="text-3xl font-semibold text-gray-900 mb-3">Student Search</h3>
             <div className="flex gap-2 mb-3">
               <input
@@ -336,7 +336,7 @@ const CollectFeePage = () => {
             )}
           </div>
 
-          <div className="bg-white rounded-xl shadow border border-gray-100 p-4">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-4">
             <h3 className="text-3xl font-semibold text-gray-900 mb-3">Outstanding Fees</h3>
             <table className="w-full text-sm">
               <thead className="bg-gray-100 border-b">
@@ -377,7 +377,7 @@ const CollectFeePage = () => {
           </div>
         </div>
 
-        <div className="lg:col-span-2 bg-white rounded-xl shadow border border-gray-100 p-4">
+        <div className="lg:col-span-2 bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-4">
           <h3 className="text-3xl font-semibold text-gray-900 mb-3">Payment Information</h3>
 
           <div className="space-y-3">
@@ -471,13 +471,13 @@ const CollectFeePage = () => {
                 <button
                   onClick={handleCollect}
                   disabled={saving}
-                  className="bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-800 disabled:opacity-60"
+                  className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] text-sm font-bold hover:bg-[#1E3A8A] shadow-md disabled:opacity-60 min-h-[44px]"
                 >
                   {saving ? 'Recording...' : 'Record Payment'}
                 </button>
                 <button
                   onClick={() => navigate('/admin/fees')}
-                  className="bg-gray-100 text-gray-700 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-200"
+                  className="bg-gray-100 text-gray-700 px-6 py-3 rounded-[16px] text-sm font-bold hover:bg-gray-200 min-h-[44px]"
                 >
                   Cancel
                 </button>

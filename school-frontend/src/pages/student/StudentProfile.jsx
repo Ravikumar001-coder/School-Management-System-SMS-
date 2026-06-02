@@ -1,11 +1,13 @@
+// src/pages/student/StudentProfile.jsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { studentApi } from '../../api/studentApi';
 import { attendanceApi } from '../../api/attendanceApi';
 import { examApi } from '../../api/examApi';
 import { fileApi } from '../../api/fileApi';
-
-const cardShadow = { boxShadow: '0 2px 12px rgba(15, 23, 42, 0.08)' };
+import PageHeader from '../../components/common/PageHeader';
+import { User, Phone, Mail, MapPin, Calendar, Award, BookOpen, Clock, Settings, Edit3 } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, PieChart, Pie, Label } from 'recharts';
 
 const getAcademicYear = () => {
   const now = new Date();
@@ -54,173 +56,257 @@ const StudentProfile = () => {
 
   const attendancePercent = Number(attendance?.percentage || 0);
 
-  const attendanceRing = {
-    background: `conic-gradient(#16a34a ${attendancePercent * 3.6}deg, #2563eb 0deg, #e2e8f0 0deg)`,
-  };
-
-  const gradeCounts = useMemo(() => {
+  const gradeChartData = useMemo(() => {
     const map = {};
     report.forEach((row) => {
       const key = row?.grade || 'NA';
       map[key] = (map[key] || 0) + 1;
     });
-    const entries = Object.entries(map).slice(0, 4);
-    const max = Math.max(...entries.map((e) => e[1]), 1);
-    return entries.map(([grade, count], index) => ({
+    return Object.entries(map).map(([grade, count], index) => ({
       grade,
       count,
-      height: Math.max(42, Math.round((count / max) * 95)),
-      color: ['#16a34a', '#3b82f6', '#8b5cf6', '#f59e0b'][index % 4],
-    }));
+      color: ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444'][index % 5],
+    })).sort((a, b) => a.grade.localeCompare(b.grade));
   }, [report]);
+
+  const attendanceData = [
+    { name: 'Present', value: attendancePercent, fill: '#10b981' },
+    { name: 'Absent', value: 100 - attendancePercent, fill: '#f1f5f9' }
+  ];
 
   if (loading) {
     return (
-      <>
-        <div className="rounded-2xl bg-white p-10 text-center" style={cardShadow}>
-          <p className="text-sm text-gray-600">Loading profile details...</p>
-        </div>
-      </>
+      <div className="flex flex-col items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+        <p className="text-gray-500">Loading student profile...</p>
+      </div>
     );
   }
 
   return (
-    <>
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <div className="text-sm font-medium text-gray-500">Home {'>'} Dashboard {'>'} Student Profile</div>
-        <div className="flex items-center gap-2">
-          <span className="text-slate-700">Filters</span>
-          <button type="button" className="relative h-7 w-14 rounded-full bg-blue-700">
-            <span className="absolute right-1 top-1 h-5 w-5 rounded-full bg-white" />
-          </button>
-        </div>
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <PageHeader 
+          title="Student Profile"
+          subtitle="View your personal and academic information"
+          className="!mb-0"
+        />
+        <button
+          type="button"
+          className="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-bold text-gray-700 hover:bg-gray-50 shadow-sm flex items-center gap-2"
+        >
+          <Settings size={18} />
+          Settings
+        </button>
       </div>
-
-      <h1 className="mb-5 text-[48px] font-semibold leading-none tracking-tight text-slate-900">Student Profile</h1>
 
       {error && (
-        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          {error}
+        </div>
       )}
 
-      <div className="rounded-2xl bg-white p-4" style={cardShadow}>
-        <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
-          <div className="xl:col-span-9">
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <div className="rounded-xl border border-slate-200 p-4">
-                <div className="mb-3 flex items-start justify-between">
-                  <h2 className="text-[42px] font-semibold leading-tight text-slate-900">Profile Overview</h2>
-                  <span className="text-4xl text-blue-400">📊</span>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="h-28 w-28 flex-shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-100">
-                    {student?.profilePhoto ? (
-                      <img
-                        src={fileApi.toPublicUrl(student.profilePhoto)}
-                        alt={`${student?.firstName || ''} ${student?.lastName || ''}`.trim()}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center text-3xl font-bold text-slate-500">
-                        {student?.firstName?.[0]}{student?.lastName?.[0]}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-[88px_1fr] gap-x-3 gap-y-1 text-[32px] leading-tight">
-                    <span className="text-slate-700">ID</span><span className="font-medium text-slate-900">{student?.studentId || '-'}</span>
-                    <span className="text-slate-700">Name</span><span className="font-medium text-slate-900">{`${student?.firstName || ''} ${student?.lastName || ''}`.trim() || '-'}</span>
-                    <span className="text-slate-700">Class</span><span className="font-medium text-slate-900">{student?.className || '-'}</span>
-                    <span className="text-slate-700">Role</span><span className="font-medium text-slate-900">Student</span>
-                    <span className="col-span-2 mt-2 inline-block w-max rounded-lg bg-blue-100 px-3 py-1 text-[28px] font-medium text-blue-800">Student</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-slate-200 p-4">
-                <div className="mb-3 flex items-start justify-between">
-                  <h2 className="text-[42px] font-semibold leading-tight text-slate-900">Personal Details</h2>
-                  <span className="text-4xl text-blue-400">📈</span>
-                </div>
-                <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-[32px] leading-tight">
-                  <span className="text-slate-700">DOB</span><span className="font-medium text-slate-900">{student?.dateOfBirth || '-'}</span>
-                  <span className="text-slate-700">Gender</span><span className="font-medium text-slate-900">{student?.gender || '-'}</span>
-                  <span className="text-slate-700">Phone</span><span className="font-medium text-slate-900">{student?.phone || '-'}</span>
-                  <span className="text-slate-700">Email</span><span className="font-medium text-slate-900">{student?.email || '-'}</span>
-                </div>
-
-                <h3 className="mt-4 text-[40px] font-semibold text-slate-900">Academic Details</h3>
-                <div className="mt-1 grid grid-cols-2 gap-x-6 gap-y-1 text-[32px] leading-tight">
-                  <span className="text-slate-700">Class</span><span className="font-medium text-slate-900">{student?.className || '-'}</span>
-                  <span className="text-slate-700">Section</span><span className="font-medium text-slate-900">{student?.section || student?.classSection || '-'}</span>
-                  <span className="text-slate-700">Admission</span><span className="font-medium text-slate-900">{student?.admissionNumber || student?.studentId || '-'}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <div className="rounded-xl border border-slate-200 p-4">
-                <h3 className="mb-3 text-[40px] font-semibold text-slate-900">Attendance</h3>
-                <div className="mx-auto h-40 w-40 rounded-full p-2" style={attendanceRing}>
-                  <div className="flex h-full w-full items-center justify-center rounded-full bg-white text-[44px] font-bold text-slate-900">
-                    {attendancePercent || 0}%
-                  </div>
-                </div>
-                <div className="mt-3 flex items-center gap-4 text-[24px] text-slate-700">
-                  <span className="inline-flex items-center gap-2"><span className="inline-block h-3.5 w-3.5 rounded-sm bg-green-600" />Present: {attendance?.present || attendance?.presentDays || 0}%</span>
-                  <span className="inline-flex items-center gap-2"><span className="inline-block h-3.5 w-3.5 rounded-sm bg-blue-600" />Absent: {attendance?.absent || attendance?.absentDays || 0}%</span>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-slate-200 p-4">
-                <div className="mb-3 flex items-start justify-between">
-                  <h3 className="text-[40px] font-semibold text-slate-900">Parent/Guardian Information</h3>
-                  <span className="text-4xl text-indigo-400">📄</span>
-                </div>
-                <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-[30px] leading-tight">
-                  <span className="text-slate-700">Guardian Name</span><span className="font-medium text-slate-900">{student?.parentName || '-'}</span>
-                  <span className="text-slate-700">Phone Number</span><span className="font-medium text-slate-900">{student?.parentPhone || '-'}</span>
-                  <span className="text-slate-700">Email</span><span className="font-medium text-slate-900">{student?.parentEmail || '-'}</span>
-                  <span className="text-slate-700">Relationship</span><span className="font-medium text-slate-900">{student?.guardianRelationship || 'Parent'}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="xl:col-span-3 space-y-4">
-            <div className="rounded-xl border border-slate-200 p-4">
-              <h3 className="mb-3 text-[38px] font-semibold text-slate-900">Attendance Summary</h3>
-              <div className="mx-auto h-40 w-40 rounded-full p-2" style={attendanceRing}>
-                <div className="flex h-full w-full items-center justify-center rounded-full bg-white text-[44px] font-bold text-slate-900">{attendancePercent || 0}%</div>
-              </div>
-              <div className="mt-3 text-[22px] text-slate-700">
-                <p>Present: {attendance?.present || attendance?.presentDays || 0}%</p>
-                <p>Absent: {attendance?.absent || attendance?.absentDays || 0}%</p>
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-slate-200 p-4">
-              <h3 className="mb-3 text-[38px] font-semibold text-slate-900">Report Card Summary</h3>
-              <div className="flex h-40 items-end gap-4">
-                {gradeCounts.length > 0 ? gradeCounts.map((item) => (
-                  <div key={item.grade} className="flex-1 text-center">
-                    <div
-                      className="mx-auto rounded-t"
-                      style={{ width: '36px', height: `${item.height}px`, backgroundColor: item.color }}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Column - Main Profile & Personal Details */}
+        <div className="lg:col-span-8 space-y-6">
+          
+          {/* Hero Profile Card */}
+          <div className="card shadow-sm border border-gray-100 p-0 overflow-hidden relative">
+            <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-700"></div>
+            <div className="px-6 pb-6 relative">
+              <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 -mt-16 sm:-mt-12 mb-6">
+                <div className="h-32 w-32 rounded-full border-4 border-white bg-white shadow-md overflow-hidden shrink-0">
+                  {student?.profilePhoto ? (
+                    <img
+                      src={fileApi.toPublicUrl(student.profilePhoto)}
+                      alt={`${student?.firstName || ''} ${student?.lastName || ''}`.trim()}
+                      className="h-full w-full object-cover"
                     />
-                    <p className="mt-2 text-[22px] font-medium text-slate-700">{item.grade}</p>
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-blue-50 text-4xl font-black text-blue-300">
+                      {student?.firstName?.[0]}{student?.lastName?.[0]}
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 text-center sm:text-left pt-2">
+                  <h1 className="text-3xl font-bold text-gray-900 leading-tight">
+                    {`${student?.firstName || ''} ${student?.lastName || ''}`.trim() || 'Student Name'}
+                  </h1>
+                  <p className="text-sm font-bold text-blue-600 uppercase tracking-widest mt-1">
+                    Student ID: {student?.studentId || '-'}
+                  </p>
+                </div>
+                <button className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg text-sm font-bold border border-gray-200 transition-colors">
+                  <Edit3 size={16} /> Edit Profile
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Class</p>
+                  <p className="font-bold text-gray-800 mt-1">{student?.className || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Section</p>
+                  <p className="font-bold text-gray-800 mt-1">{student?.section || student?.classSection || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">DOB</p>
+                  <p className="font-bold text-gray-800 mt-1">{student?.dateOfBirth || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Gender</p>
+                  <p className="font-bold text-gray-800 mt-1">{student?.gender || '-'}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Contact & Guardian Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="card shadow-sm border border-gray-100">
+              <h3 className="card-title mb-6 flex items-center gap-2">
+                <User size={18} className="text-gray-400" />
+                Contact Information
+              </h3>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-blue-50 text-blue-600 rounded-lg shrink-0"><Phone size={16} /></div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Phone</p>
+                    <p className="font-medium text-gray-800 text-sm mt-0.5">{student?.phone || '-'}</p>
                   </div>
-                )) : (
-                  <p className="text-[22px] text-slate-500">No result data</p>
-                )}
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-blue-50 text-blue-600 rounded-lg shrink-0"><Mail size={16} /></div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Email</p>
+                    <p className="font-medium text-gray-800 text-sm mt-0.5">{student?.email || '-'}</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-blue-50 text-blue-600 rounded-lg shrink-0"><MapPin size={16} /></div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Address</p>
+                    <p className="font-medium text-gray-800 text-sm mt-0.5">{student?.address || 'Address not provided'}</p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            
+            <div className="card shadow-sm border border-gray-100">
+              <h3 className="card-title mb-6 flex items-center gap-2">
+                <User size={18} className="text-gray-400" />
+                Guardian Information
+              </h3>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg shrink-0"><User size={16} /></div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Name ({student?.guardianRelationship || 'Parent'})</p>
+                    <p className="font-medium text-gray-800 text-sm mt-0.5">{student?.parentName || '-'}</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg shrink-0"><Phone size={16} /></div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Phone</p>
+                    <p className="font-medium text-gray-800 text-sm mt-0.5">{student?.parentPhone || '-'}</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg shrink-0"><Mail size={16} /></div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Email</p>
+                    <p className="font-medium text-gray-800 text-sm mt-0.5">{student?.parentEmail || '-'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+
+        </div>
+
+        {/* Right Column - Academic Summaries */}
+        <div className="lg:col-span-4 space-y-6">
+          
+          {/* Attendance Summary */}
+          <div className="card shadow-sm border border-gray-100 flex flex-col items-center">
+            <h3 className="card-title w-full mb-4 flex items-center gap-2">
+              <Clock size={18} className="text-gray-400" />
+              Attendance Overview
+            </h3>
+            <div className="h-48 w-full relative">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={attendanceData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    startAngle={90}
+                    endAngle={-270}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    <Label
+                      value={`${attendancePercent}%`}
+                      position="center"
+                      className="text-2xl font-black fill-gray-900"
+                    />
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="w-full flex justify-around mt-2 text-sm">
+              <div className="text-center">
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Present</p>
+                <p className="font-bold text-green-600">{attendance?.present || attendance?.presentDays || 0}%</p>
+              </div>
+              <div className="text-center">
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Absent</p>
+                <p className="font-bold text-red-500">{attendance?.absent || attendance?.absentDays || 0}%</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Grades Summary */}
+          <div className="card shadow-sm border border-gray-100 flex flex-col">
+            <h3 className="card-title mb-6 flex items-center gap-2">
+              <Award size={18} className="text-gray-400" />
+              Grade Distribution
+            </h3>
+            <div className="flex-1 h-48 w-full">
+              {gradeChartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={gradeChartData} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                    <XAxis dataKey="grade" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#888', fontWeight: 'bold' }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#888' }} allowDecimals={false} />
+                    <Tooltip 
+                      cursor={{ fill: '#f8fafc' }}
+                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                      formatter={(value) => [value, 'Subjects']}
+                    />
+                    <Bar dataKey="count" radius={[4, 4, 0, 0]} barSize={32}>
+                      {gradeChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex h-full items-center justify-center border-2 border-dashed border-gray-100 rounded-xl">
+                  <p className="text-gray-400 text-sm">No exam results available.</p>
+                </div>
+              )}
+            </div>
+          </div>
+
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

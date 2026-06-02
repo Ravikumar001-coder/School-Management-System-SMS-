@@ -136,10 +136,10 @@ export default function TripPlaybackMap() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="bg-gray-50 min-h-screen p-6 animate-fade-in"><div className="max-w-7xl mx-auto space-y-6">
       
       {/* Control Panel */}
-      <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+      <div className="bg-white p-5 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
         <div>
           <label className="block text-sm font-bold text-slate-700 mb-2">Select Vehicle</label>
           <div className="relative">
@@ -181,7 +181,7 @@ export default function TripPlaybackMap() {
           <button 
             onClick={loadHistory}
             disabled={loading}
-            className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold transition-all shadow-sm flex items-center justify-center gap-2"
+            className="w-full bg-[#1E40AF] hover:bg-[#1E3A8A] text-white rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2"
           >
             {loading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div> : <Search className="h-4 w-4" />}
             {loading ? 'Loading...' : 'Fetch History'}
@@ -193,7 +193,7 @@ export default function TripPlaybackMap() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[600px]">
         
         {/* Playback Controls Sidebar */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col h-full overflow-hidden">
+        <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-5 flex flex-col h-full overflow-hidden">
           <h2 className="font-bold text-slate-900 text-lg mb-6">Playback Controls</h2>
           
           <div className="space-y-6 flex-1">
@@ -273,7 +273,7 @@ export default function TripPlaybackMap() {
         </div>
 
         {/* Map View */}
-        <div className="lg:col-span-3 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative">
+        <div className="lg:col-span-3 bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] overflow-hidden relative">
           <MapContainer 
             center={mapCenter} 
             zoom={mapZoom} 
@@ -311,6 +311,7 @@ export default function TripPlaybackMap() {
         </div>
 
       </div>
+    </div>
     </div>
   );
 }

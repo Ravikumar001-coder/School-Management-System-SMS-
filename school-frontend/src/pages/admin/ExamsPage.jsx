@@ -75,14 +75,14 @@ const ExamsPage = () => {
       <PageHeader title="Exams List" subtitle="Home > Academic > Exams"
         action={
           <button onClick={() => navigate('/admin/exams/new')}
-            className="bg-blue-700 text-white px-5 py-2.5 rounded-lg hover:bg-blue-800 text-sm font-medium">
+            className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] hover:bg-[#1E3A8A] text-sm font-bold shadow-md min-h-[44px]">
             Create Exam
           </button>
         }
       />
 
       {loading ? <LoadingSpinner /> : (
-        <div className="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] overflow-hidden">
           <div className="p-4 border-b bg-gray-50 flex flex-col gap-3">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div className="relative w-full">

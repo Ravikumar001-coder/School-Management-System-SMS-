@@ -143,14 +143,14 @@ export default function HostelInfrastructure() {
         actions={
           <button
             onClick={() => openModal()}
-            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition-all shadow-sm"
+            className="bg-[#1E40AF] text-white px-6 py-2 rounded-[16px] min-h-[44px] font-bold text-sm shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] transition-all flex items-center justify-center gap-2 hover:bg-[#1E3A8A]"
           >
             <Plus size={16} /> Add Block
           </button>
         }
       />
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hidden sm:block">
+      <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] overflow-hidden hidden sm:block">
         {loading ? (
           <div className="py-20 text-center"><LoadingSpinner /></div>
         ) : blocks.length === 0 ? (

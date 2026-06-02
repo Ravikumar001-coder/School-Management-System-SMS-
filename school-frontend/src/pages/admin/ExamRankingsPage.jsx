@@ -109,7 +109,7 @@ const ExamRankingsPage = () => {
             </select>
             <button 
               onClick={handleExport}
-              className="flex items-center gap-2 bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-900 transition-all shadow-md active:scale-95"
+              className="flex items-center gap-2 bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-6 py-3 rounded-[16px] text-sm font-bold shadow-md min-h-[44px] active:scale-95 transition-all"
             >
               <Download size={16} /> Export
             </button>
@@ -124,7 +124,7 @@ const ExamRankingsPage = () => {
       {loading ? (
         <div className="py-20"><LoadingSpinner /></div>
       ) : rankings.length === 0 ? (
-        <div className="bg-white rounded-[2rem] border border-slate-100 p-20 text-center shadow-sm">
+        <div className="bg-white rounded-[16px] border border-[#f1f5f9] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] p-20 text-center">
           <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
             <Search className="text-slate-300" size={32} />
           </div>
@@ -132,7 +132,7 @@ const ExamRankingsPage = () => {
           <p className="text-slate-400 font-bold mt-2">Marks might not have been entered for this class yet.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-[16px] border border-[#f1f5f9] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] overflow-hidden">
           <table className="w-full text-left">
             <thead className="bg-slate-50 border-b border-slate-100">
               <tr>

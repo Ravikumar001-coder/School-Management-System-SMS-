@@ -56,7 +56,7 @@ const ParentDetailPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
         {/* Profile Card */}
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 text-center">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8 text-center">
             <div className="w-24 h-24 bg-indigo-50 text-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 text-3xl font-black">
               {parent.fullName?.[0]}
             </div>
@@ -71,7 +71,7 @@ const ParentDetailPage = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 space-y-6">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8 space-y-6">
             <h4 className="text-sm font-black uppercase tracking-widest text-slate-400">Contact Details</h4>
             <div className="space-y-4">
               <div className="flex items-center gap-4">
@@ -107,7 +107,7 @@ const ParentDetailPage = () => {
 
         {/* Children & Activity */}
         <div className="lg:col-span-2 space-y-8">
-          <section className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+          <section className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8">
             <h3 className="text-lg font-bold text-slate-800 mb-8 flex items-center gap-2">
               <Users className="text-indigo-500" size={20} /> Linked Children (Family Hub)
             </h3>
@@ -154,7 +154,7 @@ const ParentDetailPage = () => {
             </div>
           </section>
 
-          <section className="bg-slate-900 rounded-3xl p-8 text-white">
+          <section className="bg-slate-900 rounded-[16px] p-8 text-white shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-slate-800">
             <h3 className="text-sm uppercase tracking-widest font-black text-slate-500 mb-8">Security & Logins</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="p-6 bg-white/5 rounded-2xl border border-white/10">

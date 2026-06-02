@@ -1,3 +1,4 @@
+// src/pages/student/MyExamsPage.jsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../../components/common/Modal';
@@ -6,21 +7,23 @@ import { subjectApi } from '../../api/subjectApi';
 import { studentApi } from '../../api/studentApi';
 import { useAuth } from '../../context/AuthContext';
 import { getCurrentAcademicYear } from '../../utils/helpers';
-
-const cardShadow = { boxShadow: '0 2px 12px rgba(15, 23, 42, 0.08)' };
+import PageHeader from '../../components/common/PageHeader';
+import StatCard from '../../components/common/StatCard';
+import StatusBadge from '../../components/common/StatusBadge';
+import { BookOpen, Calendar, Clock, PlayCircle, CheckCircle, Search, Eye, Book, Award } from 'lucide-react';
 
 const getStatusMeta = (exam) => {
   const apiStatus = (exam.status || '').toUpperCase();
-  if (apiStatus === 'COMPLETED') return { label: 'Completed', cls: 'bg-green-100 text-green-800' };
-  if (!exam.examDate) return { label: 'Scheduled', cls: 'bg-amber-100 text-amber-800' };
+  if (apiStatus === 'COMPLETED') return { label: 'Completed', cls: 'green' };
+  if (!exam.examDate) return { label: 'Scheduled', cls: 'yellow' };
   const today = new Date(new Date().toDateString());
   const d = new Date(exam.examDate);
-  if (Number.isNaN(d.getTime())) return { label: 'Scheduled', cls: 'bg-amber-100 text-amber-800' };
-  if (d < today) return { label: 'Completed', cls: 'bg-green-100 text-green-800' };
+  if (Number.isNaN(d.getTime())) return { label: 'Scheduled', cls: 'yellow' };
+  if (d < today) return { label: 'Completed', cls: 'green' };
   if ((d - today) / (1000 * 60 * 60 * 24) <= 7) {
-    return { label: 'Upcoming', cls: 'bg-sky-100 text-sky-800' };
+    return { label: 'Upcoming', cls: 'blue' };
   }
-  return { label: 'Scheduled', cls: 'bg-amber-100 text-amber-800' };
+  return { label: 'Scheduled', cls: 'yellow' };
 };
 
 const MyExamsPage = () => {
@@ -129,223 +132,247 @@ const MyExamsPage = () => {
   };
 
   return (
-    <>
-      <div className="mb-3 text-sm font-medium text-gray-500">Home {'>'} Dashboard {'>'} My Exams</div>
-      <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <h1 className="text-[48px] font-semibold leading-none tracking-tight text-slate-900">My Exams</h1>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => navigate('/student/exams')}
-            className="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-800"
-          >
-            View Full Schedule
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate('/student/report-card')}
-            className="rounded-lg bg-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-400"
-          >
-            Exam Announcements
-          </button>
-        </div>
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <PageHeader 
+          title="My Exams"
+          subtitle="View upcoming schedules and syllabus details"
+          className="!mb-0"
+        />
+        <button
+          type="button"
+          onClick={() => navigate('/student/report-card')}
+          className="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-bold text-gray-700 hover:bg-gray-50 shadow-sm flex items-center gap-2"
+        >
+          <Award size={18} />
+          View Report Card
+        </button>
       </div>
 
       {error && (
-        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 flex items-center gap-2">
           {error}
         </div>
       )}
 
-      <div className="mb-5 grid grid-cols-1 gap-4 lg:grid-cols-3">
-        {[
-          {
-            title: 'Assigned Exams',
-            value: assignedCount,
-            sub: 'Total exams to take',
-            color: 'from-slate-50 to-blue-100',
-            icon: '📊',
-          },
-          {
-            title: 'Upcoming Exams',
-            value: upcomingCount,
-            sub: 'Next 7 days',
-            color: 'from-slate-50 to-indigo-100',
-            icon: '📄',
-          },
-          {
-            title: 'Recent Results Posted',
-            value: latestGrade,
-            sub: marks[0]?.examName || 'No published result',
-            color: 'from-slate-50 to-green-100',
-            icon: '💵',
-          },
-        ].map((s) => (
-          <div key={s.title} className={`rounded-2xl bg-gradient-to-r px-5 py-4 ${s.color}`} style={cardShadow}>
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-[35px] font-medium leading-tight text-slate-900">{s.title}</p>
-                <p className="mt-1 text-[52px] font-bold leading-none text-slate-900">{s.value}</p>
-                <p className="mt-2 text-[24px] leading-tight text-slate-600">{s.sub}</p>
-              </div>
-              <span className="text-4xl text-slate-500">{s.icon}</span>
-            </div>
-          </div>
-        ))}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StatCard 
+          title="Assigned Exams" 
+          value={assignedCount} 
+          subtitle="Total exams this term"
+          variant="purple" 
+          icon={() => <BookOpen size={24} className="text-purple-500" />}
+        />
+        <StatCard 
+          title="Upcoming Exams" 
+          value={upcomingCount} 
+          subtitle="Next 7 days"
+          variant="blue" 
+          icon={() => <Calendar size={24} className="text-blue-500" />}
+        />
+        <StatCard 
+          title="Latest Result" 
+          value={latestGrade} 
+          subtitle={marks[0]?.examName || 'No published result'}
+          variant={latestGrade !== 'N/A' && latestGrade !== 'F' ? "green" : "orange"} 
+          icon={() => <CheckCircle size={24} className={latestGrade !== 'N/A' && latestGrade !== 'F' ? "text-green-500" : "text-orange-500"} />}
+        />
       </div>
 
-      <div className="overflow-hidden rounded-2xl bg-white" style={cardShadow}>
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b bg-slate-50 px-4 py-2.5">
+      <div className="card shadow-sm border border-gray-100 p-0 overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b bg-gray-50/50 p-4">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <div className="relative flex-1 sm:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search exams, subjects..."
+                className="w-full rounded-xl border border-gray-200 pl-10 pr-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+              />
+            </div>
+          </div>
+          
           <div className="flex items-center gap-3">
-            <label className="inline-flex items-center gap-2 text-sm text-slate-600">
-              <span>Show Completed</span>
-              <button
-                type="button"
-                onClick={() => setShowCompleted((v) => !v)}
-                className={`relative h-7 w-14 rounded-full transition ${showCompleted ? 'bg-blue-700' : 'bg-slate-300'}`}
-              >
-                <span className={`absolute top-1 h-5 w-5 rounded-full bg-white transition ${showCompleted ? 'right-1' : 'left-1'}`} />
-              </button>
-            </label>
+            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Show Completed</span>
             <button
               type="button"
-              onClick={() => {
-                setSearch('');
-                setShowCompleted(true);
-              }}
-              className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100"
+              onClick={() => setShowCompleted((v) => !v)}
+              className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 ${showCompleted ? 'bg-blue-600' : 'bg-gray-200'}`}
             >
-              Reset Filters
+              <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${showCompleted ? 'translate-x-4' : 'translate-x-0'}`} />
             </button>
           </div>
-
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search exam, subject, class, status"
-            className="w-full max-w-md rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-          />
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-[15px]">
-            <thead className="border-b bg-slate-100">
+        {/* Mobile View (Cards) */}
+        <div className="md:hidden divide-y divide-gray-100">
+          {!loading && filteredExams.map((exam, i) => {
+            const status = getStatusMeta(exam);
+            const mark = marksByExamName.get(exam.name);
+            return (
+              <div key={exam.id || i} className="p-4 hover:bg-gray-50 transition-colors">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h4 className="font-bold text-gray-900">{exam.name || '-'}</h4>
+                    <p className="text-sm text-gray-600">{exam.subjectName || '-'}</p>
+                  </div>
+                  <StatusBadge status={status.label} variant={status.cls} />
+                </div>
+                <div className="text-xs text-gray-500 mb-3 space-y-1">
+                  <p className="flex items-center gap-1.5"><Calendar size={12} /> {exam.examDate || 'TBD'}</p>
+                  <p className="flex items-center gap-1.5"><Award size={12} /> Grade: <span className="font-bold text-gray-800">{mark?.grade || 'TBD'}</span></p>
+                </div>
+                <div className="flex gap-2">
+                  <button type="button" className="flex-1 bg-white border border-gray-200 rounded-lg py-1.5 text-xs font-bold text-gray-700 flex justify-center items-center gap-1.5 shadow-sm" onClick={() => openSchedule(exam)}>
+                    <Clock size={14} /> Schedule
+                  </button>
+                  <button type="button" className="flex-1 bg-white border border-gray-200 rounded-lg py-1.5 text-xs font-bold text-gray-700 flex justify-center items-center gap-1.5 shadow-sm" onClick={() => openSyllabus(exam)}>
+                    <Book size={14} /> Syllabus
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop View (Table) */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 text-gray-400 text-[10px] uppercase tracking-widest font-black">
               <tr>
-                {['ID', 'Exam Name', 'Term', 'Subject', 'Date', 'Status', 'Grade', 'Actions'].map((h) => (
-                  <th key={h} className="px-5 py-3.5 text-left text-[14px] font-semibold text-slate-700">{h}</th>
-                ))}
+                <th className="px-5 py-3 text-left">Exam Details</th>
+                <th className="px-5 py-3 text-left">Term</th>
+                <th className="px-5 py-3 text-left">Date</th>
+                <th className="px-5 py-3 text-left">Status</th>
+                <th className="px-5 py-3 text-center">Grade</th>
+                <th className="px-5 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-50">
               {!loading && filteredExams.map((exam, i) => {
                 const status = getStatusMeta(exam);
                 const mark = marksByExamName.get(exam.name);
                 return (
-                  <tr key={exam.id || i} className="border-b hover:bg-slate-50">
-                    <td className="px-5 py-3.5 text-slate-700">{exam.id || 120 + i}</td>
-                    <td className="px-5 py-3.5 font-semibold text-slate-800">{exam.name || '-'}</td>
-                    <td className="px-5 py-3.5 text-slate-700">{exam.academicYear || 'Term 1'}</td>
-                    <td className="px-5 py-3.5 text-slate-700">{exam.subjectName || '-'}</td>
-                    <td className="px-5 py-3.5 text-slate-700">{exam.examDate || '-'}</td>
-                    <td className="px-5 py-3.5">
-                      <span className={`rounded-full px-2 py-1 text-xs font-semibold ${status.cls}`}>{status.label}</span>
+                  <tr key={exam.id || i} className="hover:bg-blue-50/30 transition-colors">
+                    <td className="px-5 py-4">
+                      <p className="font-bold text-gray-800">{exam.name || '-'}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">{exam.subjectName || '-'}</p>
                     </td>
-                    <td className="px-5 py-3.5">
-                      <span className={`rounded-full px-2 py-1 text-xs font-semibold ${mark?.grade ? 'bg-lime-100 text-lime-800' : 'bg-gray-100 text-gray-700'}`}>
+                    <td className="px-5 py-4 text-gray-600">{exam.academicYear || 'Term 1'}</td>
+                    <td className="px-5 py-4 text-gray-600">{exam.examDate || '-'}</td>
+                    <td className="px-5 py-4">
+                      <StatusBadge status={status.label} variant={status.cls} />
+                    </td>
+                    <td className="px-5 py-4 text-center">
+                      <span className={`inline-block px-2.5 py-1 rounded-lg text-xs font-bold ${mark?.grade ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'}`}>
                         {mark?.grade || 'TBD'}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-3 whitespace-nowrap">
-                        <button type="button" className="text-blue-700 hover:underline" onClick={() => openSchedule(exam)}>View Schedule</button>
-                        <button type="button" className="text-slate-700 hover:underline" onClick={() => openSyllabus(exam)}>View Syllabus</button>
+                    <td className="px-5 py-4">
+                      <div className="flex items-center justify-end gap-2">
+                        <button type="button" className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors tooltip" onClick={() => openSchedule(exam)} title="View Schedule">
+                          <Clock size={16} />
+                        </button>
+                        <button type="button" className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors tooltip" onClick={() => openSyllabus(exam)} title="View Syllabus">
+                          <Book size={16} />
+                        </button>
                       </div>
                     </td>
                   </tr>
                 );
               })}
-
-              {!loading && filteredExams.length === 0 && (
-                <tr>
-                  <td colSpan={8} className="px-5 py-10 text-center text-slate-500">No exams found for current filters.</td>
-                </tr>
-              )}
-
-              {loading && (
-                <tr>
-                  <td colSpan={8} className="px-5 py-10 text-center text-slate-500">Loading exams...</td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
+
+        {!loading && filteredExams.length === 0 && (
+          <div className="text-center py-12 text-gray-400">
+            <BookOpen size={32} className="mx-auto mb-3 opacity-50" />
+            <p>No exams found matching your criteria.</p>
+          </div>
+        )}
+
+        {loading && (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
+            <p className="text-gray-500">Loading exams...</p>
+          </div>
+        )}
       </div>
 
+      {/* Schedule Modal */}
       <Modal isOpen={scheduleOpen} onClose={() => setScheduleOpen(false)} title="Exam Schedule" size="md">
         {selectedExam ? (
-          <div className="space-y-3 text-sm text-slate-700">
-            <div className="rounded-lg bg-slate-50 p-3">
-              <p className="text-xs text-slate-500">Exam</p>
-              <p className="text-base font-semibold text-slate-900">{selectedExam.name || '-'}</p>
+          <div className="space-y-4 text-sm text-gray-700">
+            <div className="rounded-xl border border-gray-100 bg-gray-50/50 p-4">
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Exam</p>
+              <p className="text-lg font-bold text-gray-900 mt-1">{selectedExam.name || '-'}</p>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-lg border border-slate-200 p-3">
-                <p className="text-xs text-slate-500">Date</p>
-                <p className="font-medium">{selectedExam.examDate || '-'}</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="rounded-xl border border-gray-100 p-4">
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1 flex items-center gap-1"><Calendar size={12}/> Date</p>
+                <p className="font-bold text-gray-800">{selectedExam.examDate || 'To be announced'}</p>
               </div>
-              <div className="rounded-lg border border-slate-200 p-3">
-                <p className="text-xs text-slate-500">Time</p>
-                <p className="font-medium">{selectedExam.startTime || '--:--'} - {selectedExam.endTime || '--:--'}</p>
+              <div className="rounded-xl border border-gray-100 p-4">
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1 flex items-center gap-1"><Clock size={12}/> Time</p>
+                <p className="font-bold text-gray-800">{selectedExam.startTime || '--:--'} - {selectedExam.endTime || '--:--'}</p>
               </div>
-              <div className="rounded-lg border border-slate-200 p-3">
-                <p className="text-xs text-slate-500">Subject</p>
-                <p className="font-medium">{selectedExam.subjectName || '-'}</p>
+              <div className="rounded-xl border border-gray-100 p-4">
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1 flex items-center gap-1"><Book size={12}/> Subject</p>
+                <p className="font-bold text-gray-800">{selectedExam.subjectName || '-'}</p>
               </div>
-              <div className="rounded-lg border border-slate-200 p-3">
-                <p className="text-xs text-slate-500">Class</p>
-                <p className="font-medium">{selectedExam.className || '-'}</p>
+              <div className="rounded-xl border border-gray-100 p-4">
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1 flex items-center gap-1"><Eye size={12}/> Status</p>
+                <StatusBadge status={getStatusMeta(selectedExam).label} variant={getStatusMeta(selectedExam).cls} />
               </div>
-            </div>
-            <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-blue-700">
-              Current Status: {getStatusMeta(selectedExam).label}
             </div>
           </div>
         ) : (
-          <p className="text-sm text-slate-500">No exam selected.</p>
+          <p className="text-sm text-gray-500">No exam selected.</p>
         )}
       </Modal>
 
+      {/* Syllabus Modal */}
       <Modal isOpen={syllabusOpen} onClose={() => setSyllabusOpen(false)} title="Exam Syllabus" size="md">
-        {syllabusLoading && <p className="text-sm text-slate-500">Loading syllabus...</p>}
+        {syllabusLoading && (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-3"></div>
+            <p className="text-gray-500">Loading syllabus...</p>
+          </div>
+        )}
         {!syllabusLoading && syllabusError && (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             {syllabusError}
           </div>
         )}
         {!syllabusLoading && !syllabusError && (
-          <div className="space-y-3 text-sm text-slate-700">
-            <div className="rounded-lg bg-slate-50 p-3">
-              <p className="text-xs text-slate-500">Exam</p>
-              <p className="text-base font-semibold text-slate-900">{selectedExam?.name || '-'}</p>
+          <div className="space-y-4 text-sm text-gray-700">
+            <div className="rounded-xl border border-indigo-100 bg-indigo-50/50 p-4 flex justify-between items-center">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Subject</p>
+                <p className="text-lg font-bold text-indigo-900 mt-1">{syllabusData?.name || selectedExam?.subjectName || '-'}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Code</p>
+                <p className="font-bold text-indigo-700 mt-1">{syllabusData?.code || syllabusData?.subjectCode || '-'}</p>
+              </div>
             </div>
-            <div className="rounded-lg border border-slate-200 p-3">
-              <p className="text-xs text-slate-500">Subject</p>
-              <p className="font-medium">{syllabusData?.name || selectedExam?.subjectName || '-'}</p>
-            </div>
-            <div className="rounded-lg border border-slate-200 p-3">
-              <p className="text-xs text-slate-500">Subject Code</p>
-              <p className="font-medium">{syllabusData?.code || syllabusData?.subjectCode || '-'}</p>
-            </div>
-            <div className="rounded-lg border border-slate-200 p-3">
-              <p className="text-xs text-slate-500">Syllabus Outline</p>
-              <p className="whitespace-pre-line text-slate-700">
-                {syllabusData?.description || syllabusData?.details || 'No detailed syllabus has been uploaded for this subject yet.'}
+            
+            <div className="rounded-xl border border-gray-100 p-5">
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3 flex items-center gap-2">
+                <PlayCircle size={14} /> Syllabus Outline
               </p>
+              <div className="prose prose-sm text-gray-700 max-w-none">
+                <p className="whitespace-pre-line leading-relaxed">
+                  {syllabusData?.description || syllabusData?.details || 'No detailed syllabus has been uploaded for this subject yet.'}
+                </p>
+              </div>
             </div>
           </div>
         )}
       </Modal>
-    </>
+    </div>
   );
 };
 

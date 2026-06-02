@@ -26,6 +26,9 @@ public interface ClassRoomRepository
 
     Optional<ClassRoom> findByIdAndAcademicYearId(Long id, Long academicYearId);
 
+    @Query("SELECT DISTINCT c.section FROM ClassRoom c WHERE c.name = :className AND c.deletedAt IS NULL")
+    List<String> findDistinctSectionsByClassName(String className);
+
     @Query("SELECT c FROM ClassRoom c " +
            "WHERE c.classTeacher.id = :teacherId")
     List<ClassRoom> findByClassTeacherId(Long teacherId);

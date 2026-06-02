@@ -96,22 +96,22 @@ const ExpenseTrackerUI = () => {
     ];
 
     return (
-        <div className="p-6">
+        <div className="bg-gray-50 min-h-screen p-6 animate-fade-in">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Expense Tracking</h1>
-                <Button type="primary" icon={<Plus size={16} />} onClick={() => { form.resetFields(); setIsModalVisible(true); }}>
-                    Record Expense
-                </Button>
+                <button className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all flex items-center gap-2 hover:bg-[#1E3A8A]" onClick={() => { form.resetFields(); setIsModalVisible(true); }}>
+                    <Plus size={16} /> Record Expense
+                </button>
             </div>
 
             <div className="grid grid-cols-4 gap-4 mb-6">
-                <Card className="bg-blue-50">
+                <Card className="bg-blue-50 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-blue-100">
                     <div className="text-blue-500 text-sm font-bold">Total Expense</div>
                     <div className="text-2xl font-bold text-gray-800">₹{expenses.reduce((sum, e) => sum + Number(e.amount), 0).toFixed(2)}</div>
                 </Card>
             </div>
             
-            <Card>
+            <Card className="rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
                 <Table columns={columns} dataSource={expenses} loading={loading} />
             </Card>
 

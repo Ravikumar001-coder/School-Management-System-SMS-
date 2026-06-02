@@ -331,7 +331,7 @@ CREATE TABLE IF NOT EXISTS hostel_room_types (
 CREATE TABLE IF NOT EXISTS hostel_rooms (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     room_number VARCHAR(20) NOT NULL,
-    room_type_id BIGINT NOT NULL,
+    room_type_id BIGINT,
     capacity INT NOT NULL,
     building_name VARCHAR(50),
     branch_id BIGINT,

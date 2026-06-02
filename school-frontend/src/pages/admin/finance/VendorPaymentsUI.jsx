@@ -56,20 +56,20 @@ const VendorPaymentsUI = () => {
         { title: 'Outstanding Balance (₹)', dataIndex: 'outstandingBalance' },
         {
             title: 'Action',
-            render: () => <Button type="link">Make Payment</Button>
+            render: () => <button className="text-[#1E40AF] font-bold hover:underline">Make Payment</button>
         }
     ];
 
     return (
-        <div className="p-6">
+        <div className="bg-gray-50 min-h-screen p-6 animate-fade-in">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Vendor Management & Payments</h1>
-                <Button type="primary" icon={<Plus size={16} />} onClick={() => { form.resetFields(); setIsModalVisible(true); }}>
-                    Register Vendor
-                </Button>
+                <button className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all flex items-center gap-2 hover:bg-[#1E3A8A]" onClick={() => { form.resetFields(); setIsModalVisible(true); }}>
+                    <Plus size={16} /> Register Vendor
+                </button>
             </div>
             
-            <Card>
+            <Card className="rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
                 <Table columns={columns} dataSource={vendors} loading={loading} />
             </Card>
 
@@ -102,8 +102,8 @@ const VendorPaymentsUI = () => {
                     </Form.Item>
 
                     <div className="text-right mt-4">
-                        <Button onClick={() => setIsModalVisible(false)} className="mr-2">Cancel</Button>
-                        <Button type="primary" htmlType="submit" loading={loading}>Save Vendor</Button>
+                        <button type="button" className="px-6 py-3 min-h-[44px] rounded-[16px] bg-gray-100 text-gray-700 font-bold text-sm hover:bg-gray-200 transition-all mr-2" onClick={() => setIsModalVisible(false)}>Cancel</button>
+                        <button type="submit" className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all hover:bg-[#1E3A8A]" disabled={loading}>Save Vendor</button>
                     </div>
                 </Form>
             </Modal>

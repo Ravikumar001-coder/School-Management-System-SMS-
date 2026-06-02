@@ -170,7 +170,7 @@ const EditStudentPage = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         
         {/* SECTION 1: IDENTITY */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+        <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8">
           <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
             <User size={16} className="text-indigo-600" /> Identity & Profile
           </h3>
@@ -184,7 +184,7 @@ const EditStudentPage = () => {
                   <span className="text-3xl font-black text-indigo-200">{form.firstName?.[0]}{form.lastName?.[0]}</span>
                 )}
               </div>
-              <label className="bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold cursor-pointer hover:bg-indigo-700 transition shadow-lg shadow-indigo-100">
+              <label className="bg-[#1E40AF] text-white px-4 py-2 rounded-[16px] text-xs font-bold cursor-pointer hover:bg-[#1E3A8A] shadow-md transition-all">
                 {uploadingPhoto ? 'Uploading...' : 'Change Photo'}
                 <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
               </label>
@@ -232,7 +232,7 @@ const EditStudentPage = () => {
         </div>
 
         {/* SECTION 2: COMPLIANCE */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+        <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8">
           <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
             <ShieldCheck size={16} className="text-indigo-600" /> Compliance & Health
           </h3>
@@ -263,7 +263,7 @@ const EditStudentPage = () => {
         </div>
 
         {/* SECTION 3: ACADEMIC */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+        <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8">
           <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
             <BookOpen size={16} className="text-indigo-600" /> Academic Assignment
           </h3>
@@ -314,7 +314,7 @@ const EditStudentPage = () => {
         </div>
 
         {/* SECTION 4: ELECTIVES */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+        <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8">
           <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
             <BookOpen size={16} className="text-amber-500" /> Registered Electives & Courses
           </h3>
@@ -324,7 +324,7 @@ const EditStudentPage = () => {
         </div>
 
         {/* SECTION 5: PROMOTIONS & TRANSFERS */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+        <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8">
           <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
             <Award size={16} className="text-purple-600" /> Promotions & Transfers
           </h3>
@@ -345,7 +345,7 @@ const EditStudentPage = () => {
         </div>
 
         {/* SECTION 6: FAMILY */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+        <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8">
           <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
             <Heart size={16} className="text-rose-500" /> Family & Guardian
           </h3>
@@ -379,15 +379,15 @@ const EditStudentPage = () => {
         </div>
 
         {/* ACTIONS */}
-        <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+        <div className="flex justify-between items-center bg-white p-6 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
           <button type="button" onClick={() => clearDraft(true)} className="text-slate-400 hover:text-rose-500 text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-colors">
             <Trash2 size={14} /> Clear Draft
           </button>
           <div className="flex gap-4">
-            <button type="button" onClick={() => navigate(`/admin/students/${id}`)} className="px-8 py-3 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all border border-slate-200">
+            <button type="button" onClick={() => navigate(`/admin/students/${id}`)} className="px-6 py-3 min-h-[44px] rounded-[16px] bg-gray-100 text-gray-700 font-bold text-sm hover:bg-gray-200 transition-all">
               Cancel
             </button>
-            <button type="submit" disabled={saving || uploadingPhoto} className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-3 rounded-xl text-sm font-black shadow-lg shadow-indigo-100 transition-all disabled:opacity-50">
+            <button type="submit" disabled={saving || uploadingPhoto} className="bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-6 py-3 rounded-[16px] min-h-[44px] text-sm font-bold shadow-md transition-all disabled:opacity-50">
               {saving ? 'Saving Changes...' : 'Update Record'}
             </button>
           </div>

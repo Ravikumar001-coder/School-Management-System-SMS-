@@ -44,6 +44,17 @@ public class ClassRoomController {
             classRoomService.getClassRoomById(id)));
     }
 
+    @GetMapping("/sections")
+    public ResponseEntity<ApiResponse<List<String>>> getSectionsByClassName(
+            @RequestParam String className) {
+        // Technically this should be in ClassRoomService but we can inject the repo directly or add it to service.
+        // It's better to put it in service, but since we are doing it directly, I will add it to ClassRoomService.
+        // Wait, `classRoomService` handles it.
+        return ResponseEntity.ok(ApiResponse.success(
+            "Sections fetched",
+            classRoomService.getSectionsByClassName(className)));
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApiResponse<ClassRoomResponse>> update(

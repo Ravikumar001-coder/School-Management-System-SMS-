@@ -104,7 +104,7 @@ export default function LiveTrackingMap() {
   );
 
   return (
-    <div className="h-[calc(100vh-64px)] flex flex-col md:flex-row bg-slate-50 overflow-hidden relative">
+    <div className="h-[calc(100vh-64px)] flex flex-col md:flex-row bg-gray-50 overflow-hidden relative animate-fade-in">
       
       {/* Sidebar - Mobile Responsive */}
       <div className="w-full md:w-96 bg-white/95 backdrop-blur-md border-r border-slate-200 shadow-[4px_0_24px_-12px_rgba(0,0,0,0.1)] flex flex-col z-20 md:h-full relative">
@@ -225,19 +225,19 @@ export default function LiveTrackingMap() {
         <div className="absolute top-4 right-4 z-[400] flex flex-col gap-2">
           <button 
             onClick={() => setMapZoom(prev => Math.min(prev + 1, 18))}
-            className="w-12 h-12 bg-white/95 backdrop-blur shadow-sm border border-slate-200 rounded-xl flex items-center justify-center text-slate-700 hover:text-blue-600 hover:bg-slate-50 transition-colors"
+            className="w-12 h-12 bg-white/95 backdrop-blur shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] rounded-[16px] flex items-center justify-center text-slate-700 hover:text-blue-600 hover:bg-slate-50 transition-colors"
           >
             <span className="text-2xl font-light leading-none">+</span>
           </button>
           <button 
             onClick={() => setMapZoom(prev => Math.max(prev - 1, 3))}
-            className="w-12 h-12 bg-white/95 backdrop-blur shadow-sm border border-slate-200 rounded-xl flex items-center justify-center text-slate-700 hover:text-blue-600 hover:bg-slate-50 transition-colors"
+            className="w-12 h-12 bg-white/95 backdrop-blur shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] rounded-[16px] flex items-center justify-center text-slate-700 hover:text-blue-600 hover:bg-slate-50 transition-colors"
           >
             <span className="text-2xl font-light leading-none">-</span>
           </button>
           <button 
             onClick={() => setMapCenter([28.6139, 77.2090])}
-            className="w-12 h-12 mt-4 bg-white/95 backdrop-blur shadow-sm border border-slate-200 rounded-xl flex items-center justify-center text-slate-700 hover:text-blue-600 hover:bg-slate-50 transition-colors"
+            className="w-12 h-12 mt-4 bg-white/95 backdrop-blur shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] rounded-[16px] flex items-center justify-center text-slate-700 hover:text-blue-600 hover:bg-slate-50 transition-colors"
             title="Recenter Map"
           >
             <Crosshair className="h-5 w-5" />

@@ -13,7 +13,7 @@ import { fileApi } from '../../api/fileApi';
 import { useToast } from '../../context/ToastContext';
 
 const SectionCard = ({ title, icon: Icon, children, colorCls = "text-indigo-600" }) => (
-  <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-full transition-all hover:shadow-md">
+  <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-6 h-full transition-all hover:shadow-lg">
     <div className="flex items-center gap-2 mb-6">
       <div className={`p-2 rounded-xl bg-slate-50 ${colorCls}`}>
         <Icon size={18} />
@@ -83,11 +83,11 @@ const TeacherDetailPage = () => {
         <div className="flex items-center gap-3">
           <button 
             onClick={() => navigate(`/admin/teachers/${id}/edit`)}
-            className="px-6 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 font-bold text-sm hover:border-indigo-200 hover:text-indigo-600 transition-all shadow-sm flex items-center gap-2"
+            className="px-6 py-3 min-h-[44px] rounded-[16px] bg-white border border-[#f1f5f9] text-slate-600 font-bold text-sm hover:border-indigo-200 hover:text-indigo-600 transition-all shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] flex items-center gap-2"
           >
             <Edit3 size={16} /> Edit Profile
           </button>
-          <button className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-black text-sm hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 flex items-center gap-2">
+          <button className="bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-6 py-3 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all flex items-center gap-2">
             <Fingerprint size={16} /> Biometric Sync
           </button>
         </div>
@@ -97,7 +97,7 @@ const TeacherDetailPage = () => {
         
         {/* ── Sidebar: Persona ───────────────────────────────────────── */}
         <div className="lg:col-span-3 space-y-6">
-          <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8 text-center flex flex-col items-center">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8 text-center flex flex-col items-center">
             <div className="relative mb-6 group">
               <div className="w-32 h-32 rounded-[2.5rem] bg-indigo-50 border-4 border-white shadow-xl overflow-hidden flex items-center justify-center ring-1 ring-slate-100">
                 {teacher.profilePhoto ? (
@@ -176,7 +176,7 @@ const TeacherDetailPage = () => {
                 </div>
              </SectionCard>
 
-             <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8 flex flex-col justify-center">
+             <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8 flex flex-col justify-center">
                 <div className="flex items-center gap-4 mb-4">
                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
                       <GraduationCap size={24} />
@@ -193,7 +193,7 @@ const TeacherDetailPage = () => {
              </div>
           </div>
 
-          <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8">
             <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
               <MapPin size={16} className="text-indigo-600" /> Residential Address
             </h3>

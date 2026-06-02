@@ -53,7 +53,7 @@ const FinanceDashboard = () => {
       
       <Row gutter={[16, 16]} className="mb-6">
         <Col xs={24} sm={12} lg={6}>
-          <Card>
+          <Card className="rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
             <Statistic 
               title="Daily Collection" 
               value={stats.dailyCollection} 
@@ -63,7 +63,7 @@ const FinanceDashboard = () => {
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card>
+          <Card className="rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
             <Statistic 
               title="Outstanding Dues" 
               value={stats.outstandingDues} 
@@ -73,7 +73,7 @@ const FinanceDashboard = () => {
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card>
+          <Card className="rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
             <Statistic 
               title="Collection Efficiency" 
               value={stats.collectionEfficiency} 
@@ -84,7 +84,7 @@ const FinanceDashboard = () => {
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card>
+          <Card className="rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
             <Statistic 
               title="Total Defaulters" 
               value={stats.defaulterCount} 
@@ -95,7 +95,7 @@ const FinanceDashboard = () => {
         </Col>
       </Row>
 
-      <Card title="Top Defaulters" className="shadow-sm">
+      <Card title="Top Defaulters" className="rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
         <Table columns={columns} dataSource={[]} pagination={false} />
       </Card>
     </div>

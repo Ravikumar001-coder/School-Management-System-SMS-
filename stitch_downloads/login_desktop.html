@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login | SchoolOS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "background": "#fbf8ff",
+                "surface-container-highest": "#e3e1eb",
+                "primary-fixed-dim": "#b8c4ff",
+                "outline": "#757684",
+                "neutral-bg": "#F8FAFC",
+                "on-secondary-fixed": "#00201d",
+                "tertiary": "#611e00",
+                "on-background": "#1a1b22",
+                "on-secondary-fixed-variant": "#00504a",
+                "inverse-primary": "#b8c4ff",
+                "text-body": "#334155",
+                "on-primary-fixed": "#001453",
+                "tertiary-container": "#872d00",
+                "on-tertiary": "#ffffff",
+                "inverse-surface": "#2f3037",
+                "inverse-on-surface": "#f1f0fa",
+                "secondary-fixed-dim": "#80d5cb",
+                "secondary-container": "#99efe5",
+                "tertiary-fixed-dim": "#ffb59a",
+                "on-error": "#ffffff",
+                "warning": "#B45309",
+                "role-student": "#7C3AED",
+                "surface-container-lowest": "#ffffff",
+                "outline-variant": "#c4c5d5",
+                "on-tertiary-container": "#ffa583",
+                "surface-variant": "#e3e1eb",
+                "on-error-container": "#93000a",
+                "on-primary-fixed-variant": "#173bab",
+                "on-primary": "#ffffff",
+                "surface": "#fbf8ff",
+                "on-surface-variant": "#444653",
+                "error": "#ba1a1a",
+                "secondary": "#006a63",
+                "surface-container-low": "#f4f2fc",
+                "surface-dim": "#dad9e3",
+                "surface-tint": "#3755c3",
+                "text-heading": "#0F172A",
+                "surface-bg": "#F1F5F9",
+                "on-surface": "#1a1b22",
+                "on-tertiary-fixed-variant": "#802a00",
+                "error-container": "#ffdad6",
+                "on-primary-container": "#a8b8ff",
+                "primary-container": "#1e40af",
+                "tertiary-fixed": "#ffdbce",
+                "primary": "#00288e",
+                "surface-container-high": "#e8e7f1",
+                "on-tertiary-fixed": "#380d00",
+                "primary-light": "#DBEAFE",
+                "success": "#15803D",
+                "role-admin": "#1D4ED8",
+                "surface-container": "#eeedf7",
+                "on-secondary-container": "#006f67",
+                "surface-bright": "#fbf8ff",
+                "danger": "#B91C1C",
+                "secondary-fixed": "#9cf2e8",
+                "on-secondary": "#ffffff",
+                "primary-fixed": "#dde1ff"
+            },
+            "borderRadius": {
+                "DEFAULT": "4px",
+                "lg": "8px",
+                "xl": "12px",
+                "full": "9999px"
+            },
+            "spacing": {
+                "sm": "8px",
+                "xl": "48px",
+                "gutter": "16px",
+                "base": "4px",
+                "md": "16px",
+                "xs": "4px",
+                "margin": "24px",
+                "lg": "24px"
+            },
+            "fontFamily": {
+                "label-xs": ["Inter"],
+                "body-sm": ["Inter"],
+                "headline-md": ["Inter"],
+                "headline-lg": ["Inter"],
+                "title-lg": ["Inter"],
+                "headline-md-mobile": ["Inter"],
+                "stat-display": ["Inter"],
+                "body-base": ["Inter"]
+            },
+            "fontSize": {
+                "label-xs": ["11px", {"lineHeight": "15px", "fontWeight": "500"}],
+                "body-sm": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}],
+                "headline-lg": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                "title-lg": ["18px", {"lineHeight": "25px", "fontWeight": "600"}],
+                "headline-md-mobile": ["20px", {"lineHeight": "26px", "fontWeight": "600"}],
+                "stat-display": ["36px", {"lineHeight": "40px", "fontWeight": "700"}],
+                "body-base": ["15px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fbf8ff;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-stretch overflow-hidden">
+<!-- Left Side: Hero Illustration (50% or 60% wide) -->
+<aside class="hidden lg:flex lg:w-3/5 relative bg-primary-light items-center justify-center p-xl">
+<div class="absolute inset-0 z-0">
+<img alt="Institutional Educational Management Illustration" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-QXbtDBvGOPhjpIZYo4Ncj8IMZW3akHW-laqNbfIIvwAKu6vrFfPN5GHuJBj3T0jXd4GLqGFn0guIZpaK0OubCnhlSZpnoehKARFHzqFCytabm1cdvsognqMWVEuwhHzPdQZy-8qwghBldaTy8E6fKA5b9B2pqUWmYjGTgHTUinXu8gFR7e-p_r1jZzm31qJSDTQn6jNKL5ZTfFkqzleaB8VYjWAePSYmnpnUG0nEQN3gJ4f2fep3mvIRsfK_tuiEGa29ZG4nKGc"/>
+<!-- Overlay to blend slightly with the brand identity -->
+<div class="absolute inset-0 bg-primary/5 mix-blend-multiply"></div>
+</div>
+<!-- Subtle floating branding element on hero -->
+<div class="relative z-10 glass-effect p-lg rounded-xl max-w-md shadow-lg border border-outline-variant/30">
+<div class="flex items-center gap-sm mb-sm text-primary">
+<span class="material-symbols-outlined text-stat-display">school</span>
+<span class="font-headline-lg text-headline-lg tracking-tight">SchoolOS</span>
+</div>
+<p class="font-body-base text-body-base text-on-surface-variant">
+                The centralized hub for academic excellence, administrative efficiency, and collaborative learning.
+            </p>
+</div>
+</aside>
+<!-- Right Side: Login Form (40% wide) -->
+<main class="w-full lg:w-2/5 flex flex-col justify-center items-center bg-background px-margin lg:px-xl py-xl">
+<div class="w-full max-w-md space-y-xl">
+<!-- Branding Header -->
+<header class="flex flex-col items-center lg:items-start space-y-sm">
+<div class="flex items-center gap-sm text-primary">
+<span class="material-symbols-outlined text-headline-lg">school</span>
+<h1 class="font-headline-md text-headline-md tracking-tight">SchoolOS</h1>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mt-base">Sign in to your account</h2>
+<p class="font-body-base text-body-base text-on-surface-variant">Welcome back! Please enter your details.</p>
+</header>
+<!-- Role Selector Strip -->
+<nav class="flex p-base bg-surface-container rounded-lg gap-base">
+<button class="role-tab flex-1 py-sm font-label-xs text-label-xs rounded-lg transition-all bg-primary text-on-primary shadow-sm" id="tab-admin" onclick="setRole('Admin')">Admin</button>
+<button class="role-tab flex-1 py-sm font-label-xs text-label-xs rounded-lg transition-all text-on-surface-variant hover:bg-surface-container-high" id="tab-teacher" onclick="setRole('Teacher')">Teacher</button>
+<button class="role-tab flex-1 py-sm font-label-xs text-label-xs rounded-lg transition-all text-on-surface-variant hover:bg-surface-container-high" id="tab-student" onclick="setRole('Student')">Student</button>
+<button class="role-tab flex-1 py-sm font-label-xs text-label-xs rounded-lg transition-all text-on-surface-variant hover:bg-surface-container-high" id="tab-parent" onclick="setRole('Parent')">Parent</button>
+</nav>
+<!-- Login Form -->
+<form action="#" class="space-y-lg" onsubmit="return false;">
+<!-- Identity Input -->
+<div class="space-y-sm">
+<label class="block font-label-xs text-label-xs text-on-surface-variant" for="identity">Email or Username</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">alternate_email</span>
+<input class="w-full pl-10 pr-md py-sm bg-surface border border-outline-variant rounded-lg font-body-base text-body-base focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none" id="identity" name="identity" placeholder="e.g. j.smith@school.edu" type="text"/>
+</div>
+</div>
+<!-- Password Input -->
+<div class="space-y-sm">
+<div class="flex justify-between items-center">
+<label class="block font-label-xs text-label-xs text-on-surface-variant" for="password">Password</label>
+<a class="font-label-xs text-label-xs text-primary hover:underline" href="#">Forgot Password?</a>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">lock</span>
+<input class="w-full pl-10 pr-10 py-sm bg-surface border border-outline-variant rounded-lg font-body-base text-body-base focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none" id="password" name="password" placeholder="••••••••" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface-variant transition-colors" onclick="togglePassword()" type="button">
+<span class="material-symbols-outlined" id="eye-icon">visibility</span>
+</button>
+</div>
+</div>
+<!-- Keep me logged in -->
+<div class="flex items-center gap-sm">
+<input class="w-4 h-4 text-primary border-outline-variant rounded focus:ring-primary" id="remember" type="checkbox"/>
+<label class="font-body-sm text-body-sm text-on-surface-variant select-none" for="remember">Remember me for 30 days</label>
+</div>
+<!-- Action Button -->
+<button class="w-full py-sm bg-primary-container text-white font-title-lg text-title-lg rounded-lg shadow-md hover:bg-primary transition-all active:scale-[0.98] focus:ring-4 focus:ring-primary/20" type="submit">
+                    Sign In
+                </button>
+</form>
+<!-- Alternative Footer Action -->
+<footer class="pt-lg border-t border-outline-variant/30 text-center lg:text-left">
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                    Looking for student registration? 
+                    <a class="text-primary font-semibold hover:underline" href="#">Contact Admissions</a>
+</p>
+<div class="mt-md">
+<a class="inline-flex items-center gap-xs font-label-xs text-label-xs text-primary group" href="#">
+<span>Parent Login</span>
+<span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">chevron_right</span>
+</a>
+</div>
+</footer>
+</div>
+<!-- Sticky Mobile Branding (visible only on mobile) -->
+<div class="mt-auto pt-xl lg:hidden text-outline text-center">
+<p class="font-label-xs text-label-xs">© 2024 SchoolOS Platform. All Rights Reserved.</p>
+</div>
+</main>
+<script>
+        function togglePassword() {
+            const pwdInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eye-icon');
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                eyeIcon.innerText = 'visibility_off';
+            } else {
+                pwdInput.type = 'password';
+                eyeIcon.innerText = 'visibility';
+            }
+        }
+
+        function setRole(role) {
+            // Remove active classes from all tabs
+            const tabs = document.querySelectorAll('.role-tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('bg-primary', 'text-on-primary', 'shadow-sm');
+                tab.classList.add('text-on-surface-variant', 'hover:bg-surface-container-high');
+            });
+
+            // Add active class to target tab
+            const targetId = 'tab-' + role.toLowerCase();
+            const activeTab = document.getElementById(targetId);
+            activeTab.classList.remove('text-on-surface-variant', 'hover:bg-surface-container-high');
+            activeTab.classList.add('bg-primary', 'text-on-primary', 'shadow-sm');
+
+            // Optional: Micro-interaction logic for role-specific placeholders
+            const idField = document.getElementById('identity');
+            if (role === 'Student') {
+                idField.placeholder = 'e.g. Student ID #2024';
+            } else if (role === 'Admin') {
+                idField.placeholder = 'e.g. admin_office_main';
+            } else {
+                idField.placeholder = 'e.g. j.smith@school.edu';
+            }
+        }
+
+        // Initialize with ripple or hover effects if needed
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                // Micro-interaction logic can go here
+            });
+        });
+    </script>
+</body></html>

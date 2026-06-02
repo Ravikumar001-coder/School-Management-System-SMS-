@@ -16,10 +16,10 @@ import { fileApi } from '../../api/fileApi';
 
 const StatusBadge = ({ status }) => {
   const styles = {
-    ACTIVE:    'bg-emerald-50 text-emerald-700 border-emerald-200',
-    INACTIVE:  'bg-rose-50    text-rose-700    border-rose-200',
-    GRADUATED: 'bg-blue-50    text-blue-700    border-blue-200',
-    SUSPENDED: 'bg-amber-50   text-amber-700   border-amber-200',
+    ACTIVE:    'bg-[#15803D]/10 text-[#166534] border-[#15803D]/20',
+    INACTIVE:  'bg-[#B91C1C]/10 text-[#991B1B] border-[#B91C1C]/20',
+    GRADUATED: 'bg-[#0369A1]/10 text-[#075985] border-[#0369A1]/20',
+    SUSPENDED: 'bg-[#B45309]/10 text-[#92400E] border-[#B45309]/20',
   };
   return (
     <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border uppercase tracking-wider ${styles[status] || styles.ACTIVE}`}>
@@ -188,7 +188,7 @@ const StudentsListPage = () => {
         actions={
           <button
             onClick={() => navigate('/admin/students/new')}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-lg shadow-indigo-100"
+            className="flex items-center gap-2 bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-6 py-3 rounded-[16px] font-bold text-sm transition-all shadow-md min-h-[44px]"
           >
             <Plus size={16} /> Register Student
           </button>
@@ -196,21 +196,21 @@ const StudentsListPage = () => {
       />
 
       {/* ── KPI Dashboard Cards ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <div className="bg-gradient-to-br from-indigo-50/50 to-white rounded-2xl border border-indigo-100/60 p-5 shadow-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+        <div className="bg-white rounded-[16px] border border-[#f1f5f9] p-5 shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)]">
           <div className="flex justify-between items-start">
             <div>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Students</p>
               <h3 className="text-2xl font-black text-slate-800 mt-2">{totalElements}</h3>
             </div>
-            <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100/50">
+            <div className="p-2.5 rounded-[12px] bg-[#DBEAFE] text-[#1E40AF]">
               <GraduationCap size={20} />
             </div>
           </div>
-          <p className="text-[10px] font-bold text-indigo-600 mt-2">Active academic directory</p>
+          <p className="text-[10px] font-bold text-[#1E40AF] mt-2">Active academic directory</p>
         </div>
 
-        <div className="bg-gradient-to-br from-emerald-50/50 to-white rounded-2xl border border-emerald-100/60 p-5 shadow-sm">
+        <div className="bg-white rounded-[16px] border border-[#f1f5f9] p-5 shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)]">
           <div className="flex justify-between items-start">
             <div>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Status</p>
@@ -218,27 +218,27 @@ const StudentsListPage = () => {
                 {students.filter(s => s.status === 'ACTIVE').length || 0}
               </h3>
             </div>
-            <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100/50">
+            <div className="p-2.5 rounded-[12px] bg-emerald-50 text-[#15803D]">
               <ShieldCheck size={20} />
             </div>
           </div>
-          <p className="text-[10px] font-bold text-emerald-600 mt-2">Currently attending classes</p>
+          <p className="text-[10px] font-bold text-[#15803D] mt-2">Currently attending classes</p>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-50/50 to-white rounded-2xl border border-purple-100/60 p-5 shadow-sm">
+        <div className="bg-white rounded-[16px] border border-[#f1f5f9] p-5 shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)]">
           <div className="flex justify-between items-start">
             <div>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Grade Rooms</p>
               <h3 className="text-2xl font-black text-slate-800 mt-2">{classes.length}</h3>
             </div>
-            <div className="p-2.5 rounded-xl bg-purple-50 text-purple-600 border border-purple-100/50">
+            <div className="p-2.5 rounded-[12px] bg-purple-50 text-purple-700">
               <BookOpen size={20} />
             </div>
           </div>
-          <p className="text-[10px] font-bold text-purple-600 mt-2">Active grade rooms</p>
+          <p className="text-[10px] font-bold text-purple-700 mt-2">Active grade rooms</p>
         </div>
 
-        <div className="bg-gradient-to-br from-rose-50/50 to-white rounded-2xl border border-rose-100/60 p-5 shadow-sm">
+        <div className="bg-white rounded-[16px] border border-[#f1f5f9] p-5 shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)]">
           <div className="flex justify-between items-start">
             <div>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Linked Families</p>
@@ -246,11 +246,11 @@ const StudentsListPage = () => {
                 {students.filter(s => s.parentName).length || 0}
               </h3>
             </div>
-            <div className="p-2.5 rounded-xl bg-rose-50 text-rose-600 border border-rose-100/50">
+            <div className="p-2.5 rounded-[12px] bg-[#DBEAFE] text-[#1E40AF]">
               <Heart size={20} />
             </div>
           </div>
-          <p className="text-[10px] font-bold text-rose-600 mt-2">Active primary guardians</p>
+          <p className="text-[10px] font-bold text-[#1E40AF] mt-2">Active primary guardians</p>
         </div>
       </div>
 
@@ -280,7 +280,7 @@ const StudentsListPage = () => {
       )}
 
       {/* ── Toolbar ── */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 mb-6 flex flex-wrap gap-4 items-center justify-between">
+      <div className="bg-white rounded-[16px] border border-[#f1f5f9] p-4 mb-6 flex flex-wrap gap-4 items-center justify-between shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)]">
         <div className="flex-1 flex gap-4 min-w-[320px]">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -318,7 +318,7 @@ const StudentsListPage = () => {
       </div>
 
       {/* ── Desktop Table ── */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hidden sm:block">
+      <div className="bg-white rounded-[16px] border border-[#f1f5f9] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] overflow-hidden hidden sm:block">
         {loading ? (
           <div className="py-24"><LoadingSpinner /></div>
         ) : (
@@ -446,7 +446,7 @@ const StudentsListPage = () => {
         )}
         {!loading && students.map(s => (
           <div key={s.id}
-            className={`bg-white rounded-2xl border shadow-sm p-5 transition-all ${selected.has(s.id) ? 'border-indigo-300 bg-indigo-50/30' : 'border-slate-100 hover:border-indigo-100'}`}>
+            className={`bg-white rounded-[16px] border p-5 transition-all shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] ${selected.has(s.id) ? 'border-[#1E40AF] bg-[#DBEAFE]/30' : 'border-[#f1f5f9] hover:border-[#DBEAFE]'}`}>
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3 flex-1">
                 <input type="checkbox" checked={selected.has(s.id)} onChange={() => toggleOne(s.id)}

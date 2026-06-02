@@ -59,20 +59,20 @@ const StaffAttendanceLogs = () => {
   ];
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="bg-gray-50 min-h-screen p-6 animate-fade-in">
+      <div className="flex justify-between items-center mb-6 bg-white p-5 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
         <h1 className="text-2xl font-bold">Biometric Attendance Logs</h1>
         <Space>
           <DatePicker value={selectedDate} onChange={setSelectedDate} />
-          <Button type="primary" onClick={handleSync} loading={loading} icon={<RefreshCw size={16} />}>
-            Force Sync
-          </Button>
+          <button onClick={handleSync} disabled={loading} className="bg-[#1E40AF] text-white px-6 py-2 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all flex items-center gap-2 hover:bg-[#1E3A8A]">
+            {loading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div> : <RefreshCw size={16} />} Force Sync
+          </button>
         </Space>
       </div>
       
-      <Card>
+      <div className="bg-white p-5 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
         <Table columns={columns} dataSource={logs} loading={loading} />
-      </Card>
+      </div>
     </div>
   );
 };

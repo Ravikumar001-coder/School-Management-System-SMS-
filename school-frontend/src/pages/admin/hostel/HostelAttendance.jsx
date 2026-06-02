@@ -93,14 +93,14 @@ export default function HostelAttendance() {
         actions={
           <button
             onClick={handleSaveAttendance}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition-all shadow-sm"
+            className="bg-[#1E40AF] text-white px-6 py-2 rounded-[16px] min-h-[44px] font-bold text-sm shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] transition-all flex items-center justify-center gap-2 hover:bg-[#1E3A8A]"
           >
             <ClipboardCheck size={16} /> Save Roll Call
           </button>
         }
       />
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 mb-5 flex flex-wrap gap-3 items-center">
+      <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-4 mb-5 flex flex-wrap gap-3 items-center">
         <div className="flex flex-wrap gap-2 items-center w-full">
           <div className="flex items-center gap-1.5 text-slate-500 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100">
             <Filter size={12} />
@@ -133,13 +133,13 @@ export default function HostelAttendance() {
           </select>
 
           <div className="ml-auto flex gap-2">
-             <button onClick={() => handleMarkAll('PRESENT')} className="px-3 py-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors">Mark All Present</button>
-             <button onClick={() => handleMarkAll('ABSENT')} className="px-3 py-1.5 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg transition-colors">Mark All Absent</button>
+             <button onClick={() => handleMarkAll('PRESENT')} className="px-4 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-[16px] transition-colors min-h-[36px]">Mark All Present</button>
+             <button onClick={() => handleMarkAll('ABSENT')} className="px-4 py-2 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-[16px] transition-colors min-h-[36px]">Mark All Absent</button>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hidden sm:block">
+      <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] overflow-hidden hidden sm:block">
         {loading ? (
           <div className="py-20 text-center"><LoadingSpinner /></div>
         ) : filteredAllocations.length === 0 ? (

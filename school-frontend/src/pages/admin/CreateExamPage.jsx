@@ -158,7 +158,7 @@ const CreateExamPage = () => {
     <>
       <PageHeader title="Create Exam" subtitle="Home > Academic > Create Exam" />
 
-      <div className="bg-white rounded-xl shadow border border-gray-100 p-5 space-y-5">
+      <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-5 space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1">Exam Name</label>
@@ -240,7 +240,7 @@ const CreateExamPage = () => {
             <button
               type="button"
               onClick={addRow}
-              className="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800"
+              className="bg-[#1E40AF] text-white px-5 py-2 rounded-[12px] text-sm font-bold hover:bg-[#1E3A8A]"
             >
               Add Subject Row
             </button>
@@ -379,7 +379,7 @@ const CreateExamPage = () => {
           <button
             onClick={handleSave}
             disabled={loading}
-            className="bg-blue-700 text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-800 disabled:opacity-60"
+            className="bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-6 py-3 rounded-[16px] text-sm font-bold shadow-md min-h-[44px] disabled:opacity-60"
           >
             {loading ? 'Saving...' : 'Save Exam'}
           </button>

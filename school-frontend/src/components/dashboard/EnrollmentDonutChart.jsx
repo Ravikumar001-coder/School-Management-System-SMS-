@@ -34,7 +34,7 @@ const EnrollmentDonutChart = ({ distribution = {}, loading }) => {
   }, [distribution]);
 
   return (
-    <div className="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+    <div className="lg:col-span-1 bg-white rounded-[16px] border border-[#f1f5f9] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] p-6">
       <div className="flex justify-between items-center mb-2">
         <h3 className="text-sm font-black text-slate-800">Student Enrollment</h3>
         <button 

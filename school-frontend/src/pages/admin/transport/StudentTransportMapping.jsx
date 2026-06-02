@@ -102,8 +102,8 @@ export default function StudentTransportMapping() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+    <div className="bg-gray-50 min-h-screen p-6 animate-fade-in"><div className="max-w-7xl mx-auto space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Student Assignment Wizard</h1>
           <p className="text-sm text-slate-500 mt-1">Map students to physical bus stops and routes</p>
@@ -112,7 +112,7 @@ export default function StudentTransportMapping() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Route Selection Panel */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[650px] overflow-hidden">
+        <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] flex flex-col h-[650px] overflow-hidden">
           <div className="p-5 border-b border-slate-100 bg-slate-50/50">
             <h2 className="font-bold text-slate-900 flex items-center gap-2">
               <span className="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
@@ -153,7 +153,7 @@ export default function StudentTransportMapping() {
         </div>
 
         {/* Assignment Wizard Panel */}
-        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[650px] overflow-hidden">
+        <div className="lg:col-span-2 bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] flex flex-col h-[650px] overflow-hidden">
           <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
              <h2 className="font-bold text-slate-900 flex items-center gap-2">
               <span className="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
@@ -272,7 +272,7 @@ export default function StudentTransportMapping() {
             <button 
               onClick={handleSubmit}
               disabled={!selectedStudent || (!formData.pickupStopId && !formData.dropStopId) || isSubmitting}
-              className="w-full h-[52px] bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed text-white rounded-xl font-bold transition-all shadow-sm flex items-center justify-center gap-2"
+              className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all hover:bg-[#1E3A8A] w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
@@ -286,6 +286,7 @@ export default function StudentTransportMapping() {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

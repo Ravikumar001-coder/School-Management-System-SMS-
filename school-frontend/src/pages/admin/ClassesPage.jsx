@@ -198,7 +198,7 @@ const ClassesPage = () => {
           </div>
           <button
             onClick={openCreate}
-            className="bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-800"
+            className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] text-sm font-bold shadow-md hover:bg-[#1E3A8A] min-h-[44px]"
           >
             Add New Class
           </button>
@@ -223,7 +223,7 @@ const ClassesPage = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow p-4 mb-4 flex flex-wrap gap-3 items-center border border-gray-100">
+      <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-4 mb-5 flex flex-wrap gap-3 items-center">
         <div className="relative w-full sm:w-72">
           <input
             value={search}
@@ -259,7 +259,7 @@ const ClassesPage = () => {
         </span>
       </div>
 
-      <div className="bg-white rounded-xl shadow overflow-hidden border border-gray-100">
+      <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] overflow-hidden border border-[#f1f5f9]">
         {loading ? (
           <div className="p-8 text-sm text-gray-500">Loading classes...</div>
         ) : (

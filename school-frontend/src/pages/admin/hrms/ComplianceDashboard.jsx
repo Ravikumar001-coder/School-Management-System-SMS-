@@ -68,20 +68,20 @@ const ComplianceDashboard = () => {
     {
       title: 'Action',
       render: (_, r) => r.status === 'DRAFT' ? (
-        <Button type="primary" size="small" onClick={() => handleSubmitChallan(r.id)}>Submit Challan</Button>
+        <button onClick={() => handleSubmitChallan(r.id)} className="bg-[#1E40AF] text-white px-4 py-2 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all flex items-center gap-2 hover:bg-[#1E3A8A]">Submit Challan</button>
       ) : (
-        <Button icon={<CheckCircle size={14} />} size="small" disabled>Submitted</Button>
+        <button disabled className="bg-slate-300 text-slate-500 px-4 py-2 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all flex items-center gap-2"><CheckCircle size={14} /> Submitted</button>
       )
     }
   ];
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="bg-gray-50 min-h-screen p-6 animate-fade-in">
+      <div className="flex justify-between items-center mb-6 bg-white p-5 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
         <h1 className="text-2xl font-bold">PF & ESI Compliance</h1>
       </div>
       
-      <Card className="mb-6">
+      <Card className="mb-6 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
         <Form form={form} layout="inline" onFinish={handleGenerate}>
           <Form.Item name="year" initialValue={new Date().getFullYear()}>
             <Select style={{ width: 120 }}>
@@ -94,14 +94,17 @@ const ComplianceDashboard = () => {
             </Select>
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading} icon={<FileText size={16} className="mr-2"/>}>
+            <button type="submit" disabled={loading} className="bg-[#1E40AF] text-white px-6 py-2 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all flex items-center gap-2 hover:bg-[#1E3A8A]">
+              {loading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div> : <FileText size={16} />}
               Generate Report
-            </Button>
+            </button>
           </Form.Item>
         </Form>
       </Card>
 
-      <Table columns={columns} dataSource={reports} loading={loading} />
+      <div className="bg-white p-5 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
+        <Table columns={columns} dataSource={reports} loading={loading} />
+      </div>
     </div>
   );
 };

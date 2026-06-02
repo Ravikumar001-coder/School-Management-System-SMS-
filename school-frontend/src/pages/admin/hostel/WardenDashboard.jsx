@@ -58,7 +58,7 @@ export default function WardenDashboard() {
         actions={
           <button 
             onClick={fetchDashboardData}
-            className="flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-5 py-2.5 rounded-xl font-medium text-sm transition-all shadow-sm"
+            className="bg-white border border-[#f1f5f9] text-slate-700 px-6 py-2 rounded-[16px] min-h-[44px] font-bold text-sm shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] transition-all flex items-center justify-center gap-2 hover:bg-slate-50"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin text-blue-500' : ''}`} /> Refresh Data
           </button>
@@ -71,7 +71,7 @@ export default function WardenDashboard() {
         <>
           {/* KPI Strip */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 relative overflow-hidden group">
+            <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-5 relative overflow-hidden group">
               <div className="absolute -right-4 -bottom-4 opacity-5 transform group-hover:scale-110 transition-transform duration-300">
                 <Layers className="w-24 h-24" />
               </div>
@@ -79,7 +79,7 @@ export default function WardenDashboard() {
               <h3 className="text-3xl font-bold text-slate-900">{stats.totalBlocks}</h3>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 relative overflow-hidden group">
+            <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-5 relative overflow-hidden group">
               <div className="absolute -right-4 -bottom-4 opacity-5 transform group-hover:scale-110 transition-transform duration-300 text-blue-600">
                 <Home className="w-24 h-24" />
               </div>
@@ -87,7 +87,7 @@ export default function WardenDashboard() {
               <h3 className="text-3xl font-bold text-blue-600">{stats.totalRooms}</h3>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 relative overflow-hidden group">
+            <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-5 relative overflow-hidden group">
               <div className="absolute -right-4 -bottom-4 opacity-5 transform group-hover:scale-110 transition-transform duration-300 text-emerald-600">
                 <Users className="w-24 h-24" />
               </div>
@@ -95,7 +95,7 @@ export default function WardenDashboard() {
               <h3 className="text-3xl font-bold text-emerald-600">{stats.totalStudents}</h3>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 relative overflow-hidden group">
+            <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-5 relative overflow-hidden group">
               <div className="absolute -right-4 -bottom-4 opacity-5 transform group-hover:scale-110 transition-transform duration-300 text-amber-500">
                 <Bed className="w-24 h-24" />
               </div>
@@ -114,7 +114,7 @@ export default function WardenDashboard() {
                 <h3 className="text-[15px] font-bold text-slate-900">Block Overview</h3>
               </div>
               
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-1">
+              <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-1">
                 <div className="space-y-1">
                   {blocksList.length === 0 ? (
                     <div className="p-5 text-center text-slate-500 text-sm">No active blocks found.</div>
@@ -176,7 +176,7 @@ export default function WardenDashboard() {
                   }
 
                   return (
-                    <div key={alert.id} className={`p-4 rounded-2xl border ${bgClass} shadow-sm transition-all hover:shadow-md`}>
+                    <div key={alert.id} className={`p-4 rounded-[16px] border ${bgClass} shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] transition-all hover:shadow-md`}>
                       <div className="flex gap-3 items-start">
                         <div className={`mt-0.5 ${iconClass}`}>
                           <Icon className="h-5 w-5" />

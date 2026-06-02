@@ -37,39 +37,39 @@ const SalaryPayoutsUI = () => {
         {
             title: 'Action',
             render: (_, r) => r.status !== 'Transferred' && (
-                <Button size="small" type="primary" onClick={() => handleMarkAsPaid(r.id)}>
+                <button className="bg-[#1E40AF] text-white px-4 py-2 rounded-[16px] min-h-[36px] font-bold text-xs shadow-md transition-all hover:bg-[#1E3A8A]" onClick={() => handleMarkAsPaid(r.id)}>
                     Mark Paid
-                </Button>
+                </button>
             )
         }
     ];
 
     return (
-        <div className="p-6">
+        <div className="bg-gray-50 min-h-screen p-6 animate-fade-in">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Salary Payouts</h1>
-                <div className="space-x-3">
-                    <Button icon={<Download size={16} />}>Bank Export (CSV)</Button>
-                    <Button type="primary" icon={<CreditCard size={16} />}>Bulk Transfer</Button>
+                <div className="flex">
+                    <button className="px-6 py-3 min-h-[44px] rounded-[16px] bg-gray-100 text-gray-700 font-bold text-sm hover:bg-gray-200 transition-all flex items-center gap-2 mr-2"><Download size={16} /> Bank Export (CSV)</button>
+                    <button className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] min-h-[44px] font-bold text-sm shadow-md transition-all flex items-center gap-2 hover:bg-[#1E3A8A]"><CreditCard size={16} /> Bulk Transfer</button>
                 </div>
             </div>
 
             <div className="grid grid-cols-4 gap-4 mb-6">
-                <Card className="bg-orange-50 border-orange-200">
+                <Card className="bg-orange-50 border-orange-200 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)]">
                     <div className="text-orange-600 text-sm font-bold">Pending Salary</div>
                     <div className="text-2xl font-bold text-gray-800">₹42,000</div>
                 </Card>
-                <Card className="bg-green-50 border-green-200">
+                <Card className="bg-green-50 border-green-200 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)]">
                     <div className="text-green-600 text-sm font-bold">Transferred</div>
                     <div className="text-2xl font-bold text-gray-800">₹38,200</div>
                 </Card>
-                <Card className="bg-red-50 border-red-200">
+                <Card className="bg-red-50 border-red-200 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)]">
                     <div className="text-red-600 text-sm font-bold">Failed Transfers</div>
                     <div className="text-2xl font-bold text-gray-800">₹35,000</div>
                 </Card>
             </div>
 
-            <Card>
+            <Card className="rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
                 <Table columns={columns} dataSource={payouts} rowKey="id" loading={loading} />
             </Card>
         </div>

@@ -79,7 +79,7 @@ const IdCardGenerator = () => {
             <button
               id="btn-print-id-cards"
               onClick={handlePrint}
-              className="btn-primary flex items-center gap-2"
+              className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] hover:bg-[#1E3A8A] font-bold text-sm min-h-[44px] shadow-md flex items-center gap-2"
               disabled={selectedKeys.length === 0}
             >
               <FiPrinter /> Print {selectedKeys.length > 0 ? `(${selectedKeys.length})` : 'Cards'}
@@ -88,7 +88,7 @@ const IdCardGenerator = () => {
         />
 
         {/* Class Selector */}
-        <div className="card p-5 mb-6 flex items-end gap-4 animate-fade-in">
+        <div className="bg-white rounded-[16px] p-5 mb-6 shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] flex items-end gap-4 animate-fade-in">
           <div className="flex-1">
             <label className="form-label">Select Class</label>
             <select
@@ -107,7 +107,7 @@ const IdCardGenerator = () => {
           <button
             onClick={fetchStudents}
             disabled={!selectedClassId || loadingStudents}
-            className="btn-secondary flex items-center gap-2 h-[42px]"
+            className="bg-gray-100 text-gray-700 px-6 py-3 rounded-[16px] font-bold flex items-center gap-2 min-h-[44px] hover:bg-gray-200"
           >
             <FiRefreshCw className={loadingStudents ? 'animate-spin' : ''} />
             {loadingStudents ? 'Loading...' : 'Fetch Students'}
@@ -116,7 +116,7 @@ const IdCardGenerator = () => {
 
         {/* Student Selection Table */}
         {students.length > 0 && (
-          <div className="card !p-0 overflow-hidden mb-6 animate-fade-in">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] !p-0 overflow-hidden mb-6 animate-fade-in">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <h3 className="text-sm font-black uppercase tracking-widest text-gray-500">
                 Select Students &nbsp;<span className="font-normal text-gray-400">({selectedKeys.length}/{students.length})</span>
@@ -170,7 +170,7 @@ const IdCardGenerator = () => {
 
         {/* Live Preview of Selected ID Cards */}
         {selectedStudents.length > 0 && (
-          <div className="card p-6 animate-fade-in">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-6 animate-fade-in">
             <h3 className="text-sm font-black uppercase tracking-widest text-gray-500 mb-4">
               ID Card Preview ({selectedStudents.length})
             </h3>

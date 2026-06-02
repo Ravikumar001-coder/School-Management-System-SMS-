@@ -5,7 +5,7 @@ import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const OverviewCard = ({ title, icon: Icon, onViewAll, children }) => {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col h-[280px]">
+    <div className="bg-white rounded-[16px] border border-[#f1f5f9] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] p-5 flex flex-col h-[280px]">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center">
@@ -41,7 +41,7 @@ const DepartmentOverviews = ({ stats, loading, onActionClick }) => {
 
   if (loading) {
      return <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
-       {[1,2,3,4].map(i => <div key={i} className="h-[280px] bg-white rounded-2xl border border-slate-100 animate-pulse" />)}
+       {[1,2,3,4].map(i => <div key={i} className="h-[280px] bg-white rounded-[16px] border border-[#f1f5f9] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] animate-pulse" />)}
      </div>;
   }
 

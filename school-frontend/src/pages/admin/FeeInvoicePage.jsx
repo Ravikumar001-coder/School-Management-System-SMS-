@@ -47,13 +47,13 @@ const FeeInvoicePage = () => {
           <div className="flex gap-2">
             <button
               onClick={() => navigate('/admin/fees')}
-              className="bg-gray-100 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-200"
+              className="bg-gray-100 text-gray-700 px-6 py-3 rounded-[16px] min-h-[44px] text-sm font-bold hover:bg-gray-200"
             >
               Back
             </button>
             <button
               onClick={handlePrint}
-              className="bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-800"
+              className="bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-6 py-3 rounded-[16px] min-h-[44px] text-sm font-bold shadow-md"
             >
               Download / Print
             </button>
@@ -62,7 +62,7 @@ const FeeInvoicePage = () => {
       />
 
       {invoice && (
-        <div className="bg-white rounded-xl shadow border border-gray-100 p-6 print:shadow-none print:border-none print:rounded-none">
+        <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-6 print:shadow-none print:border-none print:rounded-none">
           <div className="flex items-start justify-between border-b pb-4 mb-5">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Springdale Public School</h2>

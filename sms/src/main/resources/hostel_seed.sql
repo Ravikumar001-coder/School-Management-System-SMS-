@@ -80,14 +80,14 @@ VALUES
 SET @occupied_bed = (SELECT id FROM hostel_beds WHERE is_occupied = 1 LIMIT 1);
 
 -- Insert Mess Plans
-INSERT INTO mess_plans (branch_id, academic_year_id, plan_name, plan_type, description, status, monthly_fee, daily_rate, breakfast_rate, lunch_rate, dinner_rate, created_at, updated_at)
+INSERT INTO mess_plans (branch_id, plan_name, plan_type, status, monthly_rate, daily_rate, breakfast_cost, lunch_cost, dinner_cost, created_at, updated_at)
 VALUES
-(@branch_id, @academic_year_id, 'Standard Veg', 'VEGETARIAN', 'Standard 3 meals a day', 'ACTIVE', 3000.00, 100.00, 25.00, 40.00, 35.00, NOW(), NOW()),
-(@branch_id, @academic_year_id, 'Premium Non-Veg', 'NON_VEGETARIAN', 'Includes Non-Veg meals twice a week', 'ACTIVE', 4500.00, 150.00, 35.00, 60.00, 55.00, NOW(), NOW());
+(@branch_id, 'Standard Veg', 'VEG', 'ACTIVE', 3000.00, 100.00, 25.00, 40.00, 35.00, NOW(), NOW()),
+(@branch_id, 'Premium Non-Veg', 'NON_VEG', 'ACTIVE', 4500.00, 150.00, 35.00, 60.00, 55.00, NOW(), NOW());
 
 SET @mess_plan = (SELECT id FROM mess_plans LIMIT 1);
 
 -- Insert Allocation
-INSERT INTO hostel_allocations (student_id, bed_id, academic_year_id, mess_plan_id, allocation_date, expected_checkout_date, allocated_by_id, status, allocation_type, admin_approval, parent_consent, guardian_approval, locker_assigned, rfid_card_assigned, transport_linked, created_at, updated_at)
+INSERT INTO hostel_allocations (student_id, bed_id, academic_year_id, mess_plan_id, allocation_date, expected_checkout_date, allocated_by, status, allocation_type, admin_approval, parent_consent, guardian_approval, locker_assigned, rfid_card_assigned, transport_linked, created_at, updated_at)
 VALUES
 (@student_id, @occupied_bed, @academic_year_id, @mess_plan, CURRENT_DATE(), DATE_ADD(CURRENT_DATE(), INTERVAL 1 YEAR), @warden_id, 'ACTIVE', 'REGULAR', 1, 1, 0, 1, 1, 0, NOW(), NOW());

@@ -134,13 +134,13 @@ const PromotionEngine = () => {
           <div className="flex gap-2">
             <button
               onClick={() => setView('wizard')}
-              className={`btn-secondary flex items-center gap-2 ${view === 'wizard' ? 'ring-2 ring-blue-400' : ''}`}
+              className={`bg-gray-100 text-gray-700 px-6 py-3 rounded-[16px] font-bold min-h-[44px] hover:bg-gray-200 flex items-center gap-2 ${view === 'wizard' ? 'ring-2 ring-blue-400' : ''}`}
             >
               <FiArrowRight /> Promote
             </button>
             <button
               onClick={loadHistory}
-              className={`btn-secondary flex items-center gap-2 ${view === 'history' ? 'ring-2 ring-blue-400' : ''}`}
+              className={`bg-gray-100 text-gray-700 px-6 py-3 rounded-[16px] font-bold min-h-[44px] hover:bg-gray-200 flex items-center gap-2 ${view === 'history' ? 'ring-2 ring-blue-400' : ''}`}
             >
               <FiList /> History
             </button>
@@ -151,7 +151,7 @@ const PromotionEngine = () => {
       {view === 'wizard' && (
         <div className="animate-fade-in space-y-6">
           {/* Configuration Card */}
-          <div className="card p-6">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-6">
             <h3 className="text-sm font-black uppercase tracking-widest text-gray-500 mb-4">Step 1 — Configure Promotion</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
@@ -192,7 +192,7 @@ const PromotionEngine = () => {
           </div>
 
           {/* Students Table */}
-          <div className="card !p-0 overflow-hidden">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] !p-0 overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <h3 className="text-sm font-black uppercase tracking-widest text-gray-500">
                 Step 2 — Select Students to Promote
@@ -268,7 +268,7 @@ const PromotionEngine = () => {
                 id="btn-execute-promotion"
                 onClick={executePromotion}
                 disabled={executing || selectedKeys.length === 0}
-                className="btn-primary flex items-center gap-2 px-8 py-3 text-sm disabled:opacity-50"
+                className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] hover:bg-[#1E3A8A] font-bold text-sm min-h-[44px] shadow-md flex items-center gap-2 disabled:opacity-50"
               >
                 {executing ? 'Processing...' : `🚀 Execute Promotion (${selectedKeys.length} students)`}
               </button>
@@ -278,7 +278,7 @@ const PromotionEngine = () => {
       )}
 
       {view === 'history' && (
-        <div className="animate-fade-in card !p-0 overflow-hidden">
+        <div className="animate-fade-in bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] !p-0 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100">
             <h3 className="text-sm font-black uppercase tracking-widest text-gray-500">Promotion History</h3>
           </div>

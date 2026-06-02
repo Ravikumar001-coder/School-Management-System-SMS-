@@ -34,8 +34,8 @@ const JournalEntryList = () => {
   ];
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <Card className="mb-6" title="Journal Entries">
+    <div className="bg-gray-50 min-h-screen p-6 animate-fade-in">
+      <Card className="mb-6 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]" title="Journal Entries">
         <Table columns={columns} dataSource={entries} loading={loading} pagination={{ pageSize: 10 }} />
       </Card>
     </div>

@@ -17,6 +17,7 @@ import TeacherLayout from './components/layout/TeacherLayout';
 const LoginPage        = lazy(() => import('./pages/LoginPage'));
 const UnauthorizedPage = lazy(() => import('./pages/UnauthorizedPage'));
 const ChangePasswordPage = lazy(() => import('./pages/ChangePasswordPage'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 
 // Admin
 const AdminDashboard   = lazy(() => import('./pages/admin/AdminDashboard'));
@@ -164,6 +165,7 @@ function App() {
                 <Route path="/"             element={<Navigate to="/login" />} />
                 <Route path="/login"        element={<LoginPage />} />
                 <Route path="/unauthorized" element={<UnauthorizedPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/parent/login" element={<ParentLogin />} />
                 
                 {/* ── PROTECTED ROUTES (WITH LAYOUT) ── */}

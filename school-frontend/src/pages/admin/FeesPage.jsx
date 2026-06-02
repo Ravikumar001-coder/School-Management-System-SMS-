@@ -83,7 +83,7 @@ const FeesPage = () => {
         subtitle="Home > Academic > Fees Page"
         action={
           <button onClick={() => navigate('/admin/fees/collect')}
-            className="bg-blue-700 text-white px-5 py-2.5 rounded-lg hover:bg-blue-800 font-medium text-sm">
+            className="bg-[#1E40AF] text-white px-6 py-3 rounded-[16px] hover:bg-[#1E3A8A] font-bold text-sm min-h-[44px] shadow-md">
             Collect Fee
           </button>
         }
@@ -93,7 +93,7 @@ const FeesPage = () => {
       <>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
-        <div className="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] overflow-hidden">
           <div className="p-4 flex items-start justify-between">
             <div>
               <p className="text-2xl font-bold text-green-700">{formatInr(monthly?.totalCollection ?? collectedAmount)}</p>
@@ -104,7 +104,7 @@ const FeesPage = () => {
           <div className="bg-blue-50 text-blue-900 text-sm px-4 py-2.5">Total collected this term</div>
         </div>
 
-        <div className="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] overflow-hidden">
           <div className="p-4 flex items-start justify-between">
             <div>
               <p className="text-2xl font-bold text-gray-900">{formatInr(monthly?.totalPending ?? pendingAmount)}</p>
@@ -115,7 +115,7 @@ const FeesPage = () => {
           <div className="bg-indigo-50 text-indigo-900 text-sm px-4 py-2.5">Outstanding amount</div>
         </div>
 
-        <div className="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] overflow-hidden">
           <div className="p-4 flex items-start justify-between">
             <div>
               <p className="text-2xl font-bold text-green-700">{formatInr(dueThisMonth)}</p>

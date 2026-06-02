@@ -139,7 +139,7 @@ const TimetableManagementPage = () => {
           <button className="px-6 py-3 rounded-2xl bg-white border border-slate-200 text-slate-700 font-bold text-sm hover:bg-slate-50 transition-all flex items-center gap-2 shadow-sm">
              <Layers size={18} /> Conflict Audit
           </button>
-          <button className="px-6 py-3 rounded-2xl bg-indigo-600 text-white font-black text-sm hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 flex items-center gap-2">
+          <button className="px-6 py-3 rounded-[16px] bg-[#1E40AF] text-white font-black text-sm hover:bg-[#1E3A8A] transition-all shadow-md flex items-center gap-2 min-h-[44px]">
              <Sparkles size={18} /> Auto-Generate
           </button>
         </div>
@@ -149,7 +149,7 @@ const TimetableManagementPage = () => {
         
         {/* ── Left: Controller Panel ─────────────────────────────────── */}
         <div className="xl:col-span-3 space-y-6">
-          <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8 sticky top-24">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8 sticky top-24">
             <div className="flex items-center gap-3 mb-8">
               <div className="p-3 rounded-2xl bg-indigo-50 text-indigo-600">
                 <LayoutGrid size={20} />
@@ -246,8 +246,7 @@ const TimetableManagementPage = () => {
 
               <button 
                 type="submit" 
-                disabled={saving}
-                className="w-full py-4 mt-4 bg-indigo-600 text-white rounded-2xl font-black text-sm hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-4 mt-4 bg-[#1E40AF] text-white rounded-[16px] font-black text-sm hover:bg-[#1E3A8A] transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 min-h-[44px]"
               >
                 {saving ? 'Synchronizing...' : <><Plus size={18} /> Commit to Schedule</>}
               </button>
@@ -284,7 +283,7 @@ const TimetableManagementPage = () => {
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
                         {dayItems.map(item => (
-                          <div key={item.id} className="bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm hover:shadow-xl transition-all group relative">
+                          <div key={item.id} className="bg-white rounded-[16px] p-6 border border-[#f1f5f9] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] hover:-translate-y-1 hover:shadow-lg transition-all group relative">
                             <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-all">
                                <button 
                                  onClick={() => handleDelete(item.id)}
@@ -294,7 +293,7 @@ const TimetableManagementPage = () => {
                                </button>
                             </div>
                             
-                            <div className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 font-black text-xs flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                            <div className="w-10 h-10 rounded-[12px] bg-[#DBEAFE] text-[#1E40AF] font-black text-xs flex items-center justify-center mb-6 group-hover:bg-[#1E40AF] group-hover:text-white transition-all">
                                P{item.periodNumber}
                             </div>
 

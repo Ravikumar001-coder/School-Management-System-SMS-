@@ -42,6 +42,7 @@ public class AuthService {
     private final UserSessionService userSessionService;
     private final RateLimitingService rateLimitingService;
     private final UserRoleSyncService userRoleSyncService;
+    private final PasswordResetSessionRepository passwordResetSessionRepository;
     private final HttpServletRequest httpServletRequest;
 
     @Transactional
@@ -162,6 +163,62 @@ public class AuthService {
         Student student = studentRepository.findByStudentId(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
         return resetPasswordToDefault(student.getUser().getId());
+    }
+
+    @Transactional
+    public void requestPasswordReset(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+
+        String otpCode = String.format("%06d", new java.util.Random().nextInt(1000000));
+        log.info("Password reset requested for email: {} - OTP: {}", email, otpCode); // Mocking email send
+
+        PasswordResetSession session = PasswordResetSession.builder()
+                .email(email)
+                .otpCodeHash(passwordEncoder.encode(otpCode))
+                .build();
+        passwordResetSessionRepository.save(session);
+    }
+
+    @Transactional
+    public void verifyResetOtp(String email, String otpCode) {
+        PasswordResetSession session = passwordResetSessionRepository.findFirstByEmailOrderByCreatedAtDesc(email)
+                .orElseThrow(() -> new RuntimeException("No reset session found. Please request a new OTP."));
+
+        if (session.getAttemptsCount() >= 5) {
+            throw new RuntimeException("Too many failed attempts. Please request a new OTP.");
+        }
+
+        if (!passwordEncoder.matches(otpCode, session.getOtpCodeHash())) {
+            session.setAttemptsCount(session.getAttemptsCount() + 1);
+            passwordResetSessionRepository.save(session);
+            throw new RuntimeException("Invalid OTP code.");
+        }
+
+        session.setVerified(true);
+        passwordResetSessionRepository.save(session);
+    }
+
+    @Transactional
+    public void resetPassword(String email, String otpCode, String newPassword) {
+        PasswordResetSession session = passwordResetSessionRepository.findFirstByEmailOrderByCreatedAtDesc(email)
+                .orElseThrow(() -> new RuntimeException("No reset session found."));
+
+        if (!session.isVerified() || !passwordEncoder.matches(otpCode, session.getOtpCodeHash())) {
+            throw new RuntimeException("Session not verified or invalid OTP.");
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setFirstLogin(false);
+        userRepository.save(user);
+
+        // Clean up reset session and revoke all other active sessions
+        passwordResetSessionRepository.delete(session);
+        refreshTokenService.revokeAllForUser(user);
+        userSessionService.revokeAllSessions(user.getUsername());
     }
 
     private String normalizeIdentifier(String identifier) {

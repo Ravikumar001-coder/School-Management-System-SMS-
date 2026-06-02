@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SchoolOS Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "background": "#fbf8ff",
+                    "surface-container-highest": "#e3e1eb",
+                    "primary-fixed-dim": "#b8c4ff",
+                    "outline": "#757684",
+                    "neutral-bg": "#F8FAFC",
+                    "on-secondary-fixed": "#00201d",
+                    "tertiary": "#611e00",
+                    "on-background": "#1a1b22",
+                    "on-secondary-fixed-variant": "#00504a",
+                    "inverse-primary": "#b8c4ff",
+                    "text-body": "#334155",
+                    "on-primary-fixed": "#001453",
+                    "tertiary-container": "#872d00",
+                    "on-tertiary": "#ffffff",
+                    "inverse-surface": "#2f3037",
+                    "inverse-on-surface": "#f1f0fa",
+                    "secondary-fixed-dim": "#80d5cb",
+                    "secondary-container": "#99efe5",
+                    "tertiary-fixed-dim": "#ffb59a",
+                    "on-error": "#ffffff",
+                    "warning": "#B45309",
+                    "role-student": "#7C3AED",
+                    "surface-container-lowest": "#ffffff",
+                    "outline-variant": "#c4c5d5",
+                    "on-tertiary-container": "#ffa583",
+                    "surface-variant": "#e3e1eb",
+                    "on-error-container": "#93000a",
+                    "on-primary-fixed-variant": "#173bab",
+                    "on-primary": "#ffffff",
+                    "surface": "#fbf8ff",
+                    "on-surface-variant": "#444653",
+                    "error": "#ba1a1a",
+                    "secondary": "#006a63",
+                    "surface-container-low": "#f4f2fc",
+                    "surface-dim": "#dad9e3",
+                    "surface-tint": "#3755c3",
+                    "text-heading": "#0F172A",
+                    "surface-bg": "#F1F5F9",
+                    "on-surface": "#1a1b22",
+                    "on-tertiary-fixed-variant": "#802a00",
+                    "error-container": "#ffdad6",
+                    "on-primary-container": "#a8b8ff",
+                    "primary-container": "#1e40af",
+                    "tertiary-fixed": "#ffdbce",
+                    "primary": "#00288e",
+                    "surface-container-high": "#e8e7f1",
+                    "on-tertiary-fixed": "#380d00",
+                    "primary-light": "#DBEAFE",
+                    "success": "#15803D",
+                    "role-admin": "#1D4ED8",
+                    "surface-container": "#eeedf7",
+                    "on-secondary-container": "#006f67",
+                    "surface-bright": "#fbf8ff",
+                    "danger": "#B91C1C",
+                    "secondary-fixed": "#9cf2e8",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed": "#dde1ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "xl": "48px",
+                    "gutter": "16px",
+                    "base": "4px",
+                    "md": "16px",
+                    "xs": "4px",
+                    "margin": "24px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "label-xs": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "title-lg": ["Inter"],
+                    "headline-md-mobile": ["Inter"],
+                    "stat-display": ["Inter"],
+                    "body-base": ["Inter"]
+            },
+            "fontSize": {
+                    "label-xs": ["11px", {"lineHeight": "15px", "fontWeight": "500"}],
+                    "body-sm": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                    "title-lg": ["18px", {"lineHeight": "25px", "fontWeight": "600"}],
+                    "headline-md-mobile": ["20px", {"lineHeight": "26px", "fontWeight": "600"}],
+                    "stat-display": ["36px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "body-base": ["15px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .tab-active {
+            background-color: #00288e;
+            color: #ffffff;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-base selection:bg-primary-light flex flex-col min-h-screen">
+<!-- Login Container -->
+<main class="flex-grow flex flex-col px-margin py-xl max-w-md mx-auto w-full">
+<!-- Header Section -->
+<header class="flex flex-col items-center mb-xl">
+<div class="w-16 h-16 bg-primary-container rounded-xl flex items-center justify-center mb-md shadow-lg shadow-primary/10">
+<span class="material-symbols-outlined text-on-primary-container text-4xl" data-icon="school">school</span>
+</div>
+<h1 class="font-headline-md-mobile text-headline-md-mobile text-primary tracking-tight">SchoolOS</h1>
+</header>
+<!-- Greeting -->
+<section class="mb-lg">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-xs">Sign in to your account</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Access your educational dashboard and tools.</p>
+</section>
+<!-- Role Selector (Pill Tab Strip) -->
+<section class="mb-lg">
+<label class="font-label-xs text-label-xs text-on-surface-variant mb-sm block uppercase tracking-wider">Select Role</label>
+<div class="flex bg-surface-container rounded-full p-1 overflow-x-auto hide-scrollbar border border-outline-variant/30">
+<button class="role-tab flex-1 whitespace-nowrap px-4 py-2 rounded-full font-label-xs text-label-xs transition-all duration-200 tab-active" onclick="selectRole('Admin', this)">Admin</button>
+<button class="role-tab flex-1 whitespace-nowrap px-4 py-2 rounded-full font-label-xs text-label-xs text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200" onclick="selectRole('Teacher', this)">Teacher</button>
+<button class="role-tab flex-1 whitespace-nowrap px-4 py-2 rounded-full font-label-xs text-label-xs text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200" onclick="selectRole('Student', this)">Student</button>
+<button class="role-tab flex-1 whitespace-nowrap px-4 py-2 rounded-full font-label-xs text-label-xs text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200" onclick="selectRole('Parent', this)">Parent</button>
+</div>
+</section>
+<!-- Login Form -->
+<form class="space-y-md" onsubmit="event.preventDefault();">
+<!-- Email Field -->
+<div class="space-y-sm">
+<label class="font-label-xs text-label-xs text-on-surface-variant ml-1" for="username">Email / Username</label>
+<div class="relative group">
+<input class="w-full h-12 px-4 rounded-lg border border-outline-variant bg-surface-container-lowest text-body-base focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none" id="username" placeholder="name@school.edu" type="text"/>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary" data-icon="alternate_email">alternate_email</span>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-sm">
+<div class="flex justify-between items-center ml-1">
+<label class="font-label-xs text-label-xs text-on-surface-variant" for="password">Password</label>
+</div>
+<div class="relative group">
+<input class="w-full h-12 px-4 rounded-lg border border-outline-variant bg-surface-container-lowest text-body-base focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none" id="password" placeholder="••••••••" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors" onclick="togglePassword()" type="button">
+<span class="material-symbols-outlined" data-icon="visibility" id="password-toggle-icon">visibility</span>
+</button>
+</div>
+<div class="flex justify-end">
+<a class="font-label-xs text-label-xs text-primary font-semibold hover:underline" href="#">Forgot Password?</a>
+</div>
+</div>
+<!-- Submit Button -->
+<button class="w-full h-12 bg-primary text-on-primary rounded-lg font-title-lg text-title-lg flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-[0.98] transition-all hover:bg-primary/90 mt-lg" type="submit">
+                Sign In
+                <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</form>
+<!-- Footer Links -->
+<footer class="mt-auto pt-xl flex flex-col items-center gap-md">
+<button class="flex items-center gap-1 font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors group">
+<span class="font-semibold text-primary">Parent Login</span>
+<span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform" data-icon="chevron_right">chevron_right</span>
+</button>
+<div class="w-full h-px bg-outline-variant/30 mt-sm"></div>
+<p class="font-label-xs text-label-xs text-outline text-center">
+                Institutional Access Only. By signing in, you agree to our <br/>
+<a class="underline" href="#">Terms of Service</a> and <a class="underline" href="#">Privacy Policy</a>.
+            </p>
+</footer>
+</main>
+<!-- Visual Background Element (Atmospheric) -->
+<div class="fixed top-0 right-0 -z-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
+<div class="fixed bottom-0 left-0 -z-10 w-96 h-96 bg-secondary/5 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2"></div>
+<script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('password-toggle-icon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.textContent = 'visibility_off';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.textContent = 'visibility';
+            }
+        }
+
+        function selectRole(role, element) {
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.role-tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('tab-active');
+                tab.classList.add('text-on-surface-variant');
+            });
+            
+            // Add active class to clicked tab
+            element.classList.add('tab-active');
+            element.classList.remove('text-on-surface-variant');
+            
+            // Subtle feedback
+            console.log('Role selected:', role);
+        }
+
+        // Add visual haptic for the sign in button
+        const signInBtn = document.querySelector('button[type="submit"]');
+        signInBtn.addEventListener('click', () => {
+            signInBtn.classList.add('opacity-80');
+            setTimeout(() => signInBtn.classList.remove('opacity-80'), 150);
+        });
+    </script>
+</body></html>

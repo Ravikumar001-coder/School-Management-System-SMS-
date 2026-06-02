@@ -20,8 +20,8 @@ const SessionCard = ({ session, onRevoke, revoking }) => {
   };
 
   return (
-    <div className={`relative bg-white border rounded-xl p-5 shadow-sm transition-all
-      ${session.currentSession ? 'border-blue-400 ring-1 ring-blue-200' : 'border-gray-100'}`}>
+    <div className={`relative bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border p-5 transition-all
+      ${session.currentSession ? 'border-blue-400 ring-1 ring-blue-200' : 'border-[#f1f5f9]'}`}>
 
       {session.currentSession && (
         <span className="absolute top-3 right-3 text-[10px] font-bold bg-blue-100 text-blue-600 px-2 py-1 rounded-full">
@@ -133,7 +133,7 @@ const SessionDashboard = () => {
           isAdmin ? (
             <button 
               onClick={() => navigate(-1)}
-              className="bg-slate-100 text-slate-600 px-4 py-2 rounded-xl text-sm font-bold"
+              className="bg-gray-100 text-gray-700 px-6 py-3 rounded-[16px] min-h-[44px] text-sm font-bold hover:bg-gray-200"
             >
               Back
             </button>
@@ -142,7 +142,7 @@ const SessionDashboard = () => {
               <button
                 onClick={handleRevokeAll}
                 disabled={revokeAll}
-                className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition disabled:opacity-50"
+                className="flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-[16px] min-h-[44px] font-bold text-sm hover:bg-red-700 shadow-md transition disabled:opacity-50"
               >
                 {revokeAll ? 'Revoking...' : `🔒 Logout ${otherSessions.length} other device(s)`}
               </button>
@@ -152,7 +152,7 @@ const SessionDashboard = () => {
       />
 
       {/* Security tip */}
-      <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-3 mb-5 text-sm text-amber-700 flex justify-between items-center">
+      <div className="bg-amber-50 rounded-[16px] border border-amber-200 px-5 py-3 mb-5 text-sm text-amber-700 flex justify-between items-center">
         <span>
           {isAdmin 
             ? "🛡️ Administrative Mode: You are viewing all active logins. Terminating a session will instantly invalidate the user's JWT."
@@ -184,7 +184,7 @@ const SessionDashboard = () => {
 
       {/* Summary */}
       {!loading && sessions.length > 0 && (
-        <div className="mt-6 bg-gray-50 rounded-xl border border-gray-100 p-4">
+        <div className="mt-6 bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-4">
           <div className="grid grid-cols-3 gap-4 text-center text-sm">
             <div>
               <p className="text-2xl font-bold text-gray-800">{sessions.length}</p>

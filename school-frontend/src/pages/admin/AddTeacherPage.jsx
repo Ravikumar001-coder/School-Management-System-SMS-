@@ -22,9 +22,9 @@ const Field = ({ label, error, children }) => (
   </div>
 );
 
-const inputCls = `w-full border border-slate-200 rounded-xl px-4 py-3
+const inputCls = `w-full border border-slate-200 rounded-[12px] px-4 py-3
                   text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2
-                  focus:ring-indigo-500 transition-all placeholder:text-slate-300 bg-white shadow-sm`;
+                  focus:ring-[#1E40AF] transition-all placeholder:text-slate-300 bg-white shadow-sm`;
 
 const AddTeacherPage = () => {
   const navigate = useNavigate();
@@ -132,9 +132,9 @@ const AddTeacherPage = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         
         {/* SECTION 1: IDENTITY & PROFILE */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+        <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8">
           <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
-            <User size={16} className="text-indigo-600" /> Identity & Profile
+            <User size={16} className="text-[#1E40AF]" /> Identity & Profile
           </h3>
 
           <div className="flex flex-col lg:flex-row gap-8">
@@ -146,7 +146,7 @@ const AddTeacherPage = () => {
                   <User size={48} className="text-indigo-200" />
                 )}
               </div>
-              <label className="bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold cursor-pointer hover:bg-indigo-700 transition shadow-lg shadow-indigo-100">
+              <label className="bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-4 py-2 rounded-[12px] text-xs font-bold cursor-pointer transition shadow-md">
                 {uploadingPhoto ? 'Uploading...' : 'Upload Photo'}
                 <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
               </label>
@@ -181,9 +181,9 @@ const AddTeacherPage = () => {
         </div>
 
         {/* SECTION 2: PROFESSIONAL ASSIGNMENT */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+        <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8">
           <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
-            <Briefcase size={16} className="text-indigo-600" /> Professional & Employment
+            <Briefcase size={16} className="text-[#1E40AF]" /> Professional & Employment
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Field label="Department *">
@@ -222,7 +222,7 @@ const AddTeacherPage = () => {
         </div>
 
         {/* SECTION 3: PAYROLL & BANKING */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+        <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8">
           <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
             <Landmark size={16} className="text-emerald-600" /> Payroll & Banking
           </h3>
@@ -256,9 +256,9 @@ const AddTeacherPage = () => {
         </div>
 
         {/* SECTION 4: LIFECYCLE & ACADEMIC */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+        <div className="bg-white rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9] p-8">
           <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
-            <Clock size={16} className="text-indigo-600" /> Lifecycle & Assignments
+            <Clock size={16} className="text-[#1E40AF]" /> Lifecycle & Assignments
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Field label="Probation End Date">
@@ -288,15 +288,15 @@ const AddTeacherPage = () => {
         </div>
 
         {/* ACTIONS */}
-        <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+        <div className="flex justify-between items-center bg-white p-6 rounded-[16px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1),0_2px_4px_-2px_rgb(0,0,0,0.1),0_10px_15px_-3px_rgb(0,0,0,0.05)] border border-[#f1f5f9]">
           <button type="button" onClick={() => clearDraft(true)} className="text-slate-400 hover:text-rose-500 text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-colors">
             <Trash2 size={14} /> Clear Draft
           </button>
           <div className="flex gap-4">
-            <button type="button" onClick={() => navigate('/admin/teachers')} className="px-8 py-3 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all border border-slate-200">
+            <button type="button" onClick={() => navigate('/admin/teachers')} className="px-8 py-3 rounded-[12px] text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all border border-slate-200">
               Cancel
             </button>
-            <button type="submit" disabled={loading || uploadingPhoto} className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-3 rounded-xl text-sm font-black shadow-lg shadow-indigo-100 transition-all disabled:opacity-50">
+            <button type="submit" disabled={loading || uploadingPhoto} className="bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-10 py-3 rounded-[12px] text-sm font-black shadow-md transition-all disabled:opacity-50">
               {loading ? 'Hiring Staff...' : 'Finalize Onboarding'}
             </button>
           </div>
